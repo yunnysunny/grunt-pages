@@ -1,16 +1,29 @@
 module.exports = function (grunt) {
-// console.log(this);
+  // load all grunt tasks
+  require('matchdep').filterDev('grunt-*').forEach(grunt.loadNpmTasks);
+
   grunt.initConfig({
     blog: {
       options: {
-        pageSrc: 'test/fixtures/pages',
+        pageSrc: 'test/fixtures/jade/pages',
         devFolder: 'dev',
         distFolder: 'dist'
       },
       posts: {
-        layout: 'test/fixtures/layouts/post.jade',
-        src: 'test/fixtures/posts',
+        layout: 'test/fixtures/jade/layouts/post.jade',
+        src: 'test/fixtures/posts/',
         url: 'blog/posts/:title'
+      }
+    },
+    clean: ['dev'],
+    copy: {
+      styles: {
+        files: [{
+          expand: true,
+          flatten: true,
+          src: ['test/fixtures/styles/*'],
+          dest: 'dev/styles/'
+        }]
       }
     },
     simplemocha: {
@@ -45,8 +58,8 @@ module.exports = function (grunt) {
         livereload: true
       },
       src: {
-        files: ['src/**'],
-        tasks: ['jsblog']
+        files: ['test/fixtures/**'],
+        tasks: ['build']
       }
     },
     jshint: {
@@ -68,21 +81,21 @@ module.exports = function (grunt) {
         boss: true,
         trailing: true,
         eqnull: true,
-        globals:{
-          module: true
+        node: true,
+        expr: true,
+        globals: {
+          describe: true,
+          it: true,
+          before: true
         }
       },
       files: {
-        src:  ['*.js', 'test/*.js', 'task/*.js']
+        src:  ['*.js', 'test/*.js', 'tasks/*.js']
       }
     }
   });
 
   grunt.loadTasks('./tasks');
-  grunt.loadNpmTasks('grunt-contrib-jshint');
-  grunt.loadNpmTasks('grunt-contrib-watch');
-  grunt.loadNpmTasks('grunt-contrib-connect');
-  grunt.loadNpmTasks('grunt-concurrent');
-  grunt.loadNpmTasks('grunt-simple-mocha');
+  grunt.registerTask('build', ['clean', 'copy', 'blog']);
   grunt.registerTask('test', ['jshint', 'simplemocha']);
 };
