@@ -2,7 +2,7 @@ var fs = require('fs');
 var path = require('path');
 var marked = require('marked');
 var hljs = require('highlight.js');
-var colors = require('colors');
+require('colors');
 
 var templateEngines = {
   jade: require('jade'),
@@ -22,7 +22,7 @@ module.exports = function (grunt) {
       grunt.file.recurse(this.data.src, function (abspath) {
         var fileString = fs.readFileSync(abspath, 'utf8');
         if (fileString.indexOf(metadataDelimeter) === -1) {
-          grunt.log.error('Error: there is no metadata for the file at: ' + abspath)
+          grunt.log.error('Error: there is no metadata for the file at: ' + abspath);
           return;
         }
         // Separate metadata from content
@@ -32,7 +32,7 @@ module.exports = function (grunt) {
         var metadataObject = {};
 
         // Add metadata to the post's metadata object
-        metadataRows.forEach(function (metadataRow, index) {
+        metadataRows.forEach(function (metadataRow) {
           metadataObject[metadataRow.split(':')[0]] = metadataRow.split(':')[1];
         });
 
@@ -50,14 +50,16 @@ module.exports = function (grunt) {
         var dest = options.devFolder + '/' + this.data.url + '.html';
         // Replace dynamic url segments
         urlSegments.forEach(function (segment) {
-          if (segment in metadataObject) dest = dest.replace(':' + segment, escape(metadataObject[segment]));
+          if (segment in metadataObject) {
+            dest = dest.replace(':' + segment, metadataObject[segment].replace(/[^a-zA-Z0-9]/g, '-'));
+          }
         });
         metadataObject.url = dest.slice((options.devFolder + '/').length);
 
         if (this.data.layout) {
           templateEngine = templateEngines[path.extname(this.data.layout).slice(1)];
           var layoutString = fs.readFileSync(this.data.layout, 'utf8');
-          var fn = templateEngine.compile(layoutString, { filename: this.data.layout });
+          var fn = templateEngine.compile(layoutString, { pretty: true, filename: this.data.layout });
           grunt.file.write(dest, fn(metadataObject));
           grunt.log.ok('Created ' + 'post'.blue + ' at: ' + dest);
         } else {
@@ -72,7 +74,7 @@ module.exports = function (grunt) {
     if (options.pageSrc) {
       grunt.file.recurse(options.pageSrc, function (abspath, rootdir) {
         var layoutString = fs.readFileSync(abspath, 'utf8');
-        var fn = templateEngine.compile(layoutString, { filename: abspath });
+        var fn = templateEngine.compile(layoutString, { pretty: true, filename: abspath });
         var dest = options.devFolder + '/' + abspath.slice(rootdir.length + 1).replace(path.extname(abspath), '.html');
         grunt.log.ok('Created ' + 'page'.magenta + ' at: ' + dest);
         grunt.file.write(dest, fn({ posts: postsMetadata }));
