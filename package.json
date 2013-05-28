@@ -1,15 +1,15 @@
 {
-  "name": "grunt-blog",
+  "name": "grunt-pages",
   "version": "0.0.0",
   "description": "Grunt task to generate a blog.",
   "main": "Gruntfile.js",
   "dependencies": {
     "grunt": "~0.4.1",
     "jade": "~0.30.0",
-    "marked": "~0.2.8",
+    "marked": "git://github.com/ChrisWren/marked.git#0ccd05c815e5ac37678f1114dd483f33dcd68909",
     "ejs": "~0.8.4",
-    "highlight.js": "~7.3.0",
-    "colors": "~0.6.0-1"
+    "colors": "~0.6.0-1",
+    "pygmentize-bundled": "~1.0.1"
   },
   "devDependencies": {
     "grunt-simple-mocha": "~0.4.0",
@@ -34,11 +34,11 @@
   },
   "keywords": [
     "grunt",
-    "plugin",
-    "static",
-    "site",
-    "generator",
-    "workflow"
+    "gruntplugin",
+    "static site generator",
+    "workflow",
+    "jekyll",
+    "blog"
   ],
   "author": "ChrisWren, ColinWren",
   "license": "MIT"

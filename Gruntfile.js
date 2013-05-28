@@ -3,15 +3,14 @@ module.exports = function (grunt) {
   require('matchdep').filterDev('grunt-*').forEach(grunt.loadNpmTasks);
 
   grunt.initConfig({
-    blog: {
+    pages: {
       options: {
-        pageSrc: 'test/fixtures/jade/pages',
-        devFolder: 'dev',
-        distFolder: 'dist'
+        pageSrc: 'test/fixtures/ejs/pages'
       },
       posts: {
-        layout: 'test/fixtures/jade/layouts/post.jade',
         src: 'test/fixtures/posts/',
+        dest: 'dev',
+        layout: 'test/fixtures/ejs/layouts/post.ejs',
         url: 'blog/posts/:title'
       }
     },
@@ -64,7 +63,6 @@ module.exports = function (grunt) {
     },
     jshint: {
       options: {
-        curly: true,
         camelcase: true,
         bitwise: true,
         indent: 2,
@@ -83,6 +81,7 @@ module.exports = function (grunt) {
         eqnull: true,
         node: true,
         expr: true,
+        evil: true,
         globals: {
           describe: true,
           it: true,
@@ -96,6 +95,7 @@ module.exports = function (grunt) {
   });
 
   grunt.loadTasks('./tasks');
-  grunt.registerTask('build', ['clean', 'copy', 'blog']);
+  grunt.registerTask('build', ['clean', 'copy', 'pages']);
   grunt.registerTask('test', ['jshint', 'simplemocha']);
+  grunt.registerTask('default', ['concurrent']);
 };
