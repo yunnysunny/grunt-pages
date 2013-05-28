@@ -9,7 +9,8 @@
     "marked": "git://github.com/ChrisWren/marked.git#0ccd05c815e5ac37678f1114dd483f33dcd68909",
     "ejs": "~0.8.4",
     "colors": "~0.6.0-1",
-    "pygmentize-bundled": "~1.0.1"
+    "pygmentize-bundled": "~1.0.1",
+    "js-yaml": "~2.0.5"
   },
   "devDependencies": {
     "grunt-simple-mocha": "~0.4.0",
