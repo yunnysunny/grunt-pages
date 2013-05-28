@@ -12,13 +12,13 @@ before(function (done) {
 describe('When the grunt blog task is run', function () {
 
   it('creates posts in the location specified by the url', function() {
-    fs.existsSync('dev/blog/posts/Post1.html').should.be.ok;
-    fs.existsSync('dev/blog/posts/Post2.html').should.be.ok;
+    fs.existsSync('dev/blog/posts/Post-1.html').should.be.ok;
+    fs.existsSync('dev/blog/posts/Post-2.html').should.be.ok;
   });
 
   it('creates posts using the markdown content', function () {
-    fs.readFileSync('dev/blog/posts/Post1.html', 'utf8').should.equal(fs.readFileSync('test/output/blog/posts/Post1.html', 'utf8'));
-    fs.readFileSync('dev/blog/posts/Post2.html', 'utf8').should.equal(fs.readFileSync('test/output/blog/posts/Post2.html', 'utf8'));
+    fs.readFileSync('dev/blog/posts/Post-1.html', 'utf8').should.equal(fs.readFileSync('test/output/blog/posts/Post1.html', 'utf8'));
+    fs.readFileSync('dev/blog/posts/Post-2.html', 'utf8').should.equal(fs.readFileSync('test/output/blog/posts/Post2.html', 'utf8'));
   });
 
   it('creates pages in the location specified by the url', function() {
