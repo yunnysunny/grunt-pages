@@ -1,78 +1,84 @@
-# grunt-blog
-> Grunt task to create a blog using markdown and templates
+# grunt-pages
+> Grunt task to create pages using markdown and templates
 
 ## Getting Started
 If you haven't used grunt before, be sure to check out the [Getting Started](http://gruntjs.com/getting-started) guide, as it explains how to create a gruntfile as well as install and use grunt plugins. Once you're familiar with that process, install this plugin with this command:
 ```shell
-npm install grunt-blog --save-dev
+npm install grunt-pages --save-dev
 ```
 
 Then add this line to your project's `Gruntfile.js` gruntfile:
 
 ```javascript
-grunt.loadNpmTasks('grunt-blog');
+grunt.loadNpmTasks('grunt-pages');
 ```
 
 ## Documentation
-Here is the minimal config to create a blog using `grunt-blog`:
+### Sample config
+Here is a sample config to create a blog using `grunt-pages`:
 ```js
-blog: {
-  posts: {
-    src: 'src/posts',
-    layout: 'src/layouts/post.jade',
-    url: 'blog/posts/:title'
-  }
-}
-```
-Here is the maximum config:
-```js
-blog: {
+pages: {
   options: {
-    pageSrc: 'src/pages',
-    devFolder: 'dev',
-    distFolder: 'dist'
+    pageSrc: 'src/pages'
   },
   posts: {
     src: 'src/posts',
-    layout: 'src/layouts/post.jade',
-    url: 'blog/posts/:title'
+    dest: 'dev',
+    layout: 'src/layouts/post.ejs',
+    url: 'blog/posts/:title' 
   }
 }
 ```
-### Formatting blog posts
-Blog posts are written in markdown and include a metadata section at the top to provide information for listing blog posts, the url, and timestamp.
+### Formatting posts
+Posts are written in markdown and include a metadata section at the top to provide information about the post. There are two accepted metadata formats, YAML and a JavaScript object. Here is a YAML example:
+```yaml
+----
+title:   The Versace Sofa Thesis Vol. I
+date:    2010-10-4
+author:  Pusha T
+----
+```
+The YAML data is parsed into a JavaScript object and passed to the layout template to be rendered.
+
+Here is a JavaScript object example:
+```js
+{
+  title: "Art Ballin': Explorations in New-Weird-American Expressionism",
+  date: "2013-2-22",
+  author: "Highroller, Jody"
+}
+```
+The only property that is not interpreted literally is the `date`. It is used as a `dateString` when constructing a [Date object](https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Date) in JavaScript, and must be in a [parseable format](https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Date/parse). For both YAML and JavaScript object metadata, the JavaScript `Date` object is available in the layout.
+
+*Note: posts have GitHub flavoured markdown syntax highlighting using [pygments](http://pygments.org/).*
 
 ### Required properties
 #### src
 Type: `string`
 
-The source directory where the blog posts are located.
+The directory where the source posts are located.
+
+#### dest
+Type: `string`
+
+The directory where pages are generated. 
+
 #### layout
 Type: `string`
 
-The layout for a blog post. We currently support [jade](https://github.com/visionmedia/jade) and [ejs](https://github.com/visionmedia/ejs) templates. The post content will be stored in a `content` variable to be rendered in the layout template. Here is an example layout template;
+The [jade](https://github.com/visionmedia/jade) or [ejs](https://github.com/visionmedia/ejs) layout template for each post. The post content will be stored in a `content` variable to be rendered in the layout template. [Here](https://github.com/ChrisWren/grunt-pages/blob/master/test/fixtures/ejs/layouts/post.ejs) is an example post layout template.
 
 #### url
 Type: `string`
 
-This is the url of the blog post which will appear on your web page. This string takes variables as parameters using the '/:variable' syntax. This variable(s) must correspond to the posts metadata.
+The url format of each post. The string takes variables as parameters using the `:variable` syntax. Variable(s) specified in the url are required in each post's metadata.
 
 ### Options
 
 #### pageSrc
 Type: `string`
 
-This is folder where the pages of you website are located. These pages can use the post metadata to display a list of posts. All of the files in this folder.
-
-#### devFolder
-Type: `string`
-
-This is folder where the development version of the blog is generated. 
-
-### distFolder
-Type: `string`
-
-This is folder where the distribution version of the blog is generated. 
+The folder where the source pages of you website are located. These pages have access to the posts' metadata in a `posts` array. All of the files in this folder are generated in the `dest` folder maintaining the same relative path from `pageSrc`.
 
 # Changelog
 
