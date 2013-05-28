@@ -57,7 +57,7 @@ module.exports = function (grunt) {
         livereload: true
       },
       src: {
-        files: ['test/fixtures/**'],
+        files: ['tasks/*.js', 'test/fixtures/**'],
         tasks: ['build']
       }
     },
