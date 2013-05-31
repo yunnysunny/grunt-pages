@@ -20,45 +20,40 @@ module.exports = function (grunt) {
   grunt.registerMultiTask('pages', 'Creates pages from markdown and templates.', function () {
     done = this.async();
     options = this.options();
+    var numPosts = grunt.file.expand({ filter: 'isFile' }, this.data.src + '/**').length;
+    var parsedPosts = 0;
 
-    if (this.data.src) {
-      var numPosts = grunt.file.expand({ filter: 'isFile' }, this.data.src + '/**').length;
-      var parsedPosts = 0;
+    grunt.file.recurse(this.data.src, function (abspath) {
+      var post = parsePostData(abspath);
+      // Parse post using marked and pygmentize for highlighting
+      marked(post.markdown, {
+        highlight: function (code, lang, callback) {
+          pygmentize({ lang: lang, format: 'html' }, code, function (err, result) {
+            callback(err, result.toString());
+          });
+        },
+        gfm: true
+      }, function (err, content) {
+        if (err) throw err;
+        delete post.markdown;
+        post.content = content;
+        postCollection.push(post);
 
-      grunt.file.recurse(this.data.src, function (abspath) {
-        var post = parsePostData(abspath);
-        // Parse post using marked and pygmentize for highlighting
-        marked(post.markdown, {
-          highlight: function (code, lang, callback) {
-            pygmentize({ lang: lang, format: 'html' }, code, function (err, result) {
-              callback(err, result.toString());
-            });
-          },
-          gfm: true
-        }, function (err, content) {
-          if (err) throw err;
-          delete post.markdown;
-          post.content = content;
-          post.dest = getPostDest(this, post, abspath);
-          post.url = post.dest.slice((this.data.dest + '/').length);
-          postCollection.push(post);
-
-          // Once all the source posts are parsed, we can generate the html posts
-          if (++parsedPosts === numPosts) {
-            generatePosts(this, postCollection);
-            // If the user wants to inject post data into a page, render the page templates with the posts' data
-            if (options.pageSrc) {
-              generatePages(this, postCollection);
-            }
-            done();
+        // Once all the source posts are parsed, we can generate the html posts
+        if (++parsedPosts === numPosts) {
+          postCollection = generatePosts(this, postCollection, abspath);
+          // If the user wants to inject post data into a page, render the page templates with the posts' data
+          if (options.pageSrc) {
+            generatePages(this, postCollection);
           }
-        }.bind(this));
+          done();
+        }
       }.bind(this));
-    }
+    }.bind(this));
   });
 
   /**
-   * Parses the metadata and content from a post
+   * Parses the metadata and markdown from a post
    * @param  {String} abspath
    * @return {Object}
    */
@@ -104,11 +99,11 @@ module.exports = function (grunt) {
     if (that.data.url[0] !== ':') dynamicUrlSegments.shift();
     dest = that.data.dest + '/' + that.data.url + '.html';
     // Replace dynamic url segments
-    dynamicUrlSegments.forEach(function (segment) {
-      if (segment in postData) {
-        dest = dest.replace(':' + segment, postData[segment].replace(/[^a-zA-Z0-9]/g, '-'));
+    dynamicUrlSegments.forEach(function (urlSegment) {
+      if (urlSegment in postData) {
+        dest = dest.replace(':' + urlSegment, postData[urlSegment].replace(/[^a-zA-Z0-9]/g, '-'));
       } else {
-        grunt.log.error('Required ' + segment.red + ' attribute not found in ' + 'post'.blue + 'metadata at ' + abspath + '.');
+        grunt.log.error('Error: required ' + urlSegment.red + ' attribute not found in ' + 'post'.blue + 'metadata at ' + abspath + '.');
         return;
       }
     });
@@ -117,43 +112,90 @@ module.exports = function (grunt) {
 
   /**
    * Generates posts based on the provided data
-   * @param  {Object} postsData
-   * @return {null}
+   * @param  {Object} postCollection
+   * @return {Array}
    */
-  function generatePosts (that, postsData) {
-    if (that.data.layout) {
-      // Sort posts by descending date
-      postsData.sort(function (a, b) {
-        return b.date - a.date;
-      });
+  function generatePosts (that, postCollection, abspath) {
 
-      postsData.forEach(function (metadata) {
-        // Determine the template engine based on the file's extention name
-        templateEngine = templateEngines[path.extname(that.data.layout).slice(1)];
-        var layoutString = fs.readFileSync(that.data.layout, 'utf8');
-        var fn = templateEngine.compile(layoutString, { pretty: true, filename: that.data.layout });
-        grunt.file.write(metadata.dest, fn(metadata));
-        grunt.log.ok('Created ' + 'post'.blue + ' at: ' + metadata.dest);
-      });
-    } else {
-      grunt.log.error('Please specify a post layout.');
-      done();
-    }
+    // Sort posts by descending date
+    postCollection.sort(function (a, b) {
+      return b.date - a.date;
+    });
+
+    postCollection.forEach(function (post) {
+      var dest = getPostDest(that, post, abspath);
+      post.url = dest.slice((that.data.dest + '/').length);
+
+      // Determine the template engine based on the file's extention name
+      templateEngine = templateEngines[path.extname(that.data.layout).slice(1)];
+      var layoutString = fs.readFileSync(that.data.layout, 'utf8');
+      var fn = templateEngine.compile(layoutString, { pretty: true, filename: that.data.layout });
+      grunt.file.write(dest, fn({ post: post }));
+      grunt.log.ok('Created '.green + 'post'.blue + ' at: ' + dest);
+    });
+    return postCollection;
   }
 
   /**
    * Genereates pages using the posts' data
-   * @param  {Object} postsData
+   * @param  {Object} postCollection
    * @return {null}
    */
-  function generatePages (that, postsData) {
+  function generatePages (that, postCollection) {
+    var listPage;
+    if (options.pagination) {
+      paginate(that, postCollection);
+      listPage = options.pagination.listPage;
+    }
     grunt.file.recurse(options.pageSrc, function (abspath, rootdir) {
-      var layoutString = fs.readFileSync(abspath, 'utf8');
-      var fn = templateEngine.compile(layoutString, { pretty: true, filename: abspath });
-      var dest = that.data.dest + '/' +
-                 abspath.slice(rootdir.length + 1).replace(path.extname(abspath), '.html');
-      grunt.log.ok('Created ' + 'page'.magenta + ' at: ' + dest);
-      grunt.file.write(dest, fn({ posts: postsData }));
+      if (abspath !== listPage) {
+        var layoutString = fs.readFileSync(abspath, 'utf8');
+        var fn = templateEngine.compile(layoutString, { pretty: true, filename: abspath });
+        var dest = that.data.dest + '/' +
+                   abspath.slice(rootdir.length + 1).replace(path.extname(abspath), '.html');
+        grunt.log.ok('Created '.green + 'page'.magenta + ' at: ' + dest);
+        grunt.file.write(dest, fn({ posts: postCollection }));
+      }
+    });
+  }
+
+  /**
+   * Creates paginated pages with a number of posts per page
+   * @param  {Object} that
+   * @param  {Array} postCollection
+   * @return {null}
+   */
+  function paginate (that, postCollection) {
+    var postGroups = [];
+    var postGroup;
+    var postsPerPage = options.pagination.postsPerPage;
+    var listPage = options.pagination.listPage;
+    var baseUrl = path.dirname(listPage.slice(options.pageSrc.length + 1).replace(path.extname(listPage)));
+    console.log(baseUrl);
+    var i = 0;
+
+    while ((postGroup = postCollection.slice( i * postsPerPage, (i + 1) * postsPerPage)).length) {
+      postGroups.push(postGroup);
+      i++;
+    }
+
+    var layoutString = fs.readFileSync(listPage, 'utf8');
+    var fn = templateEngine.compile(layoutString, { pretty: true, filename: listPage });
+
+    postGroups.forEach(function (postGroup, pageNumber) {
+      var dest = that.data.dest + '/' ;
+      if (pageNumber === 0) {
+        dest += listPage.slice(options.pageSrc.length + 1).replace(path.extname(listPage), '.html');
+      } else {
+        dest += listPage.slice(options.pageSrc.length + 1).replace(path.basename(listPage), 'page/' + pageNumber + '/index.html');
+      }
+      grunt.file.write(dest, fn({
+        baseUrl: baseUrl,
+        pageNumber: pageNumber,
+        numPages: postGroups.length,
+        posts: postGroup
+      }));
+      grunt.log.ok('Created '.green + 'paginated'.rainbow + ' page'.magenta + ' at: ' + dest);
     });
   }
 };
