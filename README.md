@@ -54,29 +54,29 @@ The only property that is not interpreted literally is the `date`. It is used as
 
 ### Required properties
 #### src
-Type: `string`
+Type: `String`
 
 The directory where the source posts are located.
 
 #### dest
-Type: `string`
+Type: `String`
 
 The directory where pages are generated. 
 
 #### layout
-Type: `string`
+Type: `String`
 
 The [jade](https://github.com/visionmedia/jade) or [ejs](https://github.com/visionmedia/ejs) layout template for each post. The post metadata will be stored in a `post` object to be rendered in the layout template. [Here](https://github.com/ChrisWren/grunt-pages/blob/master/test/fixtures/ejs/layouts/post.ejs) is an example post layout template.
 
 #### url
-Type: `string`
+Type: `String`
 
 The url format of each post. The string takes variables as parameters using the `:variable` syntax. Variable(s) specified in the url are required in each post's metadata.
 
 ### Options
 
 #### pageSrc
-Type: `string`
+Type: `String`
 
 The folder where the source pages of your website are located. These pages have access to the posts' content and metadata in a `posts` array. All of the files in this folder are generated in the `dest` folder maintaining the same relative path from `pageSrc`.
 
