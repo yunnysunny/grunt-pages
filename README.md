@@ -66,7 +66,7 @@ The directory where pages are generated.
 #### layout
 Type: `string`
 
-The [jade](https://github.com/visionmedia/jade) or [ejs](https://github.com/visionmedia/ejs) layout template for each post. The post content will be stored in a `content` variable to be rendered in the layout template. [Here](https://github.com/ChrisWren/grunt-pages/blob/master/test/fixtures/ejs/layouts/post.ejs) is an example post layout template.
+The [jade](https://github.com/visionmedia/jade) or [ejs](https://github.com/visionmedia/ejs) layout template for each post. The post metadata will be stored in a `post` object to be rendered in the layout template. [Here](https://github.com/ChrisWren/grunt-pages/blob/master/test/fixtures/ejs/layouts/post.ejs) is an example post layout template.
 
 #### url
 Type: `string`
@@ -78,7 +78,35 @@ The url format of each post. The string takes variables as parameters using the 
 #### pageSrc
 Type: `string`
 
-The folder where the source pages of you website are located. These pages have access to the posts' metadata in a `posts` array. All of the files in this folder are generated in the `dest` folder maintaining the same relative path from `pageSrc`.
+The folder where the source pages of your website are located. These pages have access to the posts' content and metadata in a `posts` array. All of the files in this folder are generated in the `dest` folder maintaining the same relative path from `pageSrc`.
+
+#### pagination
+Type: `Object`
+
+An object containing config for pagination.
+
+##### pagination.postsPerPage
+Type: `Number`
+
+The number of posts each list page will contain.
+
+##### pagination.listPage
+Type: `String`
+
+The location of the layout which is used for each list page. The layout has access to the following variables:
+
+###### pageNumber
+Type: `Number`
+
+The page number of the current page.
+###### numPages
+Type: `Number`
+
+The total number of list pages.
+###### posts
+Type: `Array` of `Object`s
+
+An array of post objects which contain the content and metadata for each post.
 
 # Changelog
 
