@@ -4,14 +4,27 @@ module.exports = function (grunt) {
 
   grunt.initConfig({
     pages: {
-      options: {
-        pageSrc: 'test/fixtures/ejs/pages'
-      },
       posts: {
         src: 'test/fixtures/posts/',
         dest: 'dev',
         layout: 'test/fixtures/ejs/layouts/post.ejs',
-        url: 'blog/posts/:title'
+        url: 'blog/posts/:title',
+        options: {
+          pageSrc: 'test/fixtures/ejs/pages'
+        }
+      },
+      paginated: {
+        src: 'test/fixtures/posts/',
+        dest: 'dev',
+        layout: 'test/fixtures/jade/layouts/post.jade',
+        url: 'blog/posts/:title',
+        options: {
+          pageSrc: 'test/fixtures/jade/pages',
+          pagination: {
+            postsPerPage: 1,
+            listPage: 'test/fixtures/jade/pages/blog/index.jade'
+          }
+        }
       }
     },
     clean: ['dev'],
@@ -95,7 +108,7 @@ module.exports = function (grunt) {
   });
 
   grunt.loadTasks('./tasks');
-  grunt.registerTask('build', ['clean', 'copy', 'pages']);
+  grunt.registerTask('build', ['clean', 'copy', 'pages:paginated']);
   grunt.registerTask('test', ['jshint', 'simplemocha']);
   grunt.registerTask('default', ['concurrent']);
 };
