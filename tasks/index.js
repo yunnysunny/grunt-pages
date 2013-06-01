@@ -122,17 +122,23 @@ module.exports = function (grunt) {
       return b.date - a.date;
     });
 
+    // First determine all of the posts' urls
     postCollection.forEach(function (post) {
       var dest = getPostDest(that, post, abspath);
       post.url = dest.slice((that.data.dest + '/').length);
+    });
 
+    // Then create the posts
+    postCollection.forEach(function (post) {
+      var dest = getPostDest(that, post, abspath);
       // Determine the template engine based on the file's extention name
       templateEngine = templateEngines[path.extname(that.data.layout).slice(1)];
       var layoutString = fs.readFileSync(that.data.layout, 'utf8');
       var fn = templateEngine.compile(layoutString, { pretty: true, filename: that.data.layout });
-      grunt.file.write(dest, fn({ post: post }));
+      grunt.file.write(dest, fn({ post: post, posts: postCollection }));
       grunt.log.ok('Created '.green + 'post'.blue + ' at: ' + dest);
     });
+
     return postCollection;
   }
 
