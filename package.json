@@ -6,11 +6,11 @@
   "dependencies": {
     "grunt": "~0.4.1",
     "jade": "~0.30.0",
-    "marked": "git://github.com/ChrisWren/marked.git",
     "ejs": "~0.8.4",
     "colors": "~0.6.0-1",
     "pygmentize-bundled": "~1.0.1",
-    "js-yaml": "~2.0.5"
+    "js-yaml": "~2.0.5",
+    "marked": "~0.2.9"
   },
   "devDependencies": {
     "grunt-simple-mocha": "~0.4.0",
