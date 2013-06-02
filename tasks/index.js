@@ -25,6 +25,10 @@ module.exports = function (grunt) {
 
     grunt.file.recurse(this.data.src, function (abspath) {
       var post = parsePostData(abspath);
+      if (post.markdown.length <= 1) {
+        grunt.log.error('Error:'.red + ' the following ' + 'post'.blue + ' is blank, please add some content to it or delete it: ' + abspath.red);
+        done();
+      }
       // Parse post using marked and pygmentize for highlighting
       marked(post.markdown, {
         highlight: function (code, lang, callback) {
