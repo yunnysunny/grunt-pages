@@ -97,17 +97,21 @@ module.exports = function (grunt) {
    * @return {String}
    */
   function getPostDest (that, postData, abspath) {
-    var dest;
-    var dynamicUrlSegments = that.data.url.split('/:');
-    // Ignore the static section of the url
-    if (that.data.url[0] !== ':') dynamicUrlSegments.shift();
-    dest = that.data.dest + '/' + that.data.url + '.html';
+    var dest = that.data.dest + '/' + that.data.url + '.html';
+    var dynamicUrlSegments = that.data.url.split('/')
+    .filter(function (urlSegment) {
+      return urlSegment.indexOf(':') !== -1;
+    })
+    .map(function (urlSegment) {
+      return urlSegment.slice(urlSegment.indexOf(':') + 1);
+    });
+
     // Replace dynamic url segments
     dynamicUrlSegments.forEach(function (urlSegment) {
       if (urlSegment in postData) {
         dest = dest.replace(':' + urlSegment, postData[urlSegment].replace(/[^a-zA-Z0-9]/g, '-'));
       } else {
-        grunt.log.error('Error: required ' + urlSegment.red + ' attribute not found in ' + 'post'.blue + 'metadata at ' + abspath + '.');
+        grunt.log.error('Error: required ' + urlSegment.red + ' attribute not found in ' + 'post'.blue + ' metadata at ' + abspath + '.');
         return;
       }
     });
