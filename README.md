@@ -1,4 +1,7 @@
 # grunt-pages
+[![NPM version](https://badge.fury.io/js/grunt-pages.png)](http://badge.fury.io/js/grunt-pages)  
+[![Dependency Status](https://gemnasium.com/ChrisWren/grunt-pages.png)](https://gemnasium.com/ChrisWren/grunt-pages)   
+![Travis Status](https://travis-ci.org/ChrisWren/grunt-pages.png)  
 > Grunt task to create pages using markdown and templates
 
 ## Getting Started
