@@ -10,7 +10,8 @@ module.exports = function (grunt) {
         layout: 'test/fixtures/ejs/layouts/post.ejs',
         url: 'blog/posts/:title',
         options: {
-          pageSrc: 'test/fixtures/ejs/pages'
+          pageSrc: 'test/fixtures/ejs/pages',
+          data: 'test/fixtures/data/data.json'
         }
       },
       paginated: {
