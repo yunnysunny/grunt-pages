@@ -45,10 +45,14 @@ module.exports = function (grunt) {
 
         // Once all the source posts are parsed, we can generate the html posts
         if (++parsedPosts === numPosts) {
-          postCollection = generatePosts(this, postCollection, abspath);
+          var templateData = { posts: postCollection };
+          if (options.data) {
+            templateData.fileData = JSON.parse(fs.readFileSync(options.data));
+          }
+          postCollection = generatePosts(this, templateData, abspath);
           // If the user wants to inject post data into a page, render the page templates with the posts' data
           if (options.pageSrc) {
-            generatePages(this, postCollection);
+            generatePages(this, templateData);
           }
           done();
         }
@@ -92,6 +96,7 @@ module.exports = function (grunt) {
 
   /**
    * Returns the post destination based on the url property and postData
+   * @param  {Object} that
    * @param  {Object} postData
    * @param  {String} abspath
    * @return {String}
@@ -120,10 +125,12 @@ module.exports = function (grunt) {
 
   /**
    * Generates posts based on the provided data
-   * @param  {Object} postCollection
+   * @param  {Object} that
+   * @param  {Object} templateData
    * @return {Array}
    */
-  function generatePosts (that, postCollection, abspath) {
+  function generatePosts (that, templateData, abspath) {
+    var postCollection = templateData.posts;
 
     // Sort posts by descending date
     postCollection.sort(function (a, b) {
@@ -138,13 +145,15 @@ module.exports = function (grunt) {
 
     // Then create the posts
     postCollection.forEach(function (post) {
+      templateData.post = post;
       var dest = getPostDest(that, post, abspath);
       // Determine the template engine based on the file's extention name
       templateEngine = templateEngines[path.extname(that.data.layout).slice(1)];
       var layoutString = fs.readFileSync(that.data.layout, 'utf8');
       var fn = templateEngine.compile(layoutString, { pretty: true, filename: that.data.layout });
-      grunt.file.write(dest, fn({ post: post, posts: postCollection }));
+      grunt.file.write(dest, fn(templateData));
       grunt.log.ok('Created '.green + 'post'.blue + ' at: ' + dest);
+      delete templateData.post;
     });
 
     return postCollection;
@@ -152,10 +161,11 @@ module.exports = function (grunt) {
 
   /**
    * Genereates pages using the posts' data
-   * @param  {Object} postCollection
+   * @param  {Object} that
+   * @param  {Object} templateData
    * @return {null}
    */
-  function generatePages (that, postCollection) {
+  function generatePages (that, templateData) {
     var listPage;
     if (options.pagination) {
       paginate(that, postCollection);
@@ -168,7 +178,7 @@ module.exports = function (grunt) {
         var dest = that.data.dest + '/' +
                    abspath.slice(rootdir.length + 1).replace(path.extname(abspath), '.html');
         grunt.log.ok('Created '.green + 'page'.magenta + ' at: ' + dest);
-        grunt.file.write(dest, fn({ posts: postCollection }));
+        grunt.file.write(dest, fn(templateData));
       }
     });
   }
@@ -185,9 +195,8 @@ module.exports = function (grunt) {
     var postsPerPage = options.pagination.postsPerPage;
     var listPage = options.pagination.listPage;
     var baseUrl = path.dirname(listPage.slice(options.pageSrc.length + 1).replace(path.extname(listPage)));
-    console.log(baseUrl);
-    var i = 0;
 
+    var i = 0;
     while ((postGroup = postCollection.slice( i * postsPerPage, (i + 1) * postsPerPage)).length) {
       postGroups.push(postGroup);
       i++;
