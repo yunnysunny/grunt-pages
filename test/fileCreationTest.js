@@ -43,16 +43,16 @@ describe('When the grunt blog task is run with pagination', function () {
   });
 
   it('creates pages in the expected location', function() {
-    fs.existsSync('dev/blog/index.html').should.be.ok;
-    fs.existsSync('dev/blog/page/1/index.html').should.be.ok;
+    fs.existsSync('dev/index.html').should.be.ok;
+    fs.existsSync('dev/page/1/index.html').should.be.ok;
   });
 
   it('creates the root list page', function () {
-    fs.readFileSync('dev/blog/index.html', 'utf8').should.equal(fs.readFileSync('test/output/blog/paginatedIndex.html', 'utf8'));
+    fs.readFileSync('dev/index.html', 'utf8').should.equal(fs.readFileSync('test/output/blog/paginatedIndex.html', 'utf8'));
   });
 
   it('creates the paginated list page', function () {
-    fs.readFileSync('dev/blog/page/1/index.html', 'utf8').should.equal(fs.readFileSync('test/output/blog/page/1/index.html', 'utf8'));
+    fs.readFileSync('dev/page/1/index.html', 'utf8').should.equal(fs.readFileSync('test/output/blog/page/1/index.html', 'utf8'));
   });
 
 });
