@@ -29,6 +29,7 @@ module.exports = function (grunt) {
         grunt.log.error('Error:'.red + ' the following ' + 'post'.blue + ' is blank, please add some content to it or delete it: ' + abspath.red);
         done();
       }
+
       // Parse post using marked and pygmentize for highlighting
       marked(post.markdown, {
         highlight: function (code, lang, callback) {
@@ -50,10 +51,15 @@ module.exports = function (grunt) {
             templateData.fileData = JSON.parse(fs.readFileSync(options.data));
           }
           postCollection = generatePosts(this, templateData, abspath);
-          // If the user wants to inject post data into a page, render the page templates with the posts' data
+
           if (options.pageSrc) {
             generatePages(this, templateData);
           }
+
+          if (options.pagination) {
+            paginate(this, postCollection);
+          }
+
           done();
         }
       }.bind(this));
@@ -69,14 +75,17 @@ module.exports = function (grunt) {
     var fileString = fs.readFileSync(abspath, 'utf8');
     var postData = {};
     try {
+
       // Parse JSON metadata
       if (fileString.indexOf('{') === 0) {
         postData = eval('(' + fileString.substr(0, fileString.indexOf('}') + 1) + ')');
         postData.date = new Date(postData.date);
         postData.markdown = fileString.slice(fileString.indexOf('}') + 1);
+
       // Parse YAML metadata
       } else if (fileString.indexOf('----') === 0) {
         postData = jsYAML.load(fileString.split('----')[1]);
+
         // Extract the content by removing the metadata section
         var sections = fileString.split('----');
         sections.shift();
@@ -117,7 +126,7 @@ module.exports = function (grunt) {
         dest = dest.replace(':' + urlSegment, postData[urlSegment].replace(/[^a-zA-Z0-9]/g, '-'));
       } else {
         grunt.log.error('Error: required ' + urlSegment.red + ' attribute not found in ' + 'post'.blue + ' metadata at ' + abspath + '.');
-        return;
+        done();
       }
     });
     return dest;
@@ -147,6 +156,7 @@ module.exports = function (grunt) {
     postCollection.forEach(function (post) {
       templateData.post = post;
       var dest = getPostDest(that, post, abspath);
+
       // Determine the template engine based on the file's extention name
       templateEngine = templateEngines[path.extname(that.data.layout).slice(1)];
       var layoutString = fs.readFileSync(that.data.layout, 'utf8');
@@ -160,7 +170,7 @@ module.exports = function (grunt) {
   }
 
   /**
-   * Genereates pages using the posts' data
+   * Generates pages using the posts' data
    * @param  {Object} that
    * @param  {Object} templateData
    * @return {null}
@@ -168,10 +178,10 @@ module.exports = function (grunt) {
   function generatePages (that, templateData) {
     var listPage;
     if (options.pagination) {
-      paginate(that, postCollection);
       listPage = options.pagination.listPage;
     }
     grunt.file.recurse(options.pageSrc, function (abspath, rootdir) {
+      // Don't generate the paginated list page
       if (abspath !== listPage) {
         var layoutString = fs.readFileSync(abspath, 'utf8');
         var fn = templateEngine.compile(layoutString, { pretty: true, filename: abspath });
@@ -184,7 +194,7 @@ module.exports = function (grunt) {
   }
 
   /**
-   * Creates paginated pages with a number of posts per page
+   * Creates paginated pages with a specified number of posts per page
    * @param  {Object} that
    * @param  {Array} postCollection
    * @return {null}
@@ -194,7 +204,11 @@ module.exports = function (grunt) {
     var postGroup;
     var postsPerPage = options.pagination.postsPerPage;
     var listPage = options.pagination.listPage;
-    var baseUrl = path.dirname(listPage.slice(options.pageSrc.length + 1).replace(path.extname(listPage)));
+    var baseUrl = '';
+
+    if (options.pageSrc) {
+      baseUrl = path.dirname(listPage.slice(options.pageSrc.length + 1).replace(path.extname(listPage)));
+    }
 
     var i = 0;
     while ((postGroup = postCollection.slice( i * postsPerPage, (i + 1) * postsPerPage)).length) {
@@ -207,11 +221,31 @@ module.exports = function (grunt) {
 
     postGroups.forEach(function (postGroup, pageNumber) {
       var dest = that.data.dest + '/' ;
-      if (pageNumber === 0) {
-        dest += listPage.slice(options.pageSrc.length + 1).replace(path.extname(listPage), '.html');
-      } else {
-        dest += listPage.slice(options.pageSrc.length + 1).replace(path.basename(listPage), 'page/' + pageNumber + '/index.html');
+
+      // If the pageSrc option is used generate list pages relative to pageSrc
+      if (options.pageSrc) {
+        if (listPage.indexOf(options.pageSrc) !== -1) {
+          dest += listPage.slice(options.pageSrc.length + 1);
+        } else {
+          grunt.log.error('Error: the listPage must be within the pageSrc directory');
+          done();
+        }
       }
+
+      if (pageNumber === 0) {
+        if (!options.pageSrc) {
+          dest += 'index.html';
+        } else {
+          dest = dest.replace(path.extname(listPage), '.html');
+        }
+      } else {
+        if (!options.pageSrc) {
+          dest += 'page/' + pageNumber + '/index.html';
+        } else {
+          dest = dest.replace(path.basename(listPage), 'page/' + pageNumber + '/index.html');
+        }
+      }
+
       grunt.file.write(dest, fn({
         baseUrl: baseUrl,
         pageNumber: pageNumber,
