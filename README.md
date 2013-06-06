@@ -41,19 +41,19 @@ date:    2010-10-4
 author:  Pusha T
 ----
 ```
-The YAML data is parsed into a JavaScript object and passed to the layout template to be rendered.
+The YAML data is parsed into a JavaScript object and passed to the post's template to be rendered.
 
 Here is a JavaScript object example:
 ```js
 {
-  title: "Art Ballin': Explorations in New-Weird-American Expressionism",
-  date: "2013-2-22",
-  author: "Highroller, Jody"
+  title: 'Art Ballin': Explorations in New-Weird-American Expressionism',
+  date: '2013-2-22',
+  author: 'Highroller, Jody'
 }
 ```
 The only property that is not interpreted literally is the `date`. It is used as a `dateString` when constructing a [Date object](https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Date) in JavaScript, and must be in a [parseable format](https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Date/parse). For both YAML and JavaScript object metadata, the JavaScript `Date` object is available in the layout.
 
-*Note: posts have GitHub flavoured markdown syntax highlighting using [pygments](http://pygments.org/).*
+For adding code to your posts, grunt-pages has [GitHub flavoured markdown](https://help.github.com/articles/github-flavored-markdown) syntax highlighting using [pygments](http://pygments.org/).
 
 ### Required properties
 #### src
@@ -69,24 +69,43 @@ The directory where pages are generated.
 #### layout
 Type: `String`
 
-The [jade](https://github.com/visionmedia/jade) or [ejs](https://github.com/visionmedia/ejs) layout template for each post. The post metadata will be stored in a `post` object to be rendered in the layout template. [Here](https://github.com/ChrisWren/grunt-pages/blob/master/test/fixtures/ejs/layouts/post.ejs) is an example post layout template.
+The [jade](https://github.com/visionmedia/jade) or [ejs](https://github.com/visionmedia/ejs) layout template used for each post. The post metadata will be stored in a `post` object to be rendered in the layout template. [Here](https://github.com/ChrisWren/grunt-pages/blob/master/test/fixtures/ejs/layouts/post.ejs) is an example post layout template.
 
 #### url
 Type: `String`
 
-The url format of each post. The string takes variables as parameters using the `:variable` syntax. Variable(s) specified in the url are required in each post's metadata.
+The url of each post. The string takes variables as parameters using the `:variable` syntax. Variable(s) specified in the url are required in each post's metadata.
 
 ### Options
 
 #### pageSrc
 Type: `String`
 
-The folder where the source pages of your website are located. These pages have access to the posts' content and metadata in a `posts` array. All of the files in this folder are generated in the `dest` folder maintaining the same relative path from `pageSrc`.
+The folder where the ejs or jade source pages of your website are located. These pages have access to the posts' content and metadata in a `posts` array. All of the files in this folder are generated in the `dest` folder maintaining the same relative path from `pageSrc`.
 
 #### pagination
 Type: `Object`
 
-An object containing config for pagination.
+An object containing config for pagination. This option generates paginated list pages which each containing a specified number of posts. These paginated list pages are generated in the `dest` folder relative to the pagination.listPage's location in the format `pagination.listPage`/pages/`pageNumber`/index.html.
+
+Here is a sample config using pagination:
+
+```js
+pages: {
+  options: {
+    pagination: {
+      listPage: 'src/layouts/listPage.jade',
+      postsPerPage: 3
+    }
+  },
+  posts: {
+    src: 'src/posts',
+    dest: 'dev',
+    layout: 'src/layouts/post.jade',
+    url: 'posts/:title'
+  }
+}
+```
 
 ##### pagination.postsPerPage
 Type: `Number`
@@ -96,22 +115,23 @@ The number of posts each list page will contain.
 ##### pagination.listPage
 Type: `String`
 
-The location of the layout which is used for each list page. The layout has access to the following variables:
+The location of the layout template which is used for each list page.[Here](https://github.com/ChrisWren/grunt-pages/blob/master/test/fixtures/jade/pages/blog/index.jade) is a sample template that uses pagination. The template has access to the following variables:
 
 ###### pageNumber
 Type: `Number`
 
 The page number of the current page.
+
 ###### numPages
 Type: `Number`
 
 The total number of list pages.
+
 ###### posts
 Type: `Array` of `Object`s
 
-An array of post objects which contain the content and metadata for each post.
+An array of post objects which contains the content and metadata for each post.
 
 # Changelog
 
 **0.0.0** - Initial release
-
