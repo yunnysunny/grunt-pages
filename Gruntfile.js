@@ -20,7 +20,6 @@ module.exports = function (grunt) {
         layout: 'test/fixtures/jade/layouts/post.jade',
         url: 'blog/posts/:title',
         options: {
-          pageSrc: 'test/fixtures/jade/pages',
           pagination: {
             postsPerPage: 1,
             listPage: 'test/fixtures/jade/pages/blog/index.jade'
