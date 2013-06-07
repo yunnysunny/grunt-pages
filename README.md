@@ -22,7 +22,8 @@ Here is a sample config to create a blog using `grunt-pages`:
 ```js
 pages: {
   options: {
-    pageSrc: 'src/pages'
+    pageSrc: 'src/pages',
+    data: 'src/data/pageData.json'
   },
   posts: {
     src: 'src/posts',
@@ -46,9 +47,9 @@ The YAML data is parsed into a JavaScript object and passed to the post's templa
 Here is a JavaScript object example:
 ```js
 {
-  title: 'Art Ballin': Explorations in New-Weird-American Expressionism',
-  date: '2013-2-22',
-  author: 'Highroller, Jody'
+  title: "Art Ballin': Explorations in New-Weird-American Expressionism",
+  date: "2013-2-22",
+  author: "Highroller, Jody"
 }
 ```
 The only property that is not interpreted literally is the `date`. It is used as a `dateString` when constructing a [Date object](https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Date) in JavaScript, and must be in a [parseable format](https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Date/parse). For both YAML and JavaScript object metadata, the JavaScript `Date` object is available in the layout.
@@ -82,6 +83,11 @@ The url of each post. The string takes variables as parameters using the `:varia
 Type: `String`
 
 The folder where the ejs or jade source pages of your website are located. These pages have access to the posts' content and metadata in a `posts` array. All of the files in this folder are generated in the `dest` folder maintaining the same relative path from `pageSrc`.
+
+#### data
+Type: `String`
+
+The location of a JSON file which is parsed and passed to templates for rendering. This is primarily used for data to be shared across all pages.
 
 #### pagination
 Type: `Object`
@@ -130,7 +136,7 @@ The total number of list pages.
 ###### posts
 Type: `Array` of `Object`s
 
-An array of post objects which contains the content and metadata for each post.
+An array of post objects which contains the `content` and metadata properties for each post.
 
 # Changelog
 
