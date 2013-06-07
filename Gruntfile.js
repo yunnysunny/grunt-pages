@@ -11,6 +11,7 @@ module.exports = function (grunt) {
         url: 'blog/posts/:title',
         options: {
           pageSrc: 'test/fixtures/ejs/pages',
+          templateEngine: 'ejs',
           data: 'test/fixtures/data/data.json'
         }
       },
