@@ -14,7 +14,6 @@ var templateEngines = {
 module.exports = function (grunt) {
   var done;
   var options;
-  var postCollection = [];
   var templateEngine;
 
   grunt.registerMultiTask('pages', 'Creates pages from markdown and templates.', function () {
@@ -22,6 +21,7 @@ module.exports = function (grunt) {
     options = this.options();
     var numPosts = grunt.file.expand({ filter: 'isFile' }, this.data.src + '/**').length;
     var parsedPosts = 0;
+    var postCollection = [];
 
     grunt.file.recurse(this.data.src, function (abspath) {
       var post = parsePostData(abspath);
@@ -181,14 +181,17 @@ module.exports = function (grunt) {
       listPage = options.pagination.listPage;
     }
     grunt.file.recurse(options.pageSrc, function (abspath, rootdir) {
+
       // Don't generate the paginated list page
       if (abspath !== listPage) {
-        var layoutString = fs.readFileSync(abspath, 'utf8');
-        var fn = templateEngine.compile(layoutString, { pretty: true, filename: abspath });
-        var dest = that.data.dest + '/' +
-                   abspath.slice(rootdir.length + 1).replace(path.extname(abspath), '.html');
-        grunt.log.ok('Created '.green + 'page'.magenta + ' at: ' + dest);
-        grunt.file.write(dest, fn(templateData));
+        if (options.templateEngine && path.extname(abspath) === '.' + options.templateEngine) {
+          var layoutString = fs.readFileSync(abspath, 'utf8');
+          var fn = templateEngine.compile(layoutString, { pretty: true, filename: abspath });
+          var dest = that.data.dest + '/' +
+                     abspath.slice(rootdir.length + 1).replace(path.extname(abspath), '.html');
+          grunt.log.ok('Created '.green + 'page'.magenta + ' at: ' + dest);
+          grunt.file.write(dest, fn(templateData));
+        }
       }
     });
   }
