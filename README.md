@@ -87,7 +87,7 @@ The folder where the ejs or jade source pages of your website are located. These
 #### data
 Type: `String`
 
-The location of a JSON file which is parsed and passed to templates for rendering. This is primarily used for data to be shared across all pages.
+The location of a JSON file which is parsed and passed to templates for rendering. This is primarily used for data to be shared across all pages. This data is available in pages' and posts' templates via the `data` object.
 
 #### pagination
 Type: `Object`
