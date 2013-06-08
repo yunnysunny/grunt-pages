@@ -48,7 +48,7 @@ module.exports = function (grunt) {
         if (++parsedPosts === numPosts) {
           var templateData = { posts: postCollection };
           if (options.data) {
-            templateData.fileData = JSON.parse(fs.readFileSync(options.data));
+            templateData.data = JSON.parse(fs.readFileSync(options.data));
           }
           postCollection = generatePosts(this, templateData, abspath);
 
