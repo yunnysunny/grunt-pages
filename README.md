@@ -123,15 +123,10 @@ Type: `String`
 
 The location of the layout template which is used for each list page.[Here](https://github.com/ChrisWren/grunt-pages/blob/master/test/fixtures/jade/pages/blog/index.jade) is a sample template that uses pagination. The template has access to the following variables:
 
-###### pageNumber
-Type: `Number`
+###### pages
+Type: `Array` of `Object`s
 
-The page number of the current page.
-
-###### numPages
-Type: `Number`
-
-The total number of list pages.
+An array of page objects which each contain a `url` property. The page currently being rendered also has a `currentPage` boolean property.
 
 ###### posts
 Type: `Array` of `Object`s
