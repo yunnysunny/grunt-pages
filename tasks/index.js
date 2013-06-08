@@ -184,7 +184,7 @@ module.exports = function (grunt) {
 
       // Don't generate the paginated list page
       if (abspath !== listPage) {
-        if (options.templateEngine && path.extname(abspath) === '.' + options.templateEngine) {
+        if (!options.templateEngine || (options.templateEngine && path.extname(abspath) === '.' + options.templateEngine)) {
           var layoutString = fs.readFileSync(abspath, 'utf8');
           var fn = templateEngine.compile(layoutString, { pretty: true, filename: abspath });
           var dest = that.data.dest + '/' +
