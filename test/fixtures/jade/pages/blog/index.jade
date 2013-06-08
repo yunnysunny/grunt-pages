@@ -5,10 +5,8 @@ block content
       li
         br
         a(href = "/#{post.url}") #{post.title}
-    - for (i = 1; i < numPages; i++) {
-    - if (i === numPages)
-        if pageNumber
-          span #{pageNumber}
+    each page, pageNumber in pages
+      if page.currentPage
+        span #{pageNumber}
       else
-        a(href = "#{baseUrl}/page/#{i}/") #{i}
-    - }
+        a(href = "#{page.url}") #{pageNumber}
