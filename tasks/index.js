@@ -221,6 +221,7 @@ module.exports = function (grunt) {
 
     var layoutString = fs.readFileSync(listPage, 'utf8');
     var fn = templateEngine.compile(layoutString, { pretty: true, filename: listPage });
+    var pageDests = [];
 
     postGroups.forEach(function (postGroup, pageNumber) {
       var dest = that.data.dest + '/' ;
@@ -248,14 +249,21 @@ module.exports = function (grunt) {
           dest = dest.replace(path.basename(listPage), 'page/' + pageNumber + '/index.html');
         }
       }
+      pageDests.push(dest);
+    });
 
-      grunt.file.write(dest, fn({
-        baseUrl: baseUrl,
-        pageNumber: pageNumber,
-        numPages: postGroups.length,
+    var pageUrls = pageDests.map(function (dest) {
+      return { url: path.dirname(dest).slice(that.data.dest.length) + '/' };
+    });
+
+    postGroups.forEach(function (postGroup, pageNumber) {
+      pageUrls[pageNumber].currentPage = true;
+      grunt.file.write(pageDests[pageNumber], fn({
+        pages: pageUrls,
         posts: postGroup
       }));
-      grunt.log.ok('Created '.green + 'paginated'.rainbow + ' page'.magenta + ' at: ' + dest);
+      delete pageUrls[pageNumber].currentPage;
+      grunt.log.ok('Created '.green + 'paginated'.rainbow + ' page'.magenta + ' at: ' + pageDests[pageNumber]);
     });
   }
 };
