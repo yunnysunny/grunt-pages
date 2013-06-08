@@ -141,4 +141,5 @@ An array of post objects which contains the `content` and metadata properties fo
 # Changelog
 
 **0.0.0** - Initial release
+
 **0.1.0** - Added `data` option, added `templateEngine` option, added `pagination` option, and changed post data format to be a `post` object rather than global variables for each post property.
