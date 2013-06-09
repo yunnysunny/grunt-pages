@@ -133,11 +133,16 @@ Type: `Array` of `Object`s
 
 An array of post objects which contains the `content` and metadata properties for each post.
 
+#### templateEngine
+Type: `String`
+
+The file extension of the page layouts' template engine. This is used to filter template files in the `pageSrc` folder when developing a cabin theme for multiple template engines.
+
 # Changelog
 
-**0.0.0** - Initial release
+**0.2.0** - Fixed `templateEngine` bug, changed `pagination` and `data` api.
 
 **0.1.0** - Added `data` option, added `templateEngine` option, added `pagination` option, and changed post data format to be a `post` object rather than global variables for each post property.
 
-**0.2.0** - Fixed `templateEngine` bug, changed `pagination` and `data` api.
+**0.0.0** - Initial release
 
