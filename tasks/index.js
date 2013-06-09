@@ -12,13 +12,16 @@ var templateEngines = {
 };
 
 module.exports = function (grunt) {
+  var _this;
   var done;
   var options;
   var templateEngine;
 
   grunt.registerMultiTask('pages', 'Creates pages from markdown and templates.', function () {
+    _this = this;
     done = this.async();
     options = this.options();
+
     var numPosts = grunt.file.expand({ filter: 'isFile' }, [this.data.src + '/**', '!**/_**']).length;
     var parsedPosts = 0;
     var postCollection = [];
@@ -54,20 +57,20 @@ module.exports = function (grunt) {
           if (options.data) {
             templateData.data = JSON.parse(fs.readFileSync(options.data));
           }
-          postCollection = generatePosts(this, templateData, abspath);
+          postCollection = generatePosts(templateData, abspath);
 
           if (options.pageSrc) {
-            generatePages(this, templateData);
+            generatePages(templateData);
           }
 
           if (options.pagination) {
-            paginate(this, postCollection);
+            paginate(postCollection);
           }
 
           done();
         }
-      }.bind(this));
-    }.bind(this));
+      });
+    });
   });
 
   /**
@@ -109,14 +112,13 @@ module.exports = function (grunt) {
 
   /**
    * Returns the post destination based on the url property and postData
-   * @param  {Object} that
    * @param  {Object} postData
    * @param  {String} abspath
    * @return {String}
    */
-  function getPostDest (that, postData, abspath) {
-    var dest = that.data.dest + '/' + that.data.url + '.html';
-    var dynamicUrlSegments = that.data.url.split('/')
+  function getPostDest (postData, abspath) {
+    var dest = _this.data.dest + '/' + _this.data.url + '.html';
+    var dynamicUrlSegments = _this.data.url.split('/')
     .filter(function (urlSegment) {
       return urlSegment.indexOf(':') !== -1;
     })
@@ -138,11 +140,10 @@ module.exports = function (grunt) {
 
   /**
    * Generates posts based on the provided data
-   * @param  {Object} that
    * @param  {Object} templateData
    * @return {Array}
    */
-  function generatePosts (that, templateData, abspath) {
+  function generatePosts (templateData, abspath) {
     var postCollection = templateData.posts;
 
     // Sort posts by descending date
@@ -152,19 +153,19 @@ module.exports = function (grunt) {
 
     // First determine all of the posts' urls
     postCollection.forEach(function (post) {
-      var dest = getPostDest(that, post, abspath);
-      post.url = dest.slice((that.data.dest + '/').length);
+      var dest = getPostDest(post, abspath);
+      post.url = dest.slice((_this.data.dest + '/').length);
     });
 
     // Then create the posts
     postCollection.forEach(function (post) {
       templateData.post = post;
-      var dest = getPostDest(that, post, abspath);
+      var dest = getPostDest(post, abspath);
 
       // Determine the template engine based on the file's extention name
-      templateEngine = templateEngines[path.extname(that.data.layout).slice(1)];
-      var layoutString = fs.readFileSync(that.data.layout, 'utf8');
-      var fn = templateEngine.compile(layoutString, { pretty: true, filename: that.data.layout });
+      templateEngine = templateEngines[path.extname(_this.data.layout).slice(1)];
+      var layoutString = fs.readFileSync(_this.data.layout, 'utf8');
+      var fn = templateEngine.compile(layoutString, { pretty: true, filename: _this.data.layout });
       grunt.file.write(dest, fn(templateData));
       grunt.log.ok('Created '.green + 'post'.blue + ' at: ' + dest);
       delete templateData.post;
@@ -175,11 +176,10 @@ module.exports = function (grunt) {
 
   /**
    * Generates pages using the posts' data
-   * @param  {Object} that
    * @param  {Object} templateData
    * @return {null}
    */
-  function generatePages (that, templateData) {
+  function generatePages (templateData) {
     var listPage;
     if (options.pagination) {
       listPage = options.pagination.listPage;
@@ -191,7 +191,7 @@ module.exports = function (grunt) {
         if (!options.templateEngine || (options.templateEngine && path.extname(abspath) === '.' + options.templateEngine)) {
           var layoutString = fs.readFileSync(abspath, 'utf8');
           var fn = templateEngine.compile(layoutString, { pretty: true, filename: abspath });
-          var dest = that.data.dest + '/' +
+          var dest = _this.data.dest + '/' +
                      abspath.slice(rootdir.length + 1).replace(path.extname(abspath), '.html');
           grunt.log.ok('Created '.green + 'page'.magenta + ' at: ' + dest);
           templateData.currentPage = path.basename(abspath, path.extname(abspath));
@@ -203,11 +203,10 @@ module.exports = function (grunt) {
 
   /**
    * Creates paginated pages with a specified number of posts per page
-   * @param  {Object} that
    * @param  {Array} postCollection
    * @return {null}
    */
-  function paginate (that, postCollection) {
+  function paginate (postCollection) {
     var postGroups = [];
     var postGroup;
     var postsPerPage = options.pagination.postsPerPage;
@@ -222,11 +221,11 @@ module.exports = function (grunt) {
     var pageDests = [];
 
     postGroups.forEach(function (postGroup, pageNumber) {
-      pageDests.push(getListPageDest(that, listPage, pageNumber));
+      pageDests.push(getListPageDest(listPage, pageNumber));
     });
 
     var pageUrls = pageDests.map(function (dest) {
-      return { url: path.dirname(dest).slice(that.data.dest.length) + '/' };
+      return { url: path.dirname(dest).slice(_this.data.dest.length) + '/' };
     });
 
     var layoutString = fs.readFileSync(listPage, 'utf8');
@@ -245,13 +244,12 @@ module.exports = function (grunt) {
 
   /**
    * Gets a list page's destination to be written
-   * @param  {Object} that
    * @param  {String} listPage   Source list page template layout file
    * @param  {Number} pageNumber Index of current page to be writtern
    * @return {String}            Destination of current page
    */
-  function getListPageDest (that, listPage, pageNumber) {
-    var dest = that.data.dest + '/' ;
+  function getListPageDest (listPage, pageNumber) {
+    var dest = _this.data.dest + '/' ;
 
     // If the pageSrc option is used generate list pages relative to pageSrc
     if (options.pageSrc) {
