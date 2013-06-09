@@ -22,8 +22,7 @@ Here is a sample config to create a blog using `grunt-pages`:
 ```js
 pages: {
   options: {
-    pageSrc: 'src/pages',
-    data: 'src/data/pageData.json'
+    pageSrc: 'src/pages'
   },
   posts: {
     src: 'src/posts',
@@ -33,7 +32,9 @@ pages: {
   }
 }
 ```
-### Formatting posts
+### Authoring posts
+
+#### Post Format
 Posts are written in markdown and include a metadata section at the top to provide information about the post. There are two accepted metadata formats, YAML and a JavaScript object. Here is a YAML example:
 ```yaml
 ----
@@ -54,7 +55,11 @@ Here is a JavaScript object example:
 ```
 The only property that is not interpreted literally is the `date`. It is used as a `dateString` when constructing a [Date object](https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Date) in JavaScript, and must be in a [parseable format](https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Date/parse). For both YAML and JavaScript object metadata, the JavaScript `Date` object is available in the layout.
 
+#### Syntax Highlighting
 For adding code to your posts, grunt-pages has [GitHub flavoured markdown](https://help.github.com/articles/github-flavored-markdown) syntax highlighting using [pygments](http://pygments.org/).
+
+#### Draft Posts
+To make a post a draft, simply prefix its filename with a `_`. These posts will not be rendered or available in list pages.
 
 ### Required properties
 #### src
@@ -82,7 +87,7 @@ The url of each post. The string takes variables as parameters using the `:varia
 #### pageSrc
 Type: `String`
 
-The folder where the ejs or jade source pages of your website are located. These pages have access to the posts' content and metadata in a `posts` array. All of the files in this folder are generated in the `dest` folder maintaining the same relative path from `pageSrc`.
+The folder where the ejs or jade source pages of your website are located. These pages have access to the posts' content and metadata in a `posts` array. Additionally, pages have access to their own filename(without extension) via the `currentPage` variable. All of the files in this folder are generated in the `dest` folder maintaining the same relative path from `pageSrc`.
 
 #### data
 Type: `String`
@@ -140,9 +145,11 @@ The file extension of the page layouts' template engine. This is used to filter 
 
 # Changelog
 
+**0.2.1** - Added support for `_` prefixed draft posts and pages now receive their filename as a `currentPage` variable.
+
 **0.2.0** - Fixed `templateEngine` bug, changed `pagination` and `data` api.
 
 **0.1.0** - Added `data` option, added `templateEngine` option, added `pagination` option, and changed post data format to be a `post` object rather than global variables for each post property.
 
-**0.0.0** - Initial release
+**0.0.0** - Initial release.
 
