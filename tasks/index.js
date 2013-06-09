@@ -211,11 +211,6 @@ module.exports = function (grunt) {
     var postGroup;
     var postsPerPage = options.pagination.postsPerPage;
     var listPage = options.pagination.listPage;
-    var baseUrl = '';
-
-    if (options.pageSrc) {
-      baseUrl = path.dirname(listPage.slice(options.pageSrc.length + 1).replace(path.extname(listPage)));
-    }
 
     var i = 0;
     while ((postGroup = postCollection.slice( i * postsPerPage, (i + 1) * postsPerPage)).length) {
@@ -223,42 +218,18 @@ module.exports = function (grunt) {
       i++;
     }
 
-    var layoutString = fs.readFileSync(listPage, 'utf8');
-    var fn = templateEngine.compile(layoutString, { pretty: true, filename: listPage });
     var pageDests = [];
 
     postGroups.forEach(function (postGroup, pageNumber) {
-      var dest = that.data.dest + '/' ;
-
-      // If the pageSrc option is used generate list pages relative to pageSrc
-      if (options.pageSrc) {
-        if (listPage.indexOf(options.pageSrc) !== -1) {
-          dest += listPage.slice(options.pageSrc.length + 1);
-        } else {
-          grunt.log.error('Error: the listPage must be within the pageSrc directory');
-          done();
-        }
-      }
-
-      if (pageNumber === 0) {
-        if (!options.pageSrc) {
-          dest += 'index.html';
-        } else {
-          dest = dest.replace(path.extname(listPage), '.html');
-        }
-      } else {
-        if (!options.pageSrc) {
-          dest += 'page/' + pageNumber + '/index.html';
-        } else {
-          dest = dest.replace(path.basename(listPage), 'page/' + pageNumber + '/index.html');
-        }
-      }
-      pageDests.push(dest);
+      pageDests.push(getListPageDest(that, listPage, pageNumber));
     });
 
     var pageUrls = pageDests.map(function (dest) {
       return { url: path.dirname(dest).slice(that.data.dest.length) + '/' };
     });
+
+    var layoutString = fs.readFileSync(listPage, 'utf8');
+    var fn = templateEngine.compile(layoutString, { pretty: true, filename: listPage });
 
     postGroups.forEach(function (postGroup, pageNumber) {
       pageUrls[pageNumber].currentPage = true;
@@ -269,5 +240,41 @@ module.exports = function (grunt) {
       delete pageUrls[pageNumber].currentPage;
       grunt.log.ok('Created '.green + 'paginated'.rainbow + ' page'.magenta + ' at: ' + pageDests[pageNumber]);
     });
+  }
+
+  /**
+   * Gets a list page's destination to be written
+   * @param  {Object} that
+   * @param  {String} listPage   Source list page template layout file
+   * @param  {Number} pageNumber Index of current page to be writtern
+   * @return {String}            Destination of current page
+   */
+  function getListPageDest (that, listPage, pageNumber) {
+    var dest = that.data.dest + '/' ;
+
+    // If the pageSrc option is used generate list pages relative to pageSrc
+    if (options.pageSrc) {
+      if (listPage.indexOf(options.pageSrc) !== -1) {
+        dest += listPage.slice(options.pageSrc.length + 1);
+      } else {
+        grunt.log.error('Error: the listPage must be within the pageSrc directory');
+        done();
+      }
+    }
+
+    if (pageNumber === 0) {
+      if (!options.pageSrc) {
+        dest += 'index.html';
+      } else {
+        dest = dest.replace(path.extname(listPage), '.html');
+      }
+    } else {
+      if (!options.pageSrc) {
+        dest += 'page/' + pageNumber + '/index.html';
+      } else {
+        dest = dest.replace(path.basename(listPage), 'page/' + pageNumber + '/index.html');
+      }
+    }
+    return dest;
   }
 };
