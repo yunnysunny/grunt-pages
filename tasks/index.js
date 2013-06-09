@@ -194,6 +194,7 @@ module.exports = function (grunt) {
           var dest = that.data.dest + '/' +
                      abspath.slice(rootdir.length + 1).replace(path.extname(abspath), '.html');
           grunt.log.ok('Created '.green + 'page'.magenta + ' at: ' + dest);
+          templateData.currentPage = path.basename(abspath, path.extname(abspath));
           grunt.file.write(dest, fn(templateData));
         }
       }
