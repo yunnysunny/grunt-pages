@@ -19,11 +19,15 @@ module.exports = function (grunt) {
   grunt.registerMultiTask('pages', 'Creates pages from markdown and templates.', function () {
     done = this.async();
     options = this.options();
-    var numPosts = grunt.file.expand({ filter: 'isFile' }, this.data.src + '/**').length;
+    var numPosts = grunt.file.expand({ filter: 'isFile' }, [this.data.src + '/**', '!**/_**']).length;
     var parsedPosts = 0;
     var postCollection = [];
 
     grunt.file.recurse(this.data.src, function (abspath) {
+      // Don't include draft posts
+      if (path.basename(abspath).indexOf('_') === 0) {
+        return;
+      }
       var post = parsePostData(abspath);
       if (post.markdown.length <= 1) {
         grunt.log.error('Error:'.red + ' the following ' + 'post'.blue + ' is blank, please add some content to it or delete it: ' + abspath.red);
