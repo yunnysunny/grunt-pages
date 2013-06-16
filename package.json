@@ -1,6 +1,6 @@
 {
   "name": "grunt-pages",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Grunt task to generate a blog.",
   "main": "Gruntfile.js",
   "dependencies": {

@@ -145,6 +145,8 @@ The file extension of the page layouts' template engine. This is used to filter 
 
 # Changelog
 
+**0.2.2** - Used forked version of marked to enable header anchor links.
+
 **0.2.1** - Added support for `_` prefixed draft posts and pages now receive their filename as a `currentPage` variable.
 
 **0.2.0** - Fixed `templateEngine` bug, changed `pagination` and `data` api.
