@@ -22,13 +22,13 @@ module.exports = function (grunt) {
     done = this.async();
     options = this.options();
 
-    var numPosts = grunt.file.expand({ filter: 'isFile' }, [this.data.src + '/**', '!**/_**']).length;
+    var numPosts = grunt.file.expand({ filter: 'isFile' }, [this.data.src + '/**', '!**/_**', '!**/.**']).length;
     var parsedPosts = 0;
     var postCollection = [];
 
     grunt.file.recurse(this.data.src, function (abspath) {
-      // Don't include draft posts
-      if (path.basename(abspath).indexOf('_') === 0) {
+      // Don't include draft posts or dotfiles
+      if (path.basename(abspath).indexOf('_') === 0 || path.basename(abspath).indexOf('.') === 0) {
         return;
       }
       var post = parsePostData(abspath);
@@ -44,7 +44,8 @@ module.exports = function (grunt) {
             callback(err, result.toString());
           });
         },
-        gfm: true
+        gfm: true,
+        anchors: true
       }, function (err, content) {
         if (err) throw err;
         delete post.markdown;
@@ -185,6 +186,11 @@ module.exports = function (grunt) {
       listPage = options.pagination.listPage;
     }
     grunt.file.recurse(options.pageSrc, function (abspath, rootdir) {
+
+      // Don't include dotfiles
+      if (path.basename(abspath).indexOf('.') === 0) {
+        return;
+      }
 
       // Don't generate the paginated list page
       if (abspath !== listPage) {
