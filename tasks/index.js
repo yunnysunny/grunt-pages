@@ -56,10 +56,14 @@ module.exports = function (grunt) {
         if (++parsedPosts === numPosts) {
           var templateData = { posts: postCollection };
           if (options.data) {
-            templateData.data = JSON.parse(fs.readFileSync(options.data));
+            try {
+              templateData.data = JSON.parse(fs.readFileSync(options.data));
+            } catch (e) {
+              grunt.fail.fatal(e + ' when parsing ' + options.data);
+            }
           }
-          postCollection = generatePosts(templateData, abspath);
 
+          generatePosts(templateData, abspath);
           if (options.pageSrc) {
             generatePages(templateData);
           }
@@ -171,8 +175,6 @@ module.exports = function (grunt) {
       grunt.log.ok('Created '.green + 'post'.blue + ' at: ' + dest);
       delete templateData.post;
     });
-
-    return postCollection;
   }
 
   /**
