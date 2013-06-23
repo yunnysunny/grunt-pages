@@ -18,7 +18,7 @@ grunt.loadNpmTasks('grunt-pages');
 
 ## Documentation
 ### Sample config
-Here is a sample config to create a blog using `grunt-pages`:
+Here is a sample config to create a blog using grunt-pages:
 ```js
 pages: {
   options: {
@@ -27,7 +27,7 @@ pages: {
   posts: {
     src: 'src/posts',
     dest: 'dev',
-    layout: 'src/layouts/post.ejs',
+    layout: 'src/layouts/post.jade',
     url: 'blog/posts/:title' 
   }
 }
@@ -126,7 +126,7 @@ The number of posts each list page will contain.
 ##### pagination.listPage
 Type: `String`
 
-The location of the layout template which is used for each list page.[Here](https://github.com/ChrisWren/grunt-pages/blob/master/test/fixtures/jade/pages/blog/index.jade) is a sample template that uses pagination. The template has access to the following variables:
+The location of the layout template which is used for each list page. [Here](https://github.com/ChrisWren/grunt-pages/blob/master/test/fixtures/jade/pages/blog/index.jade) is a sample template that uses pagination. The template has access to the following variables:
 
 ###### pages
 Type: `Array` of `Object`s
