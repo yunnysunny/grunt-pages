@@ -75,7 +75,7 @@ The directory where pages are generated.
 #### layout
 Type: `String`
 
-The [jade](https://github.com/visionmedia/jade) or [ejs](https://github.com/visionmedia/ejs) layout template used for each post. The post metadata will be stored in a `post` object to be rendered in the layout template. [Here](https://github.com/ChrisWren/grunt-pages/blob/master/test/fixtures/ejs/layouts/post.ejs) is an example post layout template.
+The [jade](https://github.com/visionmedia/jade) or [ejs](https://github.com/visionmedia/ejs) layout template used for each post. The post metadata will be stored in a `post` object to be rendered in the layout template. [Here](https://github.com/ChrisWren/grunt-pages/blob/master/test/fixtures/jade/layouts/post.jade) is an example post layout template.
 
 #### url
 Type: `String`
@@ -141,7 +141,7 @@ An array of post objects which contains the `content` and metadata properties fo
 #### templateEngine
 Type: `String`
 
-The file extension of the page layouts' template engine. This is used to filter template files in the `pageSrc` folder when developing a cabin theme for multiple template engines.
+The file extension of the page layouts' template engine. This is used to filter template files in the `pageSrc` folder when developing a [Cabin](http://colinwren.github.io/Cabin/) theme for multiple template engines.
 
 # Changelog
 
