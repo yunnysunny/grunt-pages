@@ -146,7 +146,7 @@ module.exports = function (grunt) {
   /**
    * Generates posts based on the provided data
    * @param  {Object} templateData
-   * @return {Array}
+   * @return {undefined}
    */
   function generatePosts (templateData, abspath) {
     var postCollection = templateData.posts;
@@ -180,7 +180,7 @@ module.exports = function (grunt) {
   /**
    * Generates pages using the posts' data
    * @param  {Object} templateData
-   * @return {null}
+   * @return {undefined}
    */
   function generatePages (templateData) {
     var listPage;
@@ -212,7 +212,7 @@ module.exports = function (grunt) {
   /**
    * Creates paginated pages with a specified number of posts per page
    * @param  {Array} postCollection
-   * @return {null}
+   * @return {undefined}
    */
   function paginate (postCollection) {
     var postGroups = [];
