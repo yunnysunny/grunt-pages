@@ -15,13 +15,13 @@ var templateEngines = {
 
 module.exports = function (grunt) {
   var _this;
-  var done;
   var options;
   var templateEngine;
 
   grunt.registerMultiTask('pages', 'Creates pages from markdown and templates.', function () {
+    var done = this.async();
+
     _this = this;
-    done = this.async();
     options = this.options();
 
     var numPosts = grunt.file.expand({
@@ -44,8 +44,7 @@ module.exports = function (grunt) {
       var post = parsePostData(abspath);
       post.sourcePath = abspath;
       if (post.markdown.length <= 1) {
-        grunt.log.error('Error:'.red + ' the following ' + 'post'.blue + ' is blank, please add some content to it or delete it: ' + abspath.red);
-        done();
+        grunt.fail.fatal('the following post is blank, please add some content to it or delete it: ' + abspath.red);
       }
 
       // Parse post using marked and pygmentize for highlighting
@@ -121,14 +120,11 @@ module.exports = function (grunt) {
         sections.shift();
         postData.markdown = sections.join('----');
       } else {
-        grunt.log.error('Error:'.red + ' the metadata for the following ' + 'post'.blue + ' is formatted incorrectly: ' + abspath.red);
-        done();
+        grunt.fail.fatal('the metadata for the following post is formatted incorrectly: ' + abspath.red);
       }
       return postData;
     } catch (e) {
-      grunt.log.error(e);
-      grunt.log.error('Error:'.red + ' the metadata for the following ' + 'post'.blue + ' is formatted incorrectly: ' + abspath.red);
-      done();
+      grunt.fail.fatal('the metadata for the following post is formatted incorrectly: ' + abspath.red);
     }
   }
 
@@ -168,8 +164,7 @@ module.exports = function (grunt) {
       if (urlSegment in post) {
         dest = dest.replace(':' + urlSegment, post[urlSegment].replace(/[^a-zA-Z0-9]/g, '-'));
       } else {
-        grunt.log.error('Error: required ' + urlSegment.red + ' attribute not found in ' + 'post'.blue + ' metadata at ' + post.sourcePath + '.');
-        done();
+        grunt.fail.fatal('required ' + urlSegment + ' attribute not found in the following post\'s metadata: ' + post.sourcePath + '.');
       }
     });
     return dest;
@@ -318,8 +313,7 @@ module.exports = function (grunt) {
       if (listPage.indexOf(options.pageSrc) !== -1) {
         dest += listPage.slice(options.pageSrc.length + 1);
       } else {
-        grunt.log.error('Error: the listPage must be within the pageSrc directory');
-        done();
+        grunt.fail.fatal('the listPage must be within the pageSrc directory');
       }
     }
 
