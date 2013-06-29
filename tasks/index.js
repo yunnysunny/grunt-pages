@@ -1,6 +1,8 @@
 'use strict';
 var fs = require('fs');
 var path = require('path');
+
+var _ = require('lodash');
 var jsYAML = require('js-yaml');
 var marked = require('marked');
 var pygmentize = require('pygmentize-bundled');
@@ -22,16 +24,25 @@ module.exports = function (grunt) {
     done = this.async();
     options = this.options();
 
-    var numPosts = grunt.file.expand({ filter: 'isFile' }, [this.data.src + '/**', '!**/_**', '!**/.**']).length;
+    var numPosts = grunt.file.expand({
+      filter: 'isFile'
+    }, [
+      this.data.src + '/**',
+      '!**/_**',
+      '!**/.**'
+    ]).length;
+
     var parsedPosts = 0;
     var postCollection = [];
 
     grunt.file.recurse(this.data.src, function (abspath) {
       // Don't include draft posts or dotfiles
-      if (path.basename(abspath).indexOf('_') === 0 || path.basename(abspath).indexOf('.') === 0) {
+      if (path.basename(abspath).indexOf('_') === 0 ||
+          path.basename(abspath).indexOf('.') === 0) {
         return;
       }
       var post = parsePostData(abspath);
+      post.sourcePath = abspath;
       if (post.markdown.length <= 1) {
         grunt.log.error('Error:'.red + ' the following ' + 'post'.blue + ' is blank, please add some content to it or delete it: ' + abspath.red);
         done();
@@ -55,6 +66,8 @@ module.exports = function (grunt) {
         // Once all the source posts are parsed, we can generate the html posts
         if (++parsedPosts === numPosts) {
           var templateData = { posts: postCollection };
+
+          // Optionally add data from a specified JSON file
           if (options.data) {
             try {
               templateData.data = JSON.parse(fs.readFileSync(options.data));
@@ -63,7 +76,11 @@ module.exports = function (grunt) {
             }
           }
 
-          generatePosts(templateData, abspath);
+          setPostDests(postCollection);
+          setPostUrls(postCollection);
+          sortPosts(postCollection);
+          generatePosts(templateData);
+
           if (options.pageSrc) {
             generatePages(templateData);
           }
@@ -116,12 +133,25 @@ module.exports = function (grunt) {
   }
 
   /**
+   * Updates the post collection with each post's destination
+   * @param {Array} postCollection Collection of parsed posts
+   */
+  function setPostDests (postCollection) {
+    postCollection.forEach(function (post) {
+      post.dest = getPostDest(post);
+
+      // Remove the source path from the post as it is only used for error logging in getPostDest
+      delete post.sourcePath;
+    });
+
+  }
+
+  /**
    * Returns the post destination based on the url property and postData
    * @param  {Object} postData
-   * @param  {String} abspath
    * @return {String}
    */
-  function getPostDest (postData, abspath) {
+  function getPostDest (post) {
     var dest = _this.data.dest + '/' + _this.data.url + '.html';
     var dynamicUrlSegments = _this.data.url.split('/')
     .filter(function (urlSegment) {
@@ -133,10 +163,12 @@ module.exports = function (grunt) {
 
     // Replace dynamic url segments
     dynamicUrlSegments.forEach(function (urlSegment) {
-      if (urlSegment in postData) {
-        dest = dest.replace(':' + urlSegment, postData[urlSegment].replace(/[^a-zA-Z0-9]/g, '-'));
+
+      // Make sure the post has the dynamic segment as a metadata property
+      if (urlSegment in post) {
+        dest = dest.replace(':' + urlSegment, post[urlSegment].replace(/[^a-zA-Z0-9]/g, '-'));
       } else {
-        grunt.log.error('Error: required ' + urlSegment.red + ' attribute not found in ' + 'post'.blue + ' metadata at ' + abspath + '.');
+        grunt.log.error('Error: required ' + urlSegment.red + ' attribute not found in ' + 'post'.blue + ' metadata at ' + post.sourcePath + '.');
         done();
       }
     });
@@ -144,36 +176,57 @@ module.exports = function (grunt) {
   }
 
   /**
-   * Generates posts based on the provided data
+   * Updates the post collection with each post's url
+   * @param {[Array]} postCollection Array of posts
+   */
+  function setPostUrls (postCollection) {
+    postCollection.forEach(function (post) {
+
+      // Slice the destination folder from the beginning of the url
+      post.url = post.dest.slice((_this.data.dest + '/').length);
+    });
+  }
+
+  /**
+   * Sorts the posts
+   * @param {Array} postCollection Collection of parsed posts
+   */
+  function sortPosts (postCollection) {
+
+    // Defaults to sorting posts by descending date
+    var sortFunction = function (a, b) {
+      return b.date - a.date;
+    };
+
+    postCollection.sort(sortFunction);
+  }
+
+  /**
+   * Generates posts based on the templateData
    * @param  {Object} templateData
    * @return {undefined}
    */
-  function generatePosts (templateData, abspath) {
-    var postCollection = templateData.posts;
+  function generatePosts (templateData) {
+    templateData.posts.forEach(function (post) {
 
-    // Sort posts by descending date
-    postCollection.sort(function (a, b) {
-      return b.date - a.date;
-    });
-
-    // First determine all of the posts' urls
-    postCollection.forEach(function (post) {
-      var dest = getPostDest(post, abspath);
-      post.url = dest.slice((_this.data.dest + '/').length);
-    });
-
-    // Then create the posts
-    postCollection.forEach(function (post) {
+      // Pass the post data to the template via a post object
       templateData.post = post;
-      var dest = getPostDest(post, abspath);
 
       // Determine the template engine based on the file's extention name
       templateEngine = templateEngines[path.extname(_this.data.layout).slice(1)];
+
       var layoutString = fs.readFileSync(_this.data.layout, 'utf8');
       var fn = templateEngine.compile(layoutString, { pretty: true, filename: _this.data.layout });
-      grunt.file.write(dest, fn(templateData));
-      grunt.log.ok('Created '.green + 'post'.blue + ' at: ' + dest);
-      delete templateData.post;
+      grunt.file.write(post.dest, fn(_.omit(templateData, 'posts')));
+      grunt.log.ok('Created '.green + 'post'.blue + ' at: ' + post.dest);
+    });
+
+    // Remove the post object from the templateData now that each post has been generated
+    delete templateData.post;
+
+    // Remove the dest property from the posts now that they are generated
+    templateData.posts.forEach(function (post) {
+      delete post.dest;
     });
   }
 
