@@ -95,6 +95,11 @@ Type: `String`
 
 The location of a JSON file which is parsed and passed to templates for rendering. This is primarily used for data to be shared across all pages. This data is available in pages' and posts' templates via the `data` object.
 
+#### sortFunction
+Type: `Function` Default: Sort by `date` descending
+
+A compare function used by [Array.sort](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort) to sort posts. 
+
 #### pagination
 Type: `Object`
 

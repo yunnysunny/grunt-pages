@@ -21,6 +21,9 @@ module.exports = function (grunt) {
         layout: 'test/fixtures/jade/layouts/post.jade',
         url: 'blog/posts/:title',
         options: {
+          sortFunction: function (a, b) {
+            return a.date - b.date;
+          },
           pagination: {
             postsPerPage: 1,
             listPage: 'test/fixtures/jade/pages/blog/index.jade'

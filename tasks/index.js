@@ -194,9 +194,10 @@ module.exports = function (grunt) {
   function sortPosts (postCollection) {
 
     // Defaults to sorting posts by descending date
-    var sortFunction = function (a, b) {
-      return b.date - a.date;
-    };
+    var sortFunction = options.sortFunction ||
+      function (a, b) {
+        return b.date - a.date;
+      };
 
     postCollection.sort(sortFunction);
   }
