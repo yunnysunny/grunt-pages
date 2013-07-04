@@ -24,6 +24,7 @@ module.exports = function (grunt) {
     _this = this;
     options = this.options();
 
+    // Don't include draft posts or dotfiles when counting the number of posts
     var numPosts = grunt.file.expand({
       filter: 'isFile'
     }, [
@@ -36,19 +37,21 @@ module.exports = function (grunt) {
     var postCollection = [];
 
     grunt.file.recurse(this.data.src, function (abspath) {
+
       // Don't include draft posts or dotfiles
       if (path.basename(abspath).indexOf('_') === 0 ||
           path.basename(abspath).indexOf('.') === 0) {
         return;
       }
       var post = parsePostData(abspath);
+
+      // Save source path for error logging in getPostDest
       post.sourcePath = abspath;
       if (post.markdown.length <= 1) {
         grunt.fail.fatal('the following post is blank, please add some content to it or delete it: ' + abspath.red);
       }
 
-      // Parse post using marked and pygmentize for highlighting
-      marked(post.markdown, {
+      marked.setOptions({
         highlight: function (code, lang, callback) {
           pygmentize({ lang: lang, format: 'html' }, code, function (err, result) {
             callback(err, result.toString());
@@ -56,10 +59,16 @@ module.exports = function (grunt) {
         },
         gfm: true,
         anchors: true
-      }, function (err, content) {
+      });
+
+      // Parse post using marked and pygmentize for highlighting
+      marked(post.markdown, function (err, content) {
         if (err) throw err;
-        delete post.markdown;
+
+        // Replace markdown source with content property
         post.content = content;
+        delete post.markdown;
+
         postCollection.push(post);
 
         // Once all the source posts are parsed, we can generate the html posts
@@ -71,7 +80,7 @@ module.exports = function (grunt) {
               try {
                 templateData.data = JSON.parse(fs.readFileSync(options.data));
               } catch (e) {
-                grunt.fail.fatal('data could not be parsed.');
+                grunt.fail.fatal('data could not be parsed from ' + options.data + '.');
               }
             } else if (typeof options.data === 'object') {
               templateData.data = options.data;
@@ -154,24 +163,28 @@ module.exports = function (grunt) {
    */
   function getPostDest (post) {
     var dest = _this.data.dest + '/' + _this.data.url + '.html';
-    var dynamicUrlSegments = _this.data.url.split('/')
-    .filter(function (urlSegment) {
-      return urlSegment.indexOf(':') !== -1;
-    })
-    .map(function (urlSegment) {
-      return urlSegment.slice(urlSegment.indexOf(':') + 1);
-    });
 
-    // Replace dynamic url segments
-    dynamicUrlSegments.forEach(function (urlSegment) {
+    _this.data.url.split('/')
 
-      // Make sure the post has the dynamic segment as a metadata property
-      if (urlSegment in post) {
-        dest = dest.replace(':' + urlSegment, post[urlSegment].replace(/[^a-zA-Z0-9]/g, '-'));
-      } else {
-        grunt.fail.fatal('required ' + urlSegment + ' attribute not found in the following post\'s metadata: ' + post.sourcePath + '.');
-      }
-    });
+      .filter(function (urlSegment) {
+        return urlSegment.indexOf(':') !== -1;
+      })
+
+      .map(function (urlSegment) {
+        return urlSegment.slice(urlSegment.indexOf(':') + 1);
+      })
+
+      // Replace dynamic url segments
+      .forEach(function (urlSegment) {
+
+        // Make sure the post has the dynamic segment as a metadata property
+        if (urlSegment in post) {
+          dest = dest.replace(':' + urlSegment, post[urlSegment].replace(/[^a-zA-Z0-9]/g, '-'));
+        } else {
+          grunt.fail.fatal('required ' + urlSegment + ' attribute not found in the following post\'s metadata: ' + post.sourcePath + '.');
+        }
+      });
+
     return dest;
   }
 
@@ -237,10 +250,12 @@ module.exports = function (grunt) {
    * @return {undefined}
    */
   function generatePages (templateData) {
-    var listPage;
+
+    // Ignore the listPage if pagination is enabled
     if (options.pagination) {
-      listPage = options.pagination.listPage;
+      var listPage = options.pagination.listPage;
     }
+
     grunt.file.recurse(options.pageSrc, function (abspath, rootdir) {
 
       // Don't include dotfiles
@@ -271,6 +286,7 @@ module.exports = function (grunt) {
   function paginate (postCollection) {
     var postGroups = [];
     var postGroup;
+
     var postsPerPage = options.pagination.postsPerPage;
     var listPage = options.pagination.listPage;
 
