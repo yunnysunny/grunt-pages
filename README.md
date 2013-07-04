@@ -91,9 +91,9 @@ Type: `String`
 The folder where the ejs or jade source pages of your website are located. These pages have access to the posts' content and metadata in a `posts` array. Additionally, pages have access to their own filename(without extension) via the `currentPage` variable. All of the files in this folder are generated in the `dest` folder maintaining the same relative path from `pageSrc`.
 
 #### data
-Type: `String`
+Type: `Object || String`
 
-The location of a JSON file which is parsed and passed to templates for rendering. This is primarily used for data to be shared across all pages. This data is available in pages' and posts' templates via the `data` object.
+A JavaScript object or the location of a JSON file which is passed as data to templates. This option is primarily used for data to be shared across all pages. It is available in page and post templates via the `data` object.
 
 #### sortFunction
 Type: `Function` Default: Sort by `date` descending
