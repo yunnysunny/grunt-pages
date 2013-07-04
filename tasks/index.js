@@ -66,12 +66,17 @@ module.exports = function (grunt) {
         if (++parsedPosts === numPosts) {
           var templateData = { posts: postCollection };
 
-          // Optionally add data from a specified JSON file
           if (options.data) {
-            try {
-              templateData.data = JSON.parse(fs.readFileSync(options.data));
-            } catch (e) {
-              grunt.fail.fatal(e + ' when parsing ' + options.data);
+            if (typeof options.data === 'string') {
+              try {
+                templateData.data = JSON.parse(fs.readFileSync(options.data));
+              } catch (e) {
+                grunt.fail.fatal('data could not be parsed.');
+              }
+            } else if (typeof options.data === 'object') {
+              templateData.data = options.data;
+            } else {
+              grunt.fail.fatal('data format not recognized.');
             }
           }
 
