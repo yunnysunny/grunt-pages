@@ -1,6 +1,6 @@
 {
   "name": "grunt-pages",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "Grunt task to create pages using markdown and templates",
   "main": "Gruntfile.js",
   "dependencies": {
