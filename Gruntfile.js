@@ -24,6 +24,9 @@ module.exports = function (grunt) {
           sortFunction: function (a, b) {
             return a.date - b.date;
           },
+          data: {
+            test: 1
+          },
           pagination: {
             postsPerPage: 1,
             listPage: 'test/fixtures/jade/pages/blog/index.jade'
