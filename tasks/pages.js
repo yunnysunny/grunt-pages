@@ -53,6 +53,7 @@ module.exports = function (grunt) {
 
       marked.setOptions({
         highlight: function (code, lang, callback) {
+          // Use [pygments](http://pygments.org/) for highlighting
           pygmentize({ lang: lang, format: 'html' }, code, function (err, result) {
             callback(err, result.toString());
           });
@@ -61,7 +62,7 @@ module.exports = function (grunt) {
         anchors: true
       });
 
-      // Parse post using marked and pygmentize for highlighting
+      // Parse post using marked
       marked(post.markdown, function (err, content) {
         if (err) throw err;
 
