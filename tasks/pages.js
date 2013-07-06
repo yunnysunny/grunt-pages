@@ -168,10 +168,13 @@ module.exports = function (grunt) {
 
   /**
    * Returns the post destination based on the url property and postData
-   * @param  {Object} postData
+   * @param  {Object} post
    * @return {String}
    */
   function getPostDest (post) {
+    if (typeof _this.data.dest === 'undefined') {
+      grunt.fail.fatal('Please specify the dest property in your config.');
+    }
     var dest = _this.data.dest + '/' + _this.data.url + '.html';
 
     _this.data.url.split('/')
