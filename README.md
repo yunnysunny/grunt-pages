@@ -151,9 +151,9 @@ The file extension of the page layouts' template engine. This is used to filter 
 
 # Changelog
 
-**0.2.4** - Added sortFunction option & allowed for data option to take an object as a parameter.
+**0.2.4** - Added `sortFunction` option & allowed for `data` option to take an object as a parameter.
 
-**0.2.3** - Ignore dotfiles, error reporting for incorrect data JSON files, and new header anchor link format.
+**0.2.3** - Ignored dotfiles, added error reporting for incorrect data JSON files, and added new header anchor link format.
 
 **0.2.2** - Used forked version of marked to enable header anchor links.
 
