@@ -1,3 +1,11 @@
+/*
+ * grunt-pages
+ * https://github.com/ChrisWren/grunt-pages
+ *
+ * Copyright (c) 2013 Chris Wren
+ * Licensed under the MIT license.
+ */
+
 'use strict';
 var fs = require('fs');
 var path = require('path');
