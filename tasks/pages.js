@@ -36,19 +36,19 @@ module.exports = function (grunt) {
     var parsedPosts = 0;
     var postCollection = [];
 
-    grunt.file.recurse(this.data.src, function (abspath) {
+    grunt.file.recurse(this.data.src, function (postpath) {
 
       // Don't include draft posts or dotfiles
-      if (path.basename(abspath).indexOf('_') === 0 ||
-          path.basename(abspath).indexOf('.') === 0) {
+      if (path.basename(postpath).indexOf('_') === 0 ||
+          path.basename(postpath).indexOf('.') === 0) {
         return;
       }
-      var post = parsePostData(abspath);
+      var post = parsePostData(postpath);
 
       // Save source path for error logging in getPostDest
-      post.sourcePath = abspath;
+      post.sourcePath = postpath;
       if (post.markdown.length <= 1) {
-        grunt.fail.fatal('the following post is blank, please add some content to it or delete it: ' + abspath.red);
+        grunt.fail.fatal('the following post is blank, please add some content to it or delete it: ' + postpath.red);
       }
 
       marked.setOptions({
