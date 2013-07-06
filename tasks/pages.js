@@ -76,22 +76,13 @@ module.exports = function (grunt) {
           var templateData = { posts: postCollection };
 
           if (options.data) {
-            if (typeof options.data === 'string') {
-              try {
-                templateData.data = JSON.parse(fs.readFileSync(options.data));
-              } catch (e) {
-                grunt.fail.fatal('data could not be parsed from ' + options.data + '.');
-              }
-            } else if (typeof options.data === 'object') {
-              templateData.data = options.data;
-            } else {
-              grunt.fail.fatal('data format not recognized.');
-            }
+            setData(templateData);
           }
 
           setPostDests(postCollection);
           setPostUrls(postCollection);
           sortPosts(postCollection);
+
           generatePosts(templateData);
 
           if (options.pageSrc) {
@@ -139,6 +130,24 @@ module.exports = function (grunt) {
       return postData;
     } catch (e) {
       grunt.fail.fatal('the metadata for the following post is formatted incorrectly: ' + abspath.red);
+    }
+  }
+
+  /**
+   * Updates the template data with the data from an Object or JSON file
+   * @param {object} templateData
+   */
+  function setData (templateData) {
+    if (typeof options.data === 'string') {
+      try {
+        templateData.data = JSON.parse(fs.readFileSync(options.data));
+      } catch (e) {
+        grunt.fail.fatal('data could not be parsed from ' + options.data + '.');
+      }
+    } else if (typeof options.data === 'object') {
+      templateData.data = options.data;
+    } else {
+      grunt.fail.fatal('data format not recognized.');
     }
   }
 
