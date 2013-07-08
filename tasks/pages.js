@@ -120,9 +120,9 @@ module.exports = function (grunt) {
 
       // Parse JSON metadata
       if (fileString.indexOf('{') === 0) {
-        postData = eval('(' + fileString.substr(0, fileString.indexOf('}') + 1) + ')');
+        postData = eval('(' + fileString.substr(0, fileString.indexOf('\n}') + 2) + ')');
         postData.date = new Date(postData.date);
-        postData.markdown = fileString.slice(fileString.indexOf('}') + 1);
+        postData.markdown = fileString.slice(fileString.indexOf('\n}') + 2);
 
       // Parse YAML metadata
       } else if (fileString.indexOf('----') === 0) {
