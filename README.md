@@ -81,19 +81,19 @@ The [jade](https://github.com/visionmedia/jade) or [ejs](https://github.com/visi
 #### url
 Type: `String`
 
-The url of each post. The string takes variables as parameters using the `:variable` syntax. Variable(s) specified in the url are required in each post's metadata.
+The url of each post. The url string takes variables as parameters using the `:variable` syntax. Variable(s) specified in the url are required in each post's metadata.
 
 ### Options
 
 #### pageSrc
 Type: `String`
 
-The folder where the ejs or jade source pages of your website are located. These pages have access to the posts' content and metadata in a `posts` array. Additionally, pages have access to their own filename(without extension) via the `currentPage` variable. All of the files in this folder are generated in the `dest` folder maintaining the same relative path from `pageSrc`.
+The folder where the ejs or jade source pages of your website are located. These pages have access to each post's content and metadata via a `posts` array. Additionally, pages have access to their own filename(without extension) via the `currentPage` variable. All of the files in this folder are generated in the `dest` folder maintaining the same relative path from `pageSrc`.
 
 #### data
 Type: `Object || String`
 
-A JavaScript object or the location of a JSON file which is passed as data to templates. This option is primarily used for data to be shared across all pages. It is available in page and post templates via the `data` object.
+A JavaScript object or the location of a JSON file which is passed as data to templates. This option is primarily used to specify config that is shared across all pages. It is available in page and post templates via the `data` object.
 
 #### sortFunction
 Type: `Function` Default: Sort by `date` descending
@@ -103,7 +103,7 @@ A compare function used by [Array.sort](https://developer.mozilla.org/en-US/docs
 #### pagination
 Type: `Object`
 
-An object containing config for pagination. This option generates paginated list pages which each containing a specified number of posts. These paginated list pages are generated in the `dest` folder relative to the pagination.listPage's location in the format `pagination.listPage`/pages/`pageNumber`/index.html.
+An object containing config for pagination. This option generates paginated list pages which each contain a specified number of posts. These paginated list pages are generated in the `dest` folder relative to the pagination.listPage's location in the format `pagination.listPage`/pages/`pageNumber`/index.html.
 
 Here is a sample config using pagination:
 
@@ -111,8 +111,8 @@ Here is a sample config using pagination:
 pages: {
   options: {
     pagination: {
-      listPage: 'src/layouts/listPage.jade',
-      postsPerPage: 3
+      postsPerPage: 3,
+      listPage: 'src/layouts/listPage.jade'
     }
   },
   posts: {
@@ -137,17 +137,17 @@ The location of the layout template which is used for each list page. [Here](htt
 ###### pages
 Type: `Array` of `Object`s
 
-An array of page objects which each contain a `url` property. The page currently being rendered also has a `currentPage` boolean property.
+An array of page objects which each contain a `url` property. The page currently being rendered also has a `currentPage` boolean property which is set to `true`.
 
 ###### posts
 Type: `Array` of `Object`s
 
-An array of post objects which contains the `content` and metadata properties for each post.
+An array of post objects which each contain the `content` and metadata properties for each post.
 
 #### templateEngine
 Type: `String`
 
-The file extension of the page layouts' template engine. This is used to filter template files in the `pageSrc` folder when developing a [Cabin](http://colinwren.github.io/Cabin/) theme for multiple template engines.
+The file extension of the template engine to be used. This option filters template files in the `pageSrc` folder when developing a [Cabin](http://colinwren.github.io/Cabin/) theme for multiple template engines.
 
 # Changelog
 
