@@ -12,13 +12,13 @@ describe('grunt-pages', function () {
   });
 
   it('should create posts in the location specified by the url', function() {
-    fs.existsSync('dev/blog/posts/Post-1.html').should.be.ok;
-    fs.existsSync('dev/blog/posts/Post-2.html').should.be.ok;
+    fs.existsSync('dev/blog/posts/Post_1.html').should.be.ok;
+    fs.existsSync('dev/blog/posts/Post_2.html').should.be.ok;
   });
 
   it('should create posts by correctly parsing the markdown content', function () {
-    fs.readFileSync('dev/blog/posts/Post-1.html', 'utf8').should.equal(fs.readFileSync('test/output/blog/posts/Post1.html', 'utf8'));
-    fs.readFileSync('dev/blog/posts/Post-2.html', 'utf8').should.equal(fs.readFileSync('test/output/blog/posts/Post2.html', 'utf8'));
+    fs.readFileSync('dev/blog/posts/Post_1.html', 'utf8').should.equal(fs.readFileSync('test/output/blog/posts/Post1.html', 'utf8'));
+    fs.readFileSync('dev/blog/posts/Post_2.html', 'utf8').should.equal(fs.readFileSync('test/output/blog/posts/Post2.html', 'utf8'));
   });
 
   it('should create pages in the location specified by the url', function() {
@@ -47,7 +47,7 @@ describe('grunt-pages', function () {
 
     it('should create pages in the expected location', function() {
       fs.existsSync('dev/index.html').should.be.ok;
-      fs.existsSync('dev/page/1/index.html').should.be.ok;
+      fs.existsSync('dev/list/1/index.html').should.be.ok;
     });
 
     it('should create the root list page with the expected content', function () {
@@ -55,7 +55,7 @@ describe('grunt-pages', function () {
     });
 
     it('should create the paginated list page with the expected content', function () {
-      fs.readFileSync('dev/page/1/index.html', 'utf8').should.equal(fs.readFileSync('test/output/blog/page/1/index.html', 'utf8'));
+      fs.readFileSync('dev/list/1/index.html', 'utf8').should.equal(fs.readFileSync('test/output/blog/list/1/index.html', 'utf8'));
     });
 
   });

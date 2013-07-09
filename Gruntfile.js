@@ -10,6 +10,9 @@ module.exports = function (grunt) {
         layout: 'test/fixtures/ejs/layouts/post.ejs',
         url: 'blog/posts/:title',
         options: {
+          formatPostUrl: function (urlSegment) {
+            return urlSegment.replace(/[^a-zA-Z0-9]/g, '_');
+          },
           pageSrc: 'test/fixtures/ejs/pages',
           templateEngine: 'ejs',
           data: 'test/fixtures/data/data.json'
@@ -29,7 +32,8 @@ module.exports = function (grunt) {
           },
           pagination: {
             postsPerPage: 1,
-            listPage: 'test/fixtures/jade/pages/blog/index.jade'
+            listPage: 'test/fixtures/jade/pages/blog/index.jade',
+            url: 'list/:index/index.html'
           }
         }
       }
@@ -116,6 +120,6 @@ module.exports = function (grunt) {
 
   grunt.loadTasks('./tasks');
   grunt.registerTask('build', ['clean', 'copy', 'pages:paginated']);
-  grunt.registerTask('test', ['jshint', 'simplemocha']);
+  grunt.registerTask('test', ['clean', 'jshint', 'simplemocha']);
   grunt.registerTask('default', ['concurrent']);
 };
