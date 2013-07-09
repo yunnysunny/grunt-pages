@@ -150,6 +150,7 @@ Type: `String` Default: `pages/:index/index.html`
 The location of the generated list pages relative to the `pagination.listPage`. You can override this property to have a custom url scheme for list pages. You **must** have a `:index` variable in your url scheme which will be replaced by the page's index.
 
 #### formatPostUrl
+Type: `Function`
 
 Default:
 ```js
