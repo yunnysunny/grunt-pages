@@ -204,7 +204,7 @@ module.exports = function (grunt) {
 
         // Make sure the post has the dynamic segment as a metadata property
         if (urlSegment in post) {
-	  dest = dest.replace(':' + urlSegment, formatPostUrl(post[urlSegment]));
+          dest = dest.replace(':' + urlSegment, formatPostUrl(post[urlSegment]));
         } else {
           grunt.fail.fatal('required ' + urlSegment + ' attribute not found in the following post\'s metadata: ' + post.sourcePath + '.');
         }
@@ -351,7 +351,10 @@ module.exports = function (grunt) {
   function getListPageDest (listPage, pageNumber) {
     var dest = _this.data.dest + '/' ;
 
+    var paginationURL = options.pagination.url || 'page/:index/index.html';
+
     // If the pageSrc option is used generate list pages relative to pageSrc
+    // Otherwise, generate list pages in the root of 'dest'
     if (options.pageSrc) {
       if (listPage.indexOf(options.pageSrc) !== -1) {
         dest += listPage.slice(options.pageSrc.length + 1);
@@ -367,10 +370,13 @@ module.exports = function (grunt) {
         dest = dest.replace(path.extname(listPage), '.html');
       }
     } else {
+      if (paginationURL.indexOf(':index') === -1) {
+        grunt.fail.fatal('The pagination url property must include a \':index\' variable which is replaced by the pages index');
+      }
       if (!options.pageSrc) {
-        dest += 'page/' + pageNumber + '/index.html';
+        dest += paginationURL.replace(':index', pageNumber);
       } else {
-        dest = dest.replace(path.basename(listPage), 'page/' + pageNumber + '/index.html');
+        dest = dest.replace(path.basename(listPage), paginationURL.replace(':index', pageNumber));
       }
     }
     return dest;

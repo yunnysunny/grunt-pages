@@ -103,7 +103,7 @@ A compare function used by [Array.sort](https://developer.mozilla.org/en-US/docs
 #### pagination
 Type: `Object`
 
-An object containing config for pagination. This option generates paginated list pages which each contain a specified number of posts. These paginated list pages are generated in the `dest` folder relative to the pagination.listPage's location in the format `pagination.listPage`/pages/`pageNumber`/index.html.
+An object containing config for pagination. This option generates paginated list pages which each contain a specified number of posts.
 
 Here is a sample config using pagination:
 
@@ -143,6 +143,11 @@ An array of page objects which each contain a `url` property. The page currently
 Type: `Array` of `Object`s
 
 An array of post objects which each contain the `content` and metadata properties for each post.
+
+##### pagination.url
+Type: `String` Default: `pages/:index/index.html`
+
+The location of the generated list pages relative to the `pagination.listPage`. You can override this property to have a custom url scheme for list pages. You **must** have a `:index` variable in your url scheme which will be replaced by the page's index.
 
 #### formatPostUrl
 
