@@ -10,6 +10,9 @@ module.exports = function (grunt) {
         layout: 'test/fixtures/ejs/layouts/post.ejs',
         url: 'blog/posts/:title',
         options: {
+	  formatPostUrl: function (urlSegment) {
+	    return urlSegment.replace(/[^a-zA-Z0-9]/g, '_');
+	  },
           pageSrc: 'test/fixtures/ejs/pages',
           templateEngine: 'ejs',
           data: 'test/fixtures/data/data.json'

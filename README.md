@@ -144,6 +144,16 @@ Type: `Array` of `Object`s
 
 An array of post objects which each contain the `content` and metadata properties for each post.
 
+#### formatPostUrl
+
+Default:
+```js
+function (url) {
+  return url.replace(/[^a-zA-Z0-9]/g, '-');
+}
+```
+A function that takes a `url` as a parameter and returns a formatted url string. This is primarily used to remove special characters and replace whitespace.
+
 #### templateEngine
 Type: `String`
 

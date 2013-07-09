@@ -185,6 +185,10 @@ module.exports = function (grunt) {
     }
     var dest = _this.data.dest + '/' + _this.data.url + '.html';
 
+    var formatPostUrl = options.formatPostUrl || function (urlSegment) {
+      return urlSegment.replace(/[^a-zA-Z0-9]/g, '-');
+    };
+
     _this.data.url.split('/')
 
       .filter(function (urlSegment) {
@@ -200,7 +204,7 @@ module.exports = function (grunt) {
 
         // Make sure the post has the dynamic segment as a metadata property
         if (urlSegment in post) {
-          dest = dest.replace(':' + urlSegment, post[urlSegment].replace(/[^a-zA-Z0-9]/g, '-'));
+	  dest = dest.replace(':' + urlSegment, formatPostUrl(post[urlSegment]));
         } else {
           grunt.fail.fatal('required ' + urlSegment + ' attribute not found in the following post\'s metadata: ' + post.sourcePath + '.');
         }
