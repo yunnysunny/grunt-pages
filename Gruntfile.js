@@ -116,6 +116,6 @@ module.exports = function (grunt) {
 
   grunt.loadTasks('./tasks');
   grunt.registerTask('build', ['clean', 'copy', 'pages:paginated']);
-  grunt.registerTask('test', ['jshint', 'simplemocha']);
+  grunt.registerTask('test', ['clean', 'jshint', 'simplemocha']);
   grunt.registerTask('default', ['concurrent']);
 };
