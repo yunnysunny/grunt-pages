@@ -334,6 +334,7 @@ module.exports = function (grunt) {
     postGroups.forEach(function (postGroup, pageNumber) {
       pageUrls[pageNumber].currentPage = true;
       grunt.file.write(pageDests[pageNumber], fn({
+        currentIndex: pageNumber,
         pages: pageUrls,
         posts: postGroup
       }));
