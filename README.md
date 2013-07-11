@@ -155,7 +155,7 @@ Type: `Function`
 Default:
 ```js
 function (url) {
-  return url.replace(/[^a-zA-Z0-9]/g, '-');
+  return url.replace(/[^\w\s\-]/gi, '').replace(/\s{2,}/gi, ' ').replace(/\s/gi, '-').toLowerCase();
 }
 ```
 A function that takes a `url` as a parameter and returns a formatted url string. This is primarily used to remove special characters and replace whitespace.

@@ -186,7 +186,7 @@ module.exports = function (grunt) {
     var dest = _this.data.dest + '/' + _this.data.url + '.html';
 
     var formatPostUrl = options.formatPostUrl || function (urlSegment) {
-      return urlSegment.replace(/[^a-zA-Z0-9]/g, '-');
+      return urlSegment.replace(/[^\w\s\-]/gi, '').replace(/\s{2,}/gi, ' ').replace(/\s/gi, '-').toLowerCase();
     };
 
     _this.data.url.split('/')
