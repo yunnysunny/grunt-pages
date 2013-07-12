@@ -21,6 +21,9 @@ var templateEngines = {
   ejs: require('ejs')
 };
 
+// Define lib object to attach library methods to
+var lib = {};
+
 module.exports = function (grunt) {
   var _this;
   var options;
@@ -51,7 +54,7 @@ module.exports = function (grunt) {
           path.basename(postpath).indexOf('.') === 0) {
         return;
       }
-      var post = parsePostData(postpath);
+      var post = lib.parsePostData(postpath);
 
       // Save source path for error logging in getPostDest
       post.sourcePath = postpath;
@@ -85,21 +88,21 @@ module.exports = function (grunt) {
           var templateData = { posts: postCollection };
 
           if (options.data) {
-            setData(templateData);
+            lib.setData(templateData);
           }
 
-          setPostDests(postCollection);
-          setPostUrls(postCollection);
-          sortPosts(postCollection);
+          lib.setPostDests(postCollection);
+          lib.setPostUrls(postCollection);
+          lib.sortPosts(postCollection);
 
-          generatePosts(templateData);
+          lib.generatePosts(templateData);
 
           if (options.pageSrc) {
-            generatePages(templateData);
+            lib.generatePages(templateData);
           }
 
           if (options.pagination) {
-            paginate(postCollection);
+            lib.paginate(postCollection);
           }
 
           done();
@@ -113,7 +116,7 @@ module.exports = function (grunt) {
    * @param  {String} abspath
    * @return {Object}
    */
-  function parsePostData (abspath) {
+  lib.parsePostData = function (abspath) {
     var fileString = fs.readFileSync(abspath, 'utf8');
     var postData = {};
     try {
@@ -140,13 +143,13 @@ module.exports = function (grunt) {
     } catch (e) {
       grunt.fail.fatal('the metadata for the following post is formatted incorrectly: ' + abspath.red);
     }
-  }
+  };
 
   /**
    * Updates the template data with the data from an Object or JSON file
    * @param {object} templateData
    */
-  function setData (templateData) {
+  lib.setData = function (templateData) {
     if (typeof options.data === 'string') {
       try {
         templateData.data = JSON.parse(fs.readFileSync(options.data));
@@ -158,28 +161,28 @@ module.exports = function (grunt) {
     } else {
       grunt.fail.fatal('data format not recognized.');
     }
-  }
+  };
 
   /**
    * Updates the post collection with each post's destination
    * @param {Array} postCollection Collection of parsed posts
    */
-  function setPostDests (postCollection) {
+  lib.setPostDests = function (postCollection) {
     postCollection.forEach(function (post) {
-      post.dest = getPostDest(post);
+      post.dest = lib.getPostDest(post);
 
       // Remove the source path from the post as it is only used for error logging in getPostDest
       delete post.sourcePath;
     });
 
-  }
+  };
 
   /**
    * Returns the post destination based on the url property and postData
    * @param  {Object} post
    * @return {String}
    */
-  function getPostDest (post) {
+  lib.getPostDest = function (post) {
     if (typeof _this.data.dest === 'undefined') {
       grunt.fail.fatal('Please specify the dest property in your config.');
     }
@@ -211,25 +214,25 @@ module.exports = function (grunt) {
       });
 
     return dest;
-  }
+  };
 
   /**
    * Updates the post collection with each post's url
    * @param {[Array]} postCollection Array of posts
    */
-  function setPostUrls (postCollection) {
+  lib.setPostUrls = function (postCollection) {
     postCollection.forEach(function (post) {
 
       // Slice the destination folder from the beginning of the url
       post.url = post.dest.slice((_this.data.dest + '/').length);
     });
-  }
+  };
 
   /**
    * Sorts the posts
    * @param {Array} postCollection Collection of parsed posts
    */
-  function sortPosts (postCollection) {
+  lib.sortPosts = function (postCollection) {
 
     // Defaults to sorting posts by descending date
     var sortFunction = options.sortFunction ||
@@ -238,13 +241,13 @@ module.exports = function (grunt) {
       };
 
     postCollection.sort(sortFunction);
-  }
+  };
 
   /**
    * Generates posts based on the templateData
    * @param  {Object} templateData
    */
-  function generatePosts (templateData) {
+  lib.generatePosts = function (templateData) {
     templateData.posts.forEach(function (post) {
 
       // Pass the post data to the template via a post object
@@ -266,13 +269,13 @@ module.exports = function (grunt) {
     templateData.posts.forEach(function (post) {
       delete post.dest;
     });
-  }
+  };
 
   /**
    * Generates pages using the posts' data
    * @param  {Object} templateData
    */
-  function generatePages (templateData) {
+  lib.generatePages = function (templateData) {
 
     // Ignore the listPage if pagination is enabled
     if (options.pagination) {
@@ -299,13 +302,13 @@ module.exports = function (grunt) {
         }
       }
     });
-  }
+  };
 
   /**
    * Creates paginated pages with a specified number of posts per page
    * @param  {Array} postCollection
    */
-  function paginate (postCollection) {
+  lib.paginate = function (postCollection) {
     var postGroups = [];
     var postGroup;
 
@@ -321,7 +324,7 @@ module.exports = function (grunt) {
     var pageDests = [];
 
     postGroups.forEach(function (postGroup, pageNumber) {
-      pageDests.push(getListPageDest(listPage, pageNumber));
+      pageDests.push(lib.getListPageDest(listPage, pageNumber));
     });
 
     var pageUrls = pageDests.map(function (dest) {
@@ -341,7 +344,7 @@ module.exports = function (grunt) {
       delete pageUrls[pageNumber].currentPage;
       grunt.log.ok('Created '.green + 'paginated'.rainbow + ' page'.magenta + ' at: ' + pageDests[pageNumber]);
     });
-  }
+  };
 
   /**
    * Gets a list page's destination to be written
@@ -349,7 +352,7 @@ module.exports = function (grunt) {
    * @param  {Number} pageNumber Index of current page to be writtern
    * @return {String}            Destination of current page
    */
-  function getListPageDest (listPage, pageNumber) {
+  lib.getListPageDest = function (listPage, pageNumber) {
     var dest = _this.data.dest + '/' ;
 
     var paginationURL = options.pagination.url || 'page/:index/index.html';
@@ -381,5 +384,8 @@ module.exports = function (grunt) {
       }
     }
     return dest;
-  }
+  };
+
+  // Return the library methods so that they can be tested
+  return lib;
 };
