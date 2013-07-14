@@ -163,7 +163,7 @@ A function that takes a `url` as a parameter and returns a formatted url string.
 #### templateEngine
 Type: `String`
 
-The file extension of the template engine to be used. This option filters template files in the `pageSrc` folder when developing a [Cabin](http://colinwren.github.io/Cabin/) theme for multiple template engines.
+The file extension of the template engine to be used. This option filters template files in the `pageSrc` folder when developing a grunt-pages configuration for multiple template engines.
 
 # Changelog
 
