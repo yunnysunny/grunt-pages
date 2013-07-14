@@ -75,6 +75,7 @@ describe('grunt-pages library', function () {
           data: data
         }
       }), grunt);
+
       lib.setData(templateData);
       templateData.data.should.eql(data);
     });
@@ -85,6 +86,7 @@ describe('grunt-pages library', function () {
           data: 'test/fixtures/lib/baddata.json'
         }
       }), grunt);
+
       lib.setData({});
       failStub.lastCall.args[0].should.include('data could not be parsed');
     });
@@ -97,6 +99,52 @@ describe('grunt-pages library', function () {
       }), grunt);
       lib.setData({});
       failStub.lastCall.args[0].should.include('data format not recognized.');
+    });
+
+  });
+
+  describe('getPostDest', function () {
+
+    it('should log an error if the dest property isn\'t specified', function () {
+      lib = pages.call(_.extend(grunt, {
+        testContext: {
+          data: {
+            url: 'test'
+          }
+        }
+      }), grunt);
+
+      lib.getPostDest({});
+      failStub.lastCall.args[0].should.include('Please specify the dest property in your config.');
+    });
+
+    it('should log an error if the post doesn\'t contain metadata specified as a :variable in its url', function () {
+      lib = pages.call(_.extend(grunt, {
+        testContext: {
+          data: {
+            dest: 'dest',
+            url: 'posts/:title'
+          }
+        }
+      }), grunt);
+
+      lib.getPostDest({});
+      failStub.lastCall.args[0].should.include('required title attribute not found');
+    });
+
+    it('should return the post destination after replacing the :variables in the url with its metadata', function () {
+      lib = pages.call(_.extend(grunt, {
+        testContext: {
+          data: {
+            url: 'posts/:title',
+            dest: 'dest'
+          }
+        }
+      }), grunt);
+
+      lib.getPostDest({
+        title: 'Cool Post'
+      }).should.include('dest/posts/cool-post.html');
     });
 
   });
