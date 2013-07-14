@@ -263,7 +263,7 @@ module.exports = function (grunt) {
       // Pass the post data to the template via a post object
       templateData.post = post;
 
-      grunt.file.write(post.dest, fn(_.omit(templateData, 'posts')));
+      grunt.file.write(post.dest, fn(templateData));
       grunt.log.ok('Created '.green + 'post'.blue + ' at: ' + post.dest);
     });
 
