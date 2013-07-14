@@ -251,16 +251,18 @@ module.exports = function (grunt) {
    * @param  {Object} templateData
    */
   lib.generatePosts = function (templateData) {
+
+    // Determine the template engine based on the file's extention name
+    templateEngine = templateEngines[path.extname(_this.data.layout).slice(1)];
+
+    var layoutString = fs.readFileSync(_this.data.layout, 'utf8');
+    var fn = templateEngine.compile(layoutString, { pretty: true, filename: _this.data.layout });
+
     templateData.posts.forEach(function (post) {
 
       // Pass the post data to the template via a post object
       templateData.post = post;
 
-      // Determine the template engine based on the file's extention name
-      templateEngine = templateEngines[path.extname(_this.data.layout).slice(1)];
-
-      var layoutString = fs.readFileSync(_this.data.layout, 'utf8');
-      var fn = templateEngine.compile(layoutString, { pretty: true, filename: _this.data.layout });
       grunt.file.write(post.dest, fn(_.omit(templateData, 'posts')));
       grunt.log.ok('Created '.green + 'post'.blue + ' at: ' + post.dest);
     });
@@ -299,7 +301,6 @@ module.exports = function (grunt) {
           var fn = templateEngine.compile(layoutString, { pretty: true, filename: abspath });
           var dest = _this.data.dest + '/' +
                      abspath.slice(rootdir.length + 1).replace(path.extname(abspath), '.html');
-
           templateData.currentPage = path.basename(abspath, path.extname(abspath));
           grunt.file.write(dest, fn(templateData));
           grunt.log.ok('Created '.green + 'page'.magenta + ' at: ' + dest);
