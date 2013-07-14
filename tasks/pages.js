@@ -25,8 +25,11 @@ var templateEngines = {
 var lib = {};
 
 module.exports = function (grunt) {
-  var _this;
-  var options;
+
+  // Allow for test objects to be used during unit testing
+  var _this = grunt.testContext || {};
+  var options = grunt.testOptions || {};
+
   var templateEngine;
 
   grunt.registerMultiTask('pages', 'Creates pages from markdown and templates.', function () {
