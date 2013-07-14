@@ -1,0 +1,4 @@
+{
+  key: 'val'
+  key2: 'val2'
+}
