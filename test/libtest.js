@@ -12,26 +12,25 @@ describe('grunt-pages library', function () {
 
   describe('parsePostData', function () {
 
-
-
     before(function () {
       lib = pages(grunt);
     });
 
-    it('should log an error if the data is not a YAML or JavaScript Object', function () {
+    it('should log an error if the post metadata is not YAML or a JavaScript Object', function () {
       lib.parsePostData(__dirname + '/fixtures/lib/post/badmetadata.md');
       failStub.lastCall.args[0].should.include('the metadata for the following post is formatted incorrectly:');
     });
 
     describe('when parsing JavaScript Object metadata', function () {
 
-      it('should log an error if the data is not a valid JavaScript Object', function () {
+      it('should log an error if the post metadata is not a valid JavaScript Object', function () {
         lib.parsePostData(__dirname + '/fixtures/lib/post/badobjectmetadata.md');
         failStub.lastCall.args[0].should.include('the metadata for the following post is formatted incorrectly:');
       });
 
-      it('should return the post metadata and content if the metadata is a valid JavaScript Object', function () {
+      it('should return the post metadata and markdown if the metadata is a valid JavaScript Object', function () {
         lib.parsePostData(__dirname + '/fixtures/lib/post/goodobjectmetadata.md').title.should.eql('Good Post :)');
+        lib.parsePostData(__dirname + '/fixtures/lib/post/goodobjectmetadata.md').markdown.should.eql('\n\n# Hello');
       });
 
     });
@@ -43,8 +42,9 @@ describe('grunt-pages library', function () {
         failStub.lastCall.args[0].should.include('the metadata for the following post is formatted incorrectly:');
       });
 
-      it('should return the post metadata and content if the metadata is valid YAML', function () {
-        lib.parsePostData(__dirname + '/fixtures/lib/post/goodyamlmetadata.md').title.should.eql('test');
+      it('should return the post metadata and markdown if the metadata is valid YAML', function () {
+        lib.parsePostData(__dirname + '/fixtures/lib/post/goodobjectmetadata.md').title.should.eql('Good Post :)');
+        lib.parsePostData(__dirname + '/fixtures/lib/post/goodobjectmetadata.md').markdown.should.eql('\n\n# Hello');
       });
 
     });
@@ -55,8 +55,9 @@ describe('grunt-pages library', function () {
 
     var data = { test: 'testval' };
 
-    it('should add the data property directly to the templateData object when data is an Object', function () {
+    it('should add the options.data property directly to the templateData object when options.data is an Object', function () {
       var templateData = {};
+
       lib = pages.call(_.extend(grunt, {
         testOptions: {
           data: 'test/fixtures/lib/data.json'
@@ -66,7 +67,7 @@ describe('grunt-pages library', function () {
       templateData.data.should.eql(data);
     });
 
-    it('should read a JSON file specified by the data property directly to the templateData object when data is a String', function () {
+    it('should read a JSON file specified by the options.data property directly to the templateData object when options.data is a String', function () {
       var templateData = {};
 
       lib = pages.call(_.extend(grunt, {
@@ -78,7 +79,7 @@ describe('grunt-pages library', function () {
       templateData.data.should.eql(data);
     });
 
-    it('should log an error if JSON file is invalid', function () {
+    it('should log an error if the JSON file specified by the options.data String is invalid', function () {
       lib = pages.call(_.extend(grunt, {
         testOptions: {
           data: 'test/fixtures/lib/baddata.json'
@@ -88,7 +89,7 @@ describe('grunt-pages library', function () {
       failStub.lastCall.args[0].should.include('data could not be parsed');
     });
 
-    it('should log an error if the format isn\'t recognized', function () {
+    it('should log an error if the options.data format is not an Object or String', function () {
       lib = pages.call(_.extend(grunt, {
         testOptions: {
           data: 4
