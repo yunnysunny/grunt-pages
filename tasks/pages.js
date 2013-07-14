@@ -10,7 +10,6 @@
 var fs = require('fs');
 var path = require('path');
 
-var _ = require('lodash');
 var jsYAML = require('js-yaml');
 var marked = require('marked');
 var pygmentize = require('pygmentize-bundled');
