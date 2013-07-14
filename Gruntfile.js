@@ -129,7 +129,7 @@ module.exports = function (grunt) {
 
   grunt.loadTasks('./tasks');
   grunt.registerTask('build', ['clean', 'copy', 'pages:paginated']);
-  grunt.registerTask('test', ['clean', 'jshint', 'simplemocha']);
+  grunt.registerTask('test', ['clean', 'jshint', 'simplemocha:all']);
   grunt.registerTask('default', ['concurrent']);
 
   grunt.registerTask('spec', 'Runs a task on a specified file', function (fileName) {
