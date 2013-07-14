@@ -2,7 +2,10 @@ module.exports = function (grunt) {
   // load all grunt tasks
   require('matchdep').filterDev('grunt-*').forEach(grunt.loadNpmTasks);
 
+  var globalConfig = {};
+
   grunt.initConfig({
+    globalConfig: globalConfig,
     pages: {
       posts: {
         src: 'test/fixtures/posts/',
@@ -59,6 +62,9 @@ module.exports = function (grunt) {
       },
       all: {
         src: ['test/*.js']
+      },
+      spec: {
+        src: ['test/<%= globalConfig.file %>.js']
       }
     },
     connect: {
@@ -82,7 +88,10 @@ module.exports = function (grunt) {
       },
       src: {
         files: ['tasks/*.js', 'test/fixtures/**'],
-        tasks: ['build']
+        tasks: ['jshint', 'build']
+      },
+      tests: {
+        files: ['test/*.js']
       }
     },
     jshint: {
@@ -122,4 +131,9 @@ module.exports = function (grunt) {
   grunt.registerTask('build', ['clean', 'copy', 'pages:paginated']);
   grunt.registerTask('test', ['clean', 'jshint', 'simplemocha']);
   grunt.registerTask('default', ['concurrent']);
+
+  grunt.registerTask('spec', 'Runs a task on a specified file', function (fileName) {
+    globalConfig.file = fileName;
+    grunt.task.run('simplemocha:spec');
+  });
 };
