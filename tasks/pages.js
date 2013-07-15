@@ -104,7 +104,7 @@ module.exports = function (grunt) {
           }
 
           if (options.pagination) {
-            lib.paginate(postCollection);
+            lib.paginate(templateData);
           }
 
           done();
@@ -309,57 +309,80 @@ module.exports = function (grunt) {
   };
 
   /**
+   * Default function to get post groups for each paginated list page
+   * @param  {Array} postCollection
+   * @return {Array}                Array of post arrays to be displayed on each paginated page
+   */
+  lib.getPostGroups = function (postCollection) {
+    var postsPerPage = options.pagination.postsPerPage;
+    var postGroups = [];
+    var postGroup;
+    var i = 0;
+
+    while ((postGroup = postCollection.slice(i * postsPerPage, (i + 1) * postsPerPage)).length) {
+      postGroups.push({
+        posts: postGroup,
+        id: i
+      });
+      i++;
+    }
+    return postGroups;
+  };
+
+  /**
+   * Returns the set of paginated pages to be generated
+   * @param  {Array} postCollection
+   * @return {Array}                Array of pages with the collection of posts and destination path
+   */
+  lib.getPaginatedPages = function (postCollection) {
+    var postGroupGetter = options.getPostGroups ||
+                          lib.getPostGroups;
+
+    return postGroupGetter(postCollection).map(function (postGroup) {
+      return {
+        posts: postGroup.posts,
+        dest: lib.getListPageDest(postGroup.id)
+      };
+    });
+  };
+
+  /**
    * Creates paginated pages with a specified number of posts per page
    * @param  {Array} postCollection
    */
-  lib.paginate = function (postCollection) {
-    var postGroups = [];
-    var postGroup;
-
-    var postsPerPage = options.pagination.postsPerPage;
+  lib.paginate = function (templateData) {
     var listPage = options.pagination.listPage;
-
-    var i = 0;
-    while ((postGroup = postCollection.slice( i * postsPerPage, (i + 1) * postsPerPage)).length) {
-      postGroups.push(postGroup);
-      i++;
-    }
-
-    var pageDests = [];
-
-    postGroups.forEach(function (postGroup, pageNumber) {
-      pageDests.push(lib.getListPageDest(listPage, pageNumber));
-    });
-
-    var pageUrls = pageDests.map(function (dest) {
-      return { url: path.dirname(dest).slice(_this.data.dest.length) + '/' };
-    });
+    var pages = lib.getPaginatedPages(templateData.posts);
 
     var layoutString = fs.readFileSync(listPage, 'utf8');
     var fn = templateEngine.compile(layoutString, { pretty: true, filename: listPage });
 
-    postGroups.forEach(function (postGroup, pageNumber) {
+    var pageUrls = pages.map(function (page) {
+      return { url: path.dirname(page.dest).slice(_this.data.dest.length) + '/' };
+    });
+
+    pages.forEach(function (page, pageNumber) {
       pageUrls[pageNumber].currentPage = true;
-      grunt.file.write(pageDests[pageNumber], fn({
+      grunt.file.write(page.dest, fn({
         currentIndex: pageNumber,
         pages: pageUrls,
-        posts: postGroup
+        posts: page.posts,
+        data: templateData.data || {}
       }));
-      delete pageUrls[pageNumber].currentPage;
-      grunt.log.ok('Created '.green + 'paginated'.rainbow + ' page'.magenta + ' at: ' + pageDests[pageNumber]);
+      pageUrls[pageNumber].currentPage = false;
+      grunt.log.ok('Created '.green + 'paginated'.rainbow + ' page'.magenta + ' at: ' + page.dest);
     });
   };
 
   /**
    * Gets a list page's destination to be written
-   * @param  {String} listPage   Source list page template layout file
    * @param  {Number} pageNumber Index of current page to be writtern
-   * @return {String}            Destination of current page
+   * @return {String}            Destination of list page
    */
-  lib.getListPageDest = function (listPage, pageNumber) {
-    var dest = _this.data.dest + '/' ;
-
-    var paginationURL = options.pagination.url || 'page/:index/index.html';
+  lib.getListPageDest = function (pageId) {
+    var dest = _this.data.dest + '/';
+    var listPage = options.pagination.listPage;
+    var paginationURL = options.pagination.url || 'page/:id/index.html';
 
     // If the pageSrc option is used generate list pages relative to pageSrc
     // Otherwise, generate list pages in the root of 'dest'
@@ -371,20 +394,20 @@ module.exports = function (grunt) {
       }
     }
 
-    if (pageNumber === 0) {
+    if (pageId === 0) {
       if (!options.pageSrc) {
         dest += 'index.html';
       } else {
         dest = dest.replace(path.extname(listPage), '.html');
       }
     } else {
-      if (paginationURL.indexOf(':index') === -1) {
-        grunt.fail.fatal('The pagination url property must include a \':index\' variable which is replaced by the pages index');
+      if (paginationURL.indexOf(':id') === -1) {
+        grunt.fail.fatal('The pagination url property must include an \':id\' variable which is replaced by the page\'s identifier');
       }
       if (!options.pageSrc) {
-        dest += paginationURL.replace(':index', pageNumber);
+        dest += paginationURL.replace(':id', pageId);
       } else {
-        dest = dest.replace(path.basename(listPage), paginationURL.replace(':index', pageNumber));
+        dest = dest.replace(path.basename(listPage), paginationURL.replace(':id', pageId));
       }
     }
     return dest;
