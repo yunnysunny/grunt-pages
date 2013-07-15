@@ -9,10 +9,12 @@
 'use strict';
 var fs = require('fs');
 var path = require('path');
+var url = require('url');
 
 var jsYAML = require('js-yaml');
 var marked = require('marked');
 var pygmentize = require('pygmentize-bundled');
+var RSS = require('rss');
 require('colors');
 
 var templateEngines = {
@@ -105,6 +107,10 @@ module.exports = function (grunt) {
 
           if (options.pagination) {
             lib.paginate(postCollection);
+          }
+
+          if (options.rss) {
+            lib.generateRSS(postCollection);
           }
 
           done();
@@ -348,6 +354,51 @@ module.exports = function (grunt) {
       delete pageUrls[pageNumber].currentPage;
       grunt.log.ok('Created '.green + 'paginated'.rainbow + ' page'.magenta + ' at: ' + pageDests[pageNumber]);
     });
+  };
+
+  /**
+   * Writes feed.xml based on the collection of posts
+   * @param  {Array} postCollection
+   */
+  lib.generateRSS = function (postCollection) {
+    var dest = path.join(_this.data.dest, 'feed.xml');
+
+    // Allow RSS option to override
+    var siteURL = options.rss.url || options.url;
+    var author = options.rss.author || options.author;
+
+    // Create a new feed
+    var feed = new RSS({
+        title: options.rss.title || options.title,
+        description: options.rss.description || options.description,
+        feed_url: url.resolve(siteURL, 'rss.xml'),
+        site_url: siteURL,
+        image_url: options.rss.image_url,
+        docs: options.rss.docs,
+        author: author,
+        managingEditor: options.rss.managingEditor || author,
+        webMaster: options.rss.webMaster || author,
+        copyright: options.rss.copyRight || new Date().getFullYear() + ' ' + author,
+        language: options.rss.language || 'en',
+        categories: options.rss.categories || options.categories,
+        pubDate: new Date().toString(),
+        ttl: options.rss.ttl || '60'
+    });
+
+    // Add each post
+    postCollection.forEach(function (post) {
+      feed.item({
+          title: post.title,
+          description: post.content,
+          url: url.resolve(url, post.url),
+          categories: post.tags,
+          date: post.date
+      });
+    });
+
+    grunt.file.write(dest, feed.xml());
+
+    grunt.log.ok('Created '.green + 'RSS feed'.yellow + ' at ' + dest);
   };
 
   /**
