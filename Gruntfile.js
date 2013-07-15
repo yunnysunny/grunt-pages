@@ -36,7 +36,7 @@ module.exports = function (grunt) {
           pagination: {
             postsPerPage: 1,
             listPage: 'test/fixtures/jade/pages/blog/index.jade',
-            url: 'list/:index/index.html'
+            url: 'list/:id/index.html'
           }
         }
       }
