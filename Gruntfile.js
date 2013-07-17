@@ -21,6 +21,51 @@ module.exports = function (grunt) {
           data: 'test/fixtures/data/data.json'
         }
       },
+      rss_default: {
+        src: 'test/fixtures/posts/',
+        dest: 'dev',
+        layout: 'test/fixtures/ejs/layouts/post.ejs',
+        url: 'blog/posts/:title',
+        options: {
+          rss: {
+            author: 'The Author',
+            title: 'Blog of Blogs',
+            description: 'The Description',
+            url: 'http://the.url.com',
+            pubDate: new Date(2010, 10, 10) // Must pass date for output to match
+          },
+          pageSrc: 'test/fixtures/ejs/pages',
+          templateEngine: 'ejs',
+          data: 'test/fixtures/data/data.json'
+        }
+      },
+      rss_custom: {
+        src: 'test/fixtures/posts/',
+        dest: 'dev',
+        layout: 'test/fixtures/ejs/layouts/post.ejs',
+        url: 'blog/posts/:title',
+        options: {
+          rss: {
+            path: 'rss/rss.xml',
+            author: 'The Author',
+            title: 'Blog of Blogs',
+            description: 'The Description',
+            url: 'http://the.url.com',
+            image_url: 'http://the.url.com/image.jpg',
+            docs: 'The Docs',
+            managingEditor: 'The Managing Editor',
+            webMaster: 'The Web Master',
+            copyRight: '2044 Industries Inc.',
+            language: 'sp',
+            categories: ['stuff', 'things', 'items', 'widgets'],
+            ttl: '40',
+            pubDate: new Date(2010, 10, 10) // Must pass date for output to match
+          },
+          pageSrc: 'test/fixtures/ejs/pages',
+          templateEngine: 'ejs',
+          data: 'test/fixtures/data/data.json'
+        }
+      },
       paginated: {
         src: 'test/fixtures/posts/',
         dest: 'dev',
@@ -96,7 +141,6 @@ module.exports = function (grunt) {
     },
     jshint: {
       options: {
-        camelcase: true,
         bitwise: true,
         indent: 2,
         eqeqeq: true,

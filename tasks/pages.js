@@ -357,42 +357,51 @@ module.exports = function (grunt) {
   };
 
   /**
-   * Writes feed.xml based on the collection of posts
+   * Writes RSS feed XML based on the collection of posts
    * @param  {Array} postCollection
    */
   lib.generateRSS = function (postCollection) {
-    var dest = path.join(_this.data.dest, 'feed.xml');
+    if (!options.rss.url) {
+      grunt.fail.fatal('options.rss.url is required');
+    }
 
-    // Allow RSS option to override
-    var siteURL = options.rss.url || options.url;
-    var author = options.rss.author || options.author;
+    if (!options.rss.title) {
+      grunt.fail.fatal('options.rss.title is required');
+    }
+
+    if (!options.rss.author) {
+      grunt.fail.fatal('options.rss.author is required');
+    }
+
+    var fileName = options.rss.path || 'feed.xml';
+    var dest = path.join(_this.data.dest, fileName);
 
     // Create a new feed
     var feed = new RSS({
-        title: options.rss.title || options.title,
-        description: options.rss.description || options.description,
-        feed_url: url.resolve(siteURL, 'rss.xml'),
-        site_url: siteURL,
-        image_url: options.rss.image_url,
-        docs: options.rss.docs,
-        author: author,
-        managingEditor: options.rss.managingEditor || author,
-        webMaster: options.rss.webMaster || author,
-        copyright: options.rss.copyRight || new Date().getFullYear() + ' ' + author,
-        language: options.rss.language || 'en',
-        categories: options.rss.categories || options.categories,
-        pubDate: new Date().toString(),
-        ttl: options.rss.ttl || '60'
+      title: options.rss.title,
+      description: options.rss.description,
+      feed_url: url.resolve(options.rss.url, fileName),
+      site_url: options.rss.url,
+      image_url: options.rss.image_url,
+      docs: options.rss.docs,
+      author: options.rss.author,
+      managingEditor: options.rss.managingEditor || options.rss.author,
+      webMaster: options.rss.webMaster || options.rss.author,
+      copyright: options.rss.copyRight || new Date().getFullYear() + ' ' + options.rss.author,
+      language: options.rss.language || 'en',
+      categories: options.rss.categories,
+      pubDate: options.rss.pubDate || new Date().toString(),
+      ttl: options.rss.ttl || '60'
     });
 
     // Add each post
     postCollection.forEach(function (post) {
       feed.item({
-          title: post.title,
-          description: post.content,
-          url: url.resolve(url, post.url),
-          categories: post.tags,
-          date: post.date
+        title: post.title,
+        description: post.content,
+        url: url.resolve(options.rss.url, post.url),
+        categories: post.tags,
+        date: post.date
       });
     });
 

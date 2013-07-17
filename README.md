@@ -26,6 +26,12 @@ pages: {
     pageSrc: 'src/pages'
   },
   posts: {
+    rss: {
+      author: 'Chris Wren',
+      title: 'wrenBlog',
+      description: 'The blog of Chris Wren',
+      url: 'http://chrisawren.com'
+    },
     src: 'src/posts',
     dest: 'dev',
     layout: 'src/layouts/post.jade',
@@ -99,6 +105,39 @@ A JavaScript object or the location of a JSON file which is passed as data to te
 Type: `Function` Default: Sort by `date` descending
 
 A compare function used by [Array.sort](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort) to sort posts. 
+
+#### rss
+Type: `Object`
+
+An object containing config for RSS feed generation. 
+
+All [options accepted by dylang/node-rss](https://github.com/dylang/node-rss#feed-options) are supported, with notable options listed below.
+
+##### rss.url
+Type: `String`
+
+The URL of your site.
+
+##### rss.author
+Type: `String`
+
+The feed owner. Also used as `managingEditor` and `webMaster` if those options are not specified.
+
+##### rss.title
+Type: `String`
+
+The title of the feed.
+
+##### rss.description
+Type: `String`
+
+Optional. Short description of the feed.
+
+##### rss.path
+Type: `String`
+
+Optional. The path of the file to store the RSS XML in. This is specific to grunt-pages and is not part of dylang/node-rss.
+
 
 #### pagination
 Type: `Object`
