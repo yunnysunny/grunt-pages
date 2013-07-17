@@ -149,4 +149,17 @@ describe('grunt-pages library', function () {
 
   });
 
+  describe('getPostGroups', function () {
+
+    it('should return post groups based on the pagination.postsPerPage\'s value', function () {
+      lib.getPostGroups([1, 2, 3, 4], { postsPerPage: 2 }).should.eql([{
+        posts: [1, 2],
+        id: 0
+      }, {
+        posts: [3, 4],
+        id: 1
+      }]);
+    });
+
+  });
 });
