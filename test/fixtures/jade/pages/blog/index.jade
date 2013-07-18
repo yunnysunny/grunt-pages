@@ -6,7 +6,7 @@ block content
         br
         a(href = "/#{post.url}") #{post.title}
     each page, pageNumber in pages
-      if page.currentPage
-        span #{pageNumber}
+      if pageNumber === currentIndex
+        span #{page.id}
       else
-        a(href = "#{page.url}") #{pageNumber}
+        a(href = "#{page.url}") #{page.id}
