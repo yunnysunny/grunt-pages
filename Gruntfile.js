@@ -32,7 +32,7 @@ module.exports = function (grunt) {
             title: 'Blog of Blogs',
             description: 'The Description',
             url: 'http://the.url.com',
-            pubDate: new Date(2010, 10, 10) // Must pass date for output to match
+            pubDate: new Date(2010, 10, 10, 0, 0, 0, 0) // Must pass date for output to match
           },
           pageSrc: 'test/fixtures/ejs/pages',
           templateEngine: 'ejs',
@@ -59,7 +59,7 @@ module.exports = function (grunt) {
             language: 'sp',
             categories: ['stuff', 'things', 'items', 'widgets'],
             ttl: '40',
-            pubDate: new Date(2010, 10, 10) // Must pass date for output to match
+            pubDate: new Date(2010, 10, 10, 0, 0, 0, 0) // Must pass date for output to match
           },
           pageSrc: 'test/fixtures/ejs/pages',
           templateEngine: 'ejs',
