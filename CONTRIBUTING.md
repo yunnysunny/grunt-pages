@@ -10,6 +10,6 @@ We use the [mocha](http://visionmedia.github.io/mocha/) test framework and [shou
 grunt test
 ```
 
-There are integration tests located in [this](https://github.com/ChrisWren/grunt-pages/blob/master/test/fileCreationTest.js) file which verify that the html files were created as expected, and unit tests in [this](https://github.com/ChrisWren/grunt-pages/blob/master/test/libtest.js) file which verify the logic implemented in library methods.
+There are integration tests located in [this](https://github.com/ChrisWren/grunt-pages/blob/master/test/integrationTests.js) file which verify that the html files were created as expected, and unit tests in [this](https://github.com/ChrisWren/grunt-pages/blob/master/test/unitTests.js) file which verify the logic implemented in library methods.
 
 The goal is to add any new features into the integration test file and add any changes to library method logic to the unit test file.

@@ -88,7 +88,7 @@ The url of each post. The url string takes variables as parameters using the `:v
 #### pageSrc
 Type: `String`
 
-The folder where the ejs or jade source pages of your website are located. These pages have access to each post's content and metadata via a `posts` array. Additionally, pages have access to their own filename(without extension) via the `currentPage` variable. All of the files in this folder are generated in the `dest` folder maintaining the same relative path from `pageSrc`.
+The folder where the ejs or jade source pages of your website are located. These pages have access to each post's `content` and metadata properties via a `posts` array. Additionally, pages have access to their own filename(without extension) via the `currentPage` variable. All of the files in this folder are generated in the `dest` folder maintaining the same relative path from `pageSrc`.
 
 #### data
 Type: `Object || String`
@@ -96,16 +96,35 @@ Type: `Object || String`
 A JavaScript object or the location of a JSON file which is passed as data to templates. This option is primarily used to specify config that is shared across all pages. It is available in page and post templates via the `data` object.
 
 #### sortFunction
-Type: `Function` Default: Sort by `date` descending
+Type: `Function`
+
+Default: Sort by `date` descending
+
+```js
+function (a, b) {
+  return b.date - a.date;
+}
+```
 
 A compare function used by [Array.sort](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort) to sort posts. 
 
+#### formatPostUrl
+Type: `Function`
+
+Default:
+```js
+function (url) {
+  return url.replace(/[^\w\s\-]/gi, '').replace(/\s{2,}/gi, ' ').replace(/\s/gi, '-').toLowerCase();
+}
+```
+A function that takes a `url` as a parameter and returns a formatted url string. This is primarily used to remove special characters and replace whitespace.
+
 #### pagination
-Type: `Object`
+Type: `Object || Array`
 
-An object containing config for pagination. This option generates paginated list pages which each contain a specified number of posts.
+Object or an array of objects containing config for pagination. This option generates paginated list pages which each contain a specified group of posts.
 
-Here is a sample config using pagination:
+### Config using the default pagination scheme
 
 ```js
 pages: {
@@ -124,6 +143,8 @@ pages: {
 }
 ```
 
+This config will generate paginated list pages by grouping the specified number of posts per page and using the default url scheme specified in the [pagination.url](#paginationurl) parameter.
+
 ##### pagination.postsPerPage
 Type: `Number`
 
@@ -132,33 +153,119 @@ The number of posts each list page will contain.
 ##### pagination.listPage
 Type: `String`
 
-The location of the layout template which is used for each list page. [Here](https://github.com/ChrisWren/grunt-pages/blob/master/test/fixtures/jade/pages/blog/index.jade) is a sample template that uses pagination. The template has access to the following variables:
-
-###### pages
-Type: `Array` of `Object`s
-
-An array of page objects which each contain a `url` property. The page currently being rendered also has a `currentPage` boolean property which is set to `true`.
+The location of the layout template which is used for each list page. [Here](https://github.com/ChrisWren/grunt-pages/blob/master/test/fixtures/jade/pages/blog/index.jade) is a sample `listPage` template. This template has access to the following variables:
 
 ###### posts
 Type: `Array` of `Object`s
 
-An array of post objects which each contain the `content` and metadata properties for each post.
+An array of post objects assigned to this page which each contain the `content` and metadata properties of the post.
+
+###### pages
+Type: `Array` of `Object`s
+
+An array of page objects which each contain a `url` and `id` property.
+
+###### currentIndex
+Type: `Number`
+
+A reference to the index of the page currently being rendered. This can be used to display the current page differently than the rest of the pages in a list, or to display links to the surrounding pages based on their position relative to the `currentIndex`.
 
 ##### pagination.url
-Type: `String` Default: `pages/:index/index.html`
+Type: `String` Default: `pages/:id/index.html`
 
-The location of the generated list pages relative to the `pagination.listPage`. You can override this property to have a custom url scheme for list pages. You **must** have a `:index` variable in your url scheme which will be replaced by the page's index.
+The location of the generated list pages relative to the `pagination.listPage`. You can override this property to have a custom url scheme for list pages. You **must** have a `:id` variable in your url scheme which will be replaced by the page's id.
 
-#### formatPostUrl
-Type: `Function`
+### Config using a custom pagination scheme
 
-Default:
+To paginate in a custom manor, you can use the following parameter:
+
+##### pagination.getPostGroups
+Type: `Function` 
+
+Default: `Group by postsPerPage`
+
 ```js
-function (url) {
-  return url.replace(/[^\w\s\-]/gi, '').replace(/\s{2,}/gi, ' ').replace(/\s/gi, '-').toLowerCase();
+function (postCollection, pagination) {
+var postsPerPage = pagination.postsPerPage;
+    var postGroups = [];
+    var postGroup;
+    var i = 0;
+
+    while ((postGroup = postCollection.slice(i * postsPerPage, (i + 1) * postsPerPage)).length) {
+      postGroups.push({
+        posts: postGroup,
+        id: i
+      });
+      i++;
+    }
+    return postGroups;
 }
 ```
-A function that takes a `url` as a parameter and returns a formatted url string. This is primarily used to remove special characters and replace whitespace.
+
+This function returns an array of post groups to be rendered as list pages. It takes the `posts` array and `pagination` config object as parameters and is expected to return an array of postGroup objects which each contain the `id` of the group(to be used in the url) and the array of `posts` in the following format:
+
+```js
+[{
+  id: 'javascript',
+  posts: [{
+    title: 'ES6',
+    tags: ['javascript'],
+    content: '...'
+  }, {
+    title: 'Backbone.js',
+    tags: ['javascript'],
+    content: '...'
+  }]
+}, {
+  id: 'css',
+  posts: [{
+    title: 'Style and Sass',
+    tags: ['css'],
+    content: '...'
+  }]
+}];
+```
+
+Here is a sample pagination config which paginates using the `tags` property of each post:
+
+```js
+pages: {
+  options: {
+    pagination: {
+      listPage: 'src/layouts/tagListPage.jade',
+      getPostGroups: function (posts) {
+        var postGroups = {};
+
+        posts.forEach(function (post) {
+          post.tags.forEach(function (tag) {
+            tag = tag.toLowerCase();
+            if (postGroups[tag]) {
+              postGroups[tag].posts.push(post);
+            } else {
+              postGroups[tag] = {
+                posts: [post]
+              };
+            }
+          });
+        });
+
+        return grunt.util._.map(postGroups, function (postGroup, id) {
+          return {
+            id: id,
+            posts: postGroup.posts
+          };
+        });
+      }
+    }
+  },
+  posts: {
+    src: 'src/posts',
+    dest: 'dev',
+    layout: 'src/layouts/post.jade',
+    url: 'posts/:title'
+  }
+}
+```
 
 #### templateEngine
 Type: `String`

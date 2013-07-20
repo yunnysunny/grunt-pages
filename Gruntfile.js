@@ -33,11 +33,35 @@ module.exports = function (grunt) {
           data: {
             test: 1
           },
-          pagination: {
+          pagination: [{
             postsPerPage: 1,
             listPage: 'test/fixtures/jade/pages/blog/index.jade',
-            url: 'list/:index/index.html'
-          }
+            url: 'list/:id/index.html'
+          }, {
+            listPage: 'test/fixtures/jade/pages/blog/index.jade',
+            getPostGroups: function (posts) {
+              var postGroups = {};
+              posts.forEach(function (post) {
+                post.tags.forEach(function (tag) {
+                  tag = tag.toLowerCase();
+                  if (postGroups[tag]) {
+                    postGroups[tag].posts.push(post);
+                  } else {
+                    postGroups[tag] = {
+                      posts: [post]
+                    };
+                  }
+                });
+              });
+
+              return grunt.util._.map(postGroups, function (postGroup, id) {
+                return {
+                  id: id,
+                  posts: postGroup.posts
+                };
+              });
+            }
+          }]
         }
       }
     },

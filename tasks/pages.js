@@ -66,6 +66,7 @@ module.exports = function (grunt) {
 
       marked.setOptions({
         highlight: function (code, lang, callback) {
+
           // Use [pygments](http://pygments.org/) for highlighting
           pygmentize({ lang: lang, format: 'html' }, code, function (err, result) {
             callback(err, result.toString());
@@ -104,7 +105,13 @@ module.exports = function (grunt) {
           }
 
           if (options.pagination) {
-            lib.paginate(postCollection);
+            if (Array.isArray(options.pagination)) {
+              options.pagination.forEach(function (pagination) {
+                lib.paginate(templateData, pagination);
+              });
+            } else {
+              lib.paginate(templateData, options.pagination);
+            }
           }
 
           done();
@@ -115,11 +122,11 @@ module.exports = function (grunt) {
 
   /**
    * Parses the metadata and markdown from a post
-   * @param  {String} abspath
+   * @param  {String} postPath Absolute path of the post to be parsed
    * @return {Object}
    */
-  lib.parsePostData = function (abspath) {
-    var fileString = fs.readFileSync(abspath, 'utf8');
+  lib.parsePostData = function (postPath) {
+    var fileString = fs.readFileSync(postPath, 'utf8');
     var postData = {};
     try {
 
@@ -139,11 +146,11 @@ module.exports = function (grunt) {
         sections.shift();
         postData.markdown = sections.join('----');
       } else {
-        grunt.fail.fatal('the metadata for the following post is formatted incorrectly: ' + abspath.red);
+        grunt.fail.fatal('the metadata for the following post is formatted incorrectly: ' + postPath.red);
       }
       return postData;
     } catch (e) {
-      grunt.fail.fatal('the metadata for the following post is formatted incorrectly: ' + abspath.red);
+      grunt.fail.fatal('the metadata for the following post is formatted incorrectly: ' + postPath.red);
     }
   };
 
@@ -167,7 +174,7 @@ module.exports = function (grunt) {
 
   /**
    * Updates the post collection with each post's destination
-   * @param {Array} postCollection Collection of parsed posts
+   * @param {Array} postCollection Collection of parsed posts with the content and metadata properties
    */
   lib.setPostDests = function (postCollection) {
     postCollection.forEach(function (post) {
@@ -220,7 +227,7 @@ module.exports = function (grunt) {
 
   /**
    * Updates the post collection with each post's url
-   * @param {[Array]} postCollection Array of posts
+   * @param {[Array]} postCollection Collection of parsed posts with the content and metadata properties
    */
   lib.setPostUrls = function (postCollection) {
     postCollection.forEach(function (post) {
@@ -247,7 +254,7 @@ module.exports = function (grunt) {
 
   /**
    * Generates posts based on the templateData
-   * @param  {Object} templateData
+   * @param  {Object} templateData Data to be passed to templates for rendering
    */
   lib.generatePosts = function (templateData) {
 
@@ -277,24 +284,33 @@ module.exports = function (grunt) {
 
   /**
    * Generates pages using the posts' data
-   * @param  {Object} templateData
+   * @param  {Object} templateData Data to be passed to templates for rendering
    */
   lib.generatePages = function (templateData) {
 
-    // Ignore the listPage if pagination is enabled
+    // Ignore the listPage(s) when generating pages if pagination is enabled
     if (options.pagination) {
-      var listPage = options.pagination.listPage;
+      var listPages = [null];
+      if (Array.isArray(options.pagination)) {
+        listPages = options.pagination.map(function (pagination) {
+          return pagination.listPage;
+        });
+      } else {
+        listPages = [options.pagination.listPage];
+      }
     }
 
     grunt.file.recurse(options.pageSrc, function (abspath, rootdir) {
 
       // Don't include dotfiles
       if (path.basename(abspath).indexOf('.') === 0) {
-        return;
+        return false;
       }
 
-      // Don't generate the paginated list page
-      if (abspath !== listPage) {
+      // Don't generate the paginated list page(s)
+      if (!listPages || listPages && listPages.indexOf(abspath) === -1) {
+
+        // If the template engine is specified, don't render templates with other filetypes
         if (!options.templateEngine || (options.templateEngine && path.extname(abspath) === '.' + options.templateEngine)) {
           var layoutString = fs.readFileSync(abspath, 'utf8');
           var fn = templateEngine.compile(layoutString, { pretty: true, filename: abspath });
@@ -309,57 +325,84 @@ module.exports = function (grunt) {
   };
 
   /**
-   * Creates paginated pages with a specified number of posts per page
+   * Default function to get post groups for each paginated list page
    * @param  {Array} postCollection
+   * @return {Array}                Array of post arrays to be displayed on each paginated page
    */
-  lib.paginate = function (postCollection) {
+  lib.getPostGroups = function (postCollection, pagination) {
+    var postsPerPage = pagination.postsPerPage;
     var postGroups = [];
     var postGroup;
-
-    var postsPerPage = options.pagination.postsPerPage;
-    var listPage = options.pagination.listPage;
-
     var i = 0;
-    while ((postGroup = postCollection.slice( i * postsPerPage, (i + 1) * postsPerPage)).length) {
-      postGroups.push(postGroup);
+
+    while ((postGroup = postCollection.slice(i * postsPerPage, (i + 1) * postsPerPage)).length) {
+      postGroups.push({
+        posts: postGroup,
+        id: i
+      });
       i++;
     }
+    return postGroups;
+  };
 
-    var pageDests = [];
+  /**
+   * Returns the set of paginated pages to be generated
+   * @param  {Array}  postCollection
+   * @param  {Object} pagination     Configuration object for pagination
+   * @return {Array}                 Array of pages with the collection of posts and destination path
+   */
+  lib.getPaginatedPages = function (postCollection, pagination) {
+    var postGroupGetter = pagination.getPostGroups ||
+                          lib.getPostGroups;
 
-    postGroups.forEach(function (postGroup, pageNumber) {
-      pageDests.push(lib.getListPageDest(listPage, pageNumber));
+    return postGroupGetter(postCollection, pagination).map(function (postGroup) {
+      return {
+        posts: postGroup.posts,
+        id: postGroup.id,
+        dest: lib.getListPageDest(postGroup.id, pagination)
+      };
     });
+  };
 
-    var pageUrls = pageDests.map(function (dest) {
-      return { url: path.dirname(dest).slice(_this.data.dest.length) + '/' };
-    });
-
+  /**
+   * Creates paginated pages with a specified number of posts per page
+   * @param  {Object} templateData Data to be passed to templates for rendering
+   * @param  {Object} pagination   Configuration object for pagination
+   */
+  lib.paginate = function (templateData, pagination) {
+    var listPage = pagination.listPage;
+    var pages = lib.getPaginatedPages(templateData.posts, pagination);
     var layoutString = fs.readFileSync(listPage, 'utf8');
     var fn = templateEngine.compile(layoutString, { pretty: true, filename: listPage });
 
-    postGroups.forEach(function (postGroup, pageNumber) {
-      pageUrls[pageNumber].currentPage = true;
-      grunt.file.write(pageDests[pageNumber], fn({
+    var pageData = pages.map(function (page) {
+      return {
+        id: page.id,
+        url: path.dirname(page.dest).slice(_this.data.dest.length) + '/'
+      };
+    });
+
+    pages.forEach(function (page, pageNumber) {
+      grunt.file.write(page.dest, fn({
         currentIndex: pageNumber,
-        pages: pageUrls,
-        posts: postGroup
+        pages: pageData,
+        posts: page.posts,
+        data: templateData.data || {}
       }));
-      delete pageUrls[pageNumber].currentPage;
-      grunt.log.ok('Created '.green + 'paginated'.rainbow + ' page'.magenta + ' at: ' + pageDests[pageNumber]);
+      grunt.log.ok('Created '.green + 'paginated'.rainbow + ' page'.magenta + ' at: ' + page.dest);
     });
   };
 
   /**
    * Gets a list page's destination to be written
-   * @param  {String} listPage   Source list page template layout file
-   * @param  {Number} pageNumber Index of current page to be writtern
-   * @return {String}            Destination of current page
+   * @param  {Number} pageId     Identifier of current page to be written
+   * @param  {Object} pagination Configuration object for pagination
+   * @return {String}            Destination of list page
    */
-  lib.getListPageDest = function (listPage, pageNumber) {
-    var dest = _this.data.dest + '/' ;
-
-    var paginationURL = options.pagination.url || 'page/:index/index.html';
+  lib.getListPageDest = function (pageId, pagination) {
+    var dest = _this.data.dest + '/';
+    var listPage = pagination.listPage;
+    var paginationURL = pagination.url || 'page/:id/index.html';
 
     // If the pageSrc option is used generate list pages relative to pageSrc
     // Otherwise, generate list pages in the root of 'dest'
@@ -367,24 +410,24 @@ module.exports = function (grunt) {
       if (listPage.indexOf(options.pageSrc) !== -1) {
         dest += listPage.slice(options.pageSrc.length + 1);
       } else {
-        grunt.fail.fatal('the listPage must be within the pageSrc directory');
+        grunt.fail.fatal('the listPage must be within the pageSrc directory.');
       }
     }
 
-    if (pageNumber === 0) {
-      if (!options.pageSrc) {
-        dest += 'index.html';
-      } else {
+    if (pageId === 0) {
+      if (options.pageSrc) {
         dest = dest.replace(path.extname(listPage), '.html');
+      } else {
+        dest += 'index.html';
       }
     } else {
-      if (paginationURL.indexOf(':index') === -1) {
-        grunt.fail.fatal('The pagination url property must include a \':index\' variable which is replaced by the pages index');
+      if (paginationURL.indexOf(':id') === -1) {
+        grunt.fail.fatal('The pagination url property must include an \':id\' variable which is replaced by the page\'s identifier.');
       }
       if (!options.pageSrc) {
-        dest += paginationURL.replace(':index', pageNumber);
+        dest += paginationURL.replace(':id', pageId);
       } else {
-        dest = dest.replace(path.basename(listPage), paginationURL.replace(':index', pageNumber));
+        dest = dest.replace(path.basename(listPage), paginationURL.replace(':id', pageId));
       }
     }
     return dest;

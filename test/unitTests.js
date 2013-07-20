@@ -149,4 +149,116 @@ describe('grunt-pages library', function () {
 
   });
 
+  describe('getPostGroups', function () {
+
+    it('should return post groups based on the pagination.postsPerPage\'s value', function () {
+      lib.getPostGroups([1, 2, 3, 4], { postsPerPage: 2 }).should.eql([{
+        posts: [1, 2],
+        id: 0
+      }, {
+        posts: [3, 4],
+        id: 1
+      }]);
+    });
+
+  });
+
+  describe('getListPageDest', function () {
+
+    it('should log an error when the pagination.url doesn\'t contain \':id\'', function () {
+      lib = pages.call(_.extend(grunt, {
+        testContext: {
+          data: {
+            dest: 'dest'
+          }
+        }
+      }), grunt);
+
+      lib.getListPageDest(1, {
+        listPage: 'src/pages/blog/index.jade',
+        url: 'pages/:i/index.html'
+      });
+
+      failStub.lastCall.args[0].should.include('The pagination url property must include an \':id\' variable which is replaced by the page\'s identifier.');
+    });
+
+    describe('when options.pageSrc is not set', function () {
+
+      it('should return pagination.url replaced with the page\'s id', function () {
+        lib = pages.call(_.extend(grunt, {
+          testContext: {
+            data: {
+              dest: 'dest'
+            }
+          }
+        }), grunt);
+
+        lib.getListPageDest(1, {
+          listPage: 'src/pages/index.jade',
+          url: 'pages/:id/index.html'
+        }).should.eql('dest/pages/1/index.html');
+      });
+
+      it('should return the root /index.html as the dest of page 0', function () {
+        lib = pages.call(_.extend(grunt, {
+          testContext: {
+            data: {
+              dest: 'dest'
+            }
+          },
+          testOptions: {}
+        }), grunt);
+
+        lib.getListPageDest(0, { listPage: 'src/listPage.jade' }).should.eql('dest/index.html');
+      });
+    });
+
+    describe('when options.pageSrc is set', function () {
+
+      it('should log an error if options.pagination.listPage isn\'t a subdirectory of options.pageSrc', function () {
+        lib = pages.call(_.extend(grunt, {
+          testOptions: {
+            pageSrc: 'src/pages'
+          }
+        }), grunt);
+
+        lib.getListPageDest(1, { listPage: 'src/listPage.jade' });
+
+        failStub.lastCall.args[0].should.include('the listPage must be within the pageSrc directory.');
+      });
+
+      it('should return the listPage\'s relative location to options.pageSrc as the dest of page 0', function () {
+        lib = pages.call(_.extend(grunt, {
+          testContext: {
+            data: {
+              dest: 'dest'
+            }
+          },
+          testOptions: {
+            pageSrc: 'src/pages'
+          }
+        }), grunt);
+
+        lib.getListPageDest(0, { listPage: 'src/pages/blog/index.jade' }).should.eql('dest/blog/index.html');
+      });
+
+      it('should replace options.pageSrc\'s basename with the pagination.url including the page\'s id', function () {
+        lib = pages.call(_.extend(grunt, {
+          testContext: {
+            data: {
+              dest: 'dest'
+            }
+          },
+          testOptions: {
+            pageSrc: 'src/pages'
+          }
+        }), grunt);
+
+        lib.getListPageDest(1, {
+          listPage: 'src/pages/blog/index.jade',
+          url: ':id/index.html'
+        }).should.eql('dest/blog/1/index.html');
+      });
+    });
+  });
 });

@@ -35,7 +35,6 @@ describe('grunt-pages', function () {
     fs.existsSync('dev/blog/posts/Draft.html').should.not.be.ok;
   });
 
-
   describe('when run with the pagination object set', function () {
 
     before(function (done) {
@@ -48,6 +47,13 @@ describe('grunt-pages', function () {
     it('should create pages in the expected location', function() {
       fs.existsSync('dev/index.html').should.be.ok;
       fs.existsSync('dev/list/1/index.html').should.be.ok;
+      fs.existsSync('dev/page/javascript/index.html').should.be.ok;
+      fs.existsSync('dev/page/tips/index.html').should.be.ok;
+      fs.existsSync('dev/page/tutorial/index.html').should.be.ok;
+    });
+
+    it('should create the a custom list page with the expected content', function () {
+      fs.readFileSync('dev/page/javascript/index.html', 'utf8').should.equal(fs.readFileSync('test/output/page/javascript/index.html', 'utf8'));
     });
 
     it('should create the root list page with the expected content', function () {
@@ -55,11 +61,8 @@ describe('grunt-pages', function () {
     });
 
     it('should create the paginated list page with the expected content', function () {
-      fs.readFileSync('dev/list/1/index.html', 'utf8').should.equal(fs.readFileSync('test/output/blog/list/1/index.html', 'utf8'));
+      fs.readFileSync('dev/list/1/index.html', 'utf8').should.equal(fs.readFileSync('test/output/list/1/index.html', 'utf8'));
     });
 
   });
-
 });
-
-
