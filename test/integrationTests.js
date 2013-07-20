@@ -61,5 +61,3 @@ describe('grunt-pages', function () {
   });
 
 });
-
-
