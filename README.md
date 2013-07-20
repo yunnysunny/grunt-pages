@@ -274,6 +274,8 @@ The file extension of the template engine to be used. This option filters templa
 
 # Changelog
 
+**0.3.0** - Altered pagination API to allow for custom pagination schemes.
+
 **0.2.5** - Fixed metadata parsing bug, added `formatPostUrl` option & added `pagination.url` option.
 
 **0.2.4** - Added `sortFunction` option & allowed for `data` option to take an object as a parameter.
