@@ -1,6 +1,6 @@
 {
   "name": "grunt-pages",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Grunt task to create pages using markdown and templates",
   "main": "Gruntfile.js",
   "dependencies": {
@@ -44,6 +44,7 @@
     "jekyll",
     "blog"
   ],
-  "author": "ChrisWren, ColinWren",
+  "contributors": [ "Larry Davis <lazd@lazd.net>",  "Colin Wren <colin@cawren.com>"],
+  "author": "ChrisWren",
   "license": "MIT"
 }
