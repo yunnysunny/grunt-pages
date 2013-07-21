@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Blog of Blogs]]></title><description><![CDATA[The Description]]></description><link>http://the.url.com</link><image><url>http://the.url.com/image.jpg</url><title>Blog of Blogs</title><link>http://the.url.com</link></image><generator>NodeJS RSS Module</generator><lastBuildDate>Sun, 21 Jul 2013 16:53:32 GMT</lastBuildDate><atom:link href="http://the.url.com/rss/rss.xml" rel="self" type="application/rss+xml"/><author><![CDATA[The Author]]></author><pubDate>Thu, 01 Jan 1970 00:00:01 GMT</pubDate><copyright><![CDATA[2044 Industries Inc.]]></copyright><language><![CDATA[sp]]></language><managingEditor><![CDATA[The Managing Editor]]></managingEditor><webMaster><![CDATA[The Web Master]]></webMaster><docs>The Docs</docs><ttl>40</ttl><category><![CDATA[stuff]]></category><category><![CDATA[things]]></category><category><![CDATA[items]]></category><category><![CDATA[widgets]]></category><item><title><![CDATA[Post 2]]></title><description><![CDATA[<p>Here&#39;s some alerts:</p>
+<pre><code class="lang-js"><div class="highlight"><pre><span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span>  <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">alert</span><span class="p">(</span><span class="nx">i</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</code></pre>
+]]></description><link>http://the.url.com/blog/posts/post-2.html</link><guid isPermaLink="true">http://the.url.com/blog/posts/post-2.html</guid><category><![CDATA[JavaScript]]></category><category><![CDATA[Tips]]></category><dc:creator><![CDATA[The Author]]></dc:creator><pubDate>Mon, 13 May 2013 00:00:00 GMT</pubDate></item><item><title><![CDATA[Post 1]]></title><description><![CDATA[<p>This is a JavaScript object:</p>
+<pre><code class="lang-js"><div class="highlight"><pre><span class="p">{</span>
+  <span class="nx">myString</span><span class="o">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+  <span class="nx">num</span><span class="o">:</span> <span class="mi">4</span>
+<span class="p">}</span>
+</pre></div>
+</code></pre>
+]]></description><link>http://the.url.com/blog/posts/post-1.html</link><guid isPermaLink="true">http://the.url.com/blog/posts/post-1.html</guid><category><![CDATA[JavaScript]]></category><category><![CDATA[Tutorial]]></category><dc:creator><![CDATA[The Author]]></dc:creator><pubDate>Sun, 12 May 2013 00:00:00 GMT</pubDate></item></channel></rss>

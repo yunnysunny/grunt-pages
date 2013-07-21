@@ -9,7 +9,8 @@
     "colors": "~0.6.0-1",
     "pygmentize-bundled": "~1.1.0",
     "marked": "git://github.com/ChrisWren/marked.git#40b3f286203ec7013e81d2c6ce03fabf8a4129b0",
-    "js-yaml": "~2.1.0"
+    "js-yaml": "~2.1.0",
+    "rss": "~0.2.0"
   },
   "devDependencies": {
     "grunt": "~0.4.1",

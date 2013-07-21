@@ -2,6 +2,10 @@ var fs = require('fs');
 require('should');
 var spawn = require('child_process').spawn;
 
+function stripBuildDate(str) {
+  return str.replace(/<lastBuildDate>.*?<\/lastBuildDate>/, '');
+}
+
 describe('grunt-pages', function () {
 
   before(function (done) {
@@ -35,7 +39,35 @@ describe('grunt-pages', function () {
     fs.existsSync('dev/blog/posts/Draft.html').should.not.be.ok;
   });
 
-  describe('when run with the pagination object set', function () {
+  describe('when ran with the RSS object set with default options', function () {
+
+    before(function (done) {
+      var buildProcess = spawn('grunt', ['pages:rss_default']);
+      buildProcess.stdout.on('close', function () {
+        done();
+      });
+    });
+
+    it('should create feed.xml from the posts and default options', function () {
+      stripBuildDate(fs.readFileSync('dev/feed.xml', 'utf8')).should.equal(stripBuildDate(fs.readFileSync('test/output/feed.xml', 'utf8')));
+    });
+  });
+
+  describe('when ran with the RSS object set with custom options', function () {
+
+    before(function (done) {
+      var buildProcess = spawn('grunt', ['pages:rss_custom']);
+      buildProcess.stdout.on('close', function () {
+        done();
+      });
+    });
+
+    it('should create rss.xml from the posts and provided options', function () {
+      stripBuildDate(fs.readFileSync('dev/rss/rss.xml', 'utf8')).should.equal(stripBuildDate(fs.readFileSync('test/output/rss/rss.xml', 'utf8')));
+    });
+  });
+
+  describe('when ran with the pagination object set', function () {
 
     before(function (done) {
       var buildProcess = spawn('grunt', ['pages:paginated']);

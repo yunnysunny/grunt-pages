@@ -9,10 +9,12 @@
 'use strict';
 var fs = require('fs');
 var path = require('path');
+var url = require('url');
 
 var jsYAML = require('js-yaml');
 var marked = require('marked');
 var pygmentize = require('pygmentize-bundled');
+var RSS = require('rss');
 require('colors');
 
 var templateEngines = {
@@ -112,6 +114,10 @@ module.exports = function (grunt) {
             } else {
               lib.paginate(templateData, options.pagination);
             }
+          }
+
+          if (options.rss) {
+            lib.generateRSS(postCollection);
           }
 
           done();
@@ -391,6 +397,60 @@ module.exports = function (grunt) {
       }));
       grunt.log.ok('Created '.green + 'paginated'.rainbow + ' page'.magenta + ' at: ' + page.dest);
     });
+  };
+
+  /**
+   * Writes RSS feed XML based on the collection of posts
+   * @param  {Array} postCollection
+   */
+  lib.generateRSS = function (postCollection) {
+    if (!options.rss.url) {
+      grunt.fail.fatal('options.rss.url is required');
+    }
+
+    if (!options.rss.title) {
+      grunt.fail.fatal('options.rss.title is required');
+    }
+
+    if (!options.rss.author) {
+      grunt.fail.fatal('options.rss.author is required');
+    }
+
+    var fileName = options.rss.path || 'feed.xml';
+    var dest = path.join(_this.data.dest, fileName);
+
+    // Create a new feed
+    var feed = new RSS({
+      title: options.rss.title,
+      description: options.rss.description,
+      feed_url: url.resolve(options.rss.url, fileName),
+      site_url: options.rss.url,
+      image_url: options.rss.image_url,
+      docs: options.rss.docs,
+      author: options.rss.author,
+      managingEditor: options.rss.managingEditor || options.rss.author,
+      webMaster: options.rss.webMaster || options.rss.author,
+      copyright: options.rss.copyRight || new Date().getFullYear() + ' ' + options.rss.author,
+      language: options.rss.language || 'en',
+      categories: options.rss.categories,
+      pubDate: options.rss.pubDate || new Date().toString(),
+      ttl: options.rss.ttl || '60'
+    });
+
+    // Add each post
+    postCollection.forEach(function (post) {
+      feed.item({
+        title: post.title,
+        description: post.content,
+        url: url.resolve(options.rss.url, post.url),
+        categories: post.tags,
+        date: post.date
+      });
+    });
+
+    grunt.file.write(dest, feed.xml());
+
+    grunt.log.ok('Created '.green + 'RSS feed'.yellow + ' at ' + dest);
   };
 
   /**

@@ -33,6 +33,7 @@ pages: {
   }
 }
 ```
+
 ### Authoring posts
 
 #### Post Format
@@ -118,6 +119,59 @@ function (url) {
 }
 ```
 A function that takes a `url` as a parameter and returns a formatted url string. This is primarily used to remove special characters and replace whitespace.
+
+#### rss
+Type: `Object`
+
+An object containing config for RSS feed generation. 
+
+All [options accepted by dylang/node-rss](https://github.com/dylang/node-rss#feed-options) are supported, with notable options listed below.
+
+Here is a sample config to create a blog with an RSS feed using grunt-pages:
+```js
+pages: {
+  options: {
+    pageSrc: 'src/pages',
+    rss: {
+      author: 'Chris Wren',
+      title: 'wrenBlog',
+      description: 'The blog of Chris Wren',
+      url: 'http://chrisawren.com'
+    }
+  },
+  posts: {
+    src: 'src/posts',
+    dest: 'dev',
+    layout: 'src/layouts/post.jade',
+    url: 'blog/posts/:title'
+  }
+}
+```
+
+##### rss.url
+Type: `String`
+
+The URL of your site.
+
+##### rss.author
+Type: `String`
+
+The feed owner. Also used as `managingEditor` and `webMaster` if those options are not specified.
+
+##### rss.title
+Type: `String`
+
+The title of the feed.
+
+##### rss.description
+Type: `String`
+
+Optional. Short description of the feed.
+
+##### rss.path
+Type: `String`
+
+Optional. The path of the file to store the RSS XML in. This is specific to grunt-pages and is not part of dylang/node-rss.
 
 #### pagination
 Type: `Object || Array`
