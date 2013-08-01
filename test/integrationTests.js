@@ -39,7 +39,7 @@ describe('grunt-pages', function () {
     fs.existsSync('dev/blog/posts/Draft.html').should.not.be.ok;
   });
 
-  describe('when ran with the RSS object set with default options', function () {
+  describe('when run with the RSS object set with default options', function () {
 
     before(function (done) {
       var buildProcess = spawn('grunt', ['pages:rss_default']);
@@ -53,7 +53,7 @@ describe('grunt-pages', function () {
     });
   });
 
-  describe('when ran with the RSS object set with custom options', function () {
+  describe('when run with the RSS object set with custom options', function () {
 
     before(function (done) {
       var buildProcess = spawn('grunt', ['pages:rss_custom']);
@@ -67,7 +67,7 @@ describe('grunt-pages', function () {
     });
   });
 
-  describe('when ran with the pagination object set', function () {
+  describe('when run with the pagination object set', function () {
 
     before(function (done) {
       var buildProcess = spawn('grunt', ['pages:paginated']);
