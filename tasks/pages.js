@@ -129,7 +129,7 @@ module.exports = function (grunt) {
   /**
    * Parses the metadata and markdown from a post
    * @param  {String} postPath Absolute path of the post to be parsed
-   * @return {Object}
+   * @return {Object} Object
    */
   lib.parsePostData = function (postPath) {
     var fileString = fs.readFileSync(postPath, 'utf8');
@@ -162,7 +162,7 @@ module.exports = function (grunt) {
 
   /**
    * Updates the template data with the data from an Object or JSON file
-   * @param {object} templateData
+   * @param {Object} templateData Data to be passed to templates for rendering
    */
   lib.setData = function (templateData) {
     if (typeof options.data === 'string') {
@@ -194,7 +194,7 @@ module.exports = function (grunt) {
 
   /**
    * Returns the post destination based on the url property and postData
-   * @param  {Object} post
+   * @param  {Object} post Post object containing all metadata properties of the post
    * @return {String}
    */
   lib.getPostDest = function (post) {
@@ -233,7 +233,7 @@ module.exports = function (grunt) {
 
   /**
    * Updates the post collection with each post's url
-   * @param {[Array]} postCollection Collection of parsed posts with the content and metadata properties
+   * @param {Array} postCollection Collection of parsed posts with the content and metadata properties
    */
   lib.setPostUrls = function (postCollection) {
     postCollection.forEach(function (post) {
@@ -245,7 +245,7 @@ module.exports = function (grunt) {
 
   /**
    * Sorts the posts
-   * @param {Array} postCollection Collection of parsed posts
+   * @param {Array} postCollection Collection of parsed posts with the content and metadata properties
    */
   lib.sortPosts = function (postCollection) {
 
@@ -296,7 +296,7 @@ module.exports = function (grunt) {
 
     // Ignore the listPage(s) when generating pages if pagination is enabled
     if (options.pagination) {
-      var listPages = [null];
+      var listPages = [];
       if (Array.isArray(options.pagination)) {
         listPages = options.pagination.map(function (pagination) {
           return pagination.listPage;
@@ -331,8 +331,8 @@ module.exports = function (grunt) {
   };
 
   /**
-   * Default function to get post groups for each paginated list page
-   * @param  {Array} postCollection
+   * Default function to get post groups for each paginated list page by grouping a specified number of posts per page
+   * @param  {Array} postCollection Collection of parsed posts with the content and metadata properties
    * @return {Array}                Array of post arrays to be displayed on each paginated page
    */
   lib.getPostGroups = function (postCollection, pagination) {
@@ -353,7 +353,7 @@ module.exports = function (grunt) {
 
   /**
    * Returns the set of paginated pages to be generated
-   * @param  {Array}  postCollection
+   * @param  {Array}  postCollection Collection of parsed posts with the content and metadata properties
    * @param  {Object} pagination     Configuration object for pagination
    * @return {Array}                 Array of pages with the collection of posts and destination path
    */
@@ -401,7 +401,7 @@ module.exports = function (grunt) {
 
   /**
    * Writes RSS feed XML based on the collection of posts
-   * @param  {Array} postCollection
+   * @param  {Array} postCollection Collection of parsed posts with the content and metadata properties
    */
   lib.generateRSS = function (postCollection) {
     if (!options.rss.url) {
@@ -457,7 +457,7 @@ module.exports = function (grunt) {
    * Gets a list page's destination to be written
    * @param  {Number} pageId     Identifier of current page to be written
    * @param  {Object} pagination Configuration object for pagination
-   * @return {String}            Destination of list page
+   * @return {String}
    */
   lib.getListPageDest = function (pageId, pagination) {
     var dest = _this.data.dest + '/';
