@@ -62,6 +62,7 @@ module.exports = function (grunt) {
     var parsedPosts = unmodifiedPosts.length;
     var postCollection = unmodifiedPosts;
 
+    // If there are no posts to parse, immediately render the posts and pages
     if (parsedPosts === numPosts) {
       lib.renderPostsAndPages(postCollection, done);
       return;
@@ -142,9 +143,8 @@ module.exports = function (grunt) {
         postData = jsYAML.load(fileString.split('----')[1]);
 
         // Extract the content by removing the metadata section
-        var sections = fileString.split('----');
-        sections.shift();
-        sections.shift();
+        var sections = fileString.split('----')
+                                 .slice(2);
         postData.markdown = sections.join('----');
       } else {
         grunt.fail.fatal('the metadata for the following post is formatted incorrectly: ' + postPath.red);
@@ -173,15 +173,13 @@ module.exports = function (grunt) {
     }
   };
 
+  /**
+   * Renders posts and pages once all posts have been parsed
+   * @param  {Array}   postCollection Collection of parsed posts with the content and metadata properties
+   * @param  {Function} done           Callback to call once grunt-pages is done
+   */
   lib.renderPostsAndPages = function (postCollection, done) {
     var templateData = { posts: postCollection };
-
-    fs.writeFileSync(cacheFile, JSON.stringify(templateData));
-
-    // Remove the lastModified attribute as it only used for caching
-    templateData.posts.forEach(function (post) {
-      delete post.lastModified;
-    });
 
     if (options.data) {
       lib.setData(templateData);
@@ -544,6 +542,11 @@ module.exports = function (grunt) {
   return lib;
 };
 
+/**
+ * Returns an array of unmodified posts by checking the last modified date of each post in the cache
+ * @param  {Array} posts Collection of posts
+ * @return {Array}       An array of posts which have not been modified and do not need to be parsed
+ */
 lib.getUnmodifiedPosts = function (posts) {
   return posts.filter(function (post) {
     if (('' + fs.statSync(post.sourcePath).mtime) === ('' + new Date(post.lastModified))) {
