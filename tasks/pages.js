@@ -34,7 +34,9 @@ module.exports = function (grunt) {
   var options = grunt.testOptions || {};
 
   var templateEngine;
+  var start = new Date().getTime();
   var unmodifiedPosts = [];
+
   if (fs.existsSync(cacheFile)) {
     unmodifiedPosts = lib.getUnmodifiedPosts(JSON.parse(fs.readFileSync(cacheFile)).posts);
     var unmodifiedPostPaths = unmodifiedPosts.map(function (post) {
@@ -189,6 +191,17 @@ module.exports = function (grunt) {
     lib.setPostUrls(postCollection);
     lib.sortPosts(postCollection);
 
+    var cachedPosts = _.cloneDeep(templateData);
+
+    templateData.posts.forEach(function (post) {
+
+      // Remove the lastModified attribute as it only used for caching
+      delete post.lastModified;
+
+      // Remove the source path from the post as it is only used for error logging in getPostDest
+      delete post.sourcePath;
+    });
+
     lib.generatePosts(templateData);
 
     if (options.pageSrc) {
@@ -208,6 +221,10 @@ module.exports = function (grunt) {
     if (options.rss) {
       lib.generateRSS(postCollection);
     }
+
+    fs.writeFileSync(cacheFile, JSON.stringify(cachedPosts));
+    var message = 'Took ' + (new Date().getTime() - start) / 1000 + 's';
+    console.log(message.yellow);
     done();
   };
 
@@ -218,9 +235,6 @@ module.exports = function (grunt) {
   lib.setPostDests = function (postCollection) {
     postCollection.forEach(function (post) {
       post.dest = lib.getPostDest(post);
-
-      // Remove the source path from the post as it is only used for error logging in getPostDest
-      delete post.sourcePath;
     });
 
   };
