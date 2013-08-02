@@ -22,7 +22,7 @@ var templateEngines = {
   jade: require('jade'),
   ejs: require('ejs')
 };
-var cacheFile = __dirname + '/../post-cache.json';
+var cacheFile = path.normalize(__dirname + '/../.post-cache.json');
 
 // Define lib object to attach library methods to
 var lib = {};
