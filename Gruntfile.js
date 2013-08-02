@@ -110,7 +110,10 @@ module.exports = function (grunt) {
         }
       }
     },
-    clean: ['dev'],
+    clean: {
+      build: ['dev'],
+      cache: ['.post-cache.json']
+    },
     copy: {
       styles: {
         files: [{
@@ -196,7 +199,7 @@ module.exports = function (grunt) {
   });
 
   grunt.loadTasks('./tasks');
-  grunt.registerTask('build', ['clean', 'copy', 'pages:paginated']);
+  grunt.registerTask('build', ['clean:build', 'copy', 'pages:paginated']);
   grunt.registerTask('test', ['clean', 'jshint', 'simplemocha:all']);
   grunt.registerTask('default', ['concurrent']);
 
