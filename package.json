@@ -44,7 +44,10 @@
     "jekyll",
     "blog"
   ],
-  "contributors": [ "Larry Davis <lazd@lazd.net>",  "Colin Wren <colin@cawren.com>"],
+  "contributors": [
+    "Larry Davis <lazd@lazd.net>",
+    "Colin Wren <colin@cawren.com>"
+  ],
   "author": "ChrisWren",
   "license": "MIT"
 }

@@ -15,6 +15,7 @@ var jsYAML = require('js-yaml');
 var marked = require('marked');
 var pygmentize = require('pygmentize-bundled');
 var RSS = require('rss');
+var _ = require('lodash');
 require('colors');
 
 var templateEngines = {
