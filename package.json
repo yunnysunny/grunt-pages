@@ -7,7 +7,7 @@
     "jade": "~0.33.0",
     "ejs": "~0.8.4",
     "colors": "~0.6.0-1",
-    "pygmentize-bundled": "~1.1.0",
+    "pygmentize-bundled": "~1.2.0",
     "marked": "git://github.com/ChrisWren/marked.git#40b3f286203ec7013e81d2c6ce03fabf8a4129b0",
     "js-yaml": "~2.1.0",
     "rss": "~0.2.0"
@@ -44,7 +44,10 @@
     "jekyll",
     "blog"
   ],
-  "contributors": [ "Larry Davis <lazd@lazd.net>",  "Colin Wren <colin@cawren.com>"],
+  "contributors": [
+    "Larry Davis <lazd@lazd.net>",
+    "Colin Wren <colin@cawren.com>"
+  ],
   "author": "ChrisWren",
   "license": "MIT"
 }
