@@ -50,6 +50,16 @@ module.exports = function (grunt) {
     _this = this;
     options = this.options();
 
+    // Get the content and metadata of unmodified posts so that they don't have to be parsed
+    var unmodifiedPosts = [];
+    var cacheFile = path.normalize(__dirname + '/../.' + this.target + '-post-cache.json');
+    if (fs.existsSync(cacheFile)) {
+      unmodifiedPosts = lib.getUnmodifiedPosts(JSON.parse(fs.readFileSync(cacheFile)).posts);
+      var unmodifiedPostPaths = unmodifiedPosts.map(function (post) {
+        return post.sourcePath;
+      });
+    }
+
     // Don't include draft posts or dotfiles when counting the number of posts
     var numPosts = grunt.file.expand({
       filter: 'isFile'
@@ -59,12 +69,12 @@ module.exports = function (grunt) {
       '!**/.**'
     ]).length;
 
-    var parsedPosts = unmodifiedPosts.length;
+    var parsedPosts    = unmodifiedPosts.length;
     var postCollection = unmodifiedPosts;
 
     // If there are no posts to parse, immediately render the posts and pages
     if (parsedPosts === numPosts) {
-      lib.renderPostsAndPages(postCollection, done);
+      lib.renderPostsAndPages(postCollection, cacheFile, done);
       return;
     }
 
@@ -116,7 +126,7 @@ module.exports = function (grunt) {
 
         // Once all the source posts are parsed, we can generate the html posts
         if (++parsedPosts === numPosts) {
-          lib.renderPostsAndPages(postCollection, done);
+          lib.renderPostsAndPages(postCollection, cacheFile, done);
         }
       });
     });
@@ -156,6 +166,28 @@ module.exports = function (grunt) {
   };
 
   /**
+   * Returns an array of unmodified posts by checking the last modified date of each post in the cache
+   * @param  {Array} posts Collection of posts
+   * @return {Array}       An array of posts which have not been modified and do not need to be parsed
+   */
+  lib.getUnmodifiedPosts = function (posts) {
+    return posts.filter(function (post) {
+
+      // If the post has been moved or deleted, we can't cache it
+      if (!fs.existsSync(post.sourcePath)) {
+        return false;
+      }
+
+      if (('' + fs.statSync(post.sourcePath).mtime) === ('' + new Date(post.lastModified))) {
+
+        // We have to restore the Date object since it is lost during JSON serialization
+        post.date = new Date(post.date);
+        return true;
+      }
+    });
+  };
+
+  /**
    * Updates the template data with the data from an Object or JSON file
    * @param {Object} templateData Data to be passed to templates for rendering
    */
@@ -176,9 +208,10 @@ module.exports = function (grunt) {
   /**
    * Renders posts and pages once all posts have been parsed
    * @param  {Array}   postCollection Collection of parsed posts with the content and metadata properties
+   * @param  {String}  cacheFile      Pathname of file to write post data to for future caching of unmodified posts
    * @param  {Function} done           Callback to call once grunt-pages is done
    */
-  lib.renderPostsAndPages = function (postCollection, done) {
+  lib.renderPostsAndPages = function (postCollection, cacheFile, done) {
     var templateData = { posts: postCollection };
 
     if (options.data) {
