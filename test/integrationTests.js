@@ -40,7 +40,7 @@ describe('grunt-pages', function () {
   });
 
   it('should cache posts after they have been parsed', function () {
-    var post = JSON.parse(fs.readFileSync('.post-cache.json')).posts[0];
+    var post = JSON.parse(fs.readFileSync('.posts-post-cache.json')).posts[0];
     post.sourcePath.should.equal('test/fixtures/posts/post2.md');
   });
 
