@@ -39,7 +39,12 @@ describe('grunt-pages', function () {
     fs.existsSync('dev/blog/posts/Draft.html').should.not.be.ok;
   });
 
-  describe('when run with the RSS object set with default options', function () {
+  it('should cache posts after they have been parsed', function () {
+    var post = JSON.parse(fs.readFileSync('.posts-post-cache.json')).posts[0];
+    post.sourcePath.should.equal('test/fixtures/posts/post2.md');
+  });
+
+  describe('when ran with the RSS object set with default options', function () {
 
     before(function (done) {
       var buildProcess = spawn('grunt', ['pages:rss_default']);
