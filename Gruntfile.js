@@ -112,7 +112,7 @@ module.exports = function (grunt) {
     },
     clean: {
       build: ['dev'],
-      cache: ['.post-cache.json']
+      cache: ['.*post-cache.json']
     },
     copy: {
       styles: {
