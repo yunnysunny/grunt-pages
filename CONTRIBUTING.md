@@ -13,3 +13,7 @@ grunt test
 There are integration tests located in [this](https://github.com/ChrisWren/grunt-pages/blob/master/test/integrationTests.js) file which verify that the html files were created as expected, and unit tests in [this](https://github.com/ChrisWren/grunt-pages/blob/master/test/unitTests.js) file which verify the logic implemented in library methods.
 
 The goal is to test any new features in the integration test file and test any changes to library method logic in the unit test file.
+
+## Performance
+
+To see how fast grunt-pages is running, add the `--bench` flag. This will log the time it took to run the task after it is completed. The goal is to make grunt-pages run as fast as possible by using caching for both template rendering and post parsing and also optimizing the logic.
