@@ -7,42 +7,40 @@
  */
 
 'use strict';
-var fs = require('fs');
+var fs   = require('fs');
 var path = require('path');
-var url = require('url');
+var url  = require('url');
 
-var jsYAML = require('js-yaml');
-var marked = require('marked');
-var pygmentize = require('pygmentize-bundled');
-var RSS = require('rss');
-var _ = require('lodash');
 require('colors');
+var jsYAML     = require('js-yaml');
+var _          = require('lodash');
+var marked     = require('marked');
+var pygmentize = require('pygmentize-bundled');
+var RSS        = require('rss');
 
 var templateEngines = {
-  jade: require('jade'),
-  ejs: require('ejs')
+  ejs:  require('ejs'),
+  jade: require('jade')
 };
-var cacheFile = path.normalize(__dirname + '/../.post-cache.json');
 
 // Define lib object to attach library methods to
 var lib = {};
 
+/**
+ * Export module as a grunt plugin
+ * @param  {Object} grunt Grunt object to register tasks and use for utilities
+ */
 module.exports = function (grunt) {
 
   // Allow for test objects to be used during unit testing
-  var _this = grunt.testContext || {};
+  var _this   = grunt.testContext || {};
   var options = grunt.testOptions || {};
 
+  // Create a reference to the template engine that is available to all lib methods
   var templateEngine;
-  var start = new Date().getTime();
-  var unmodifiedPosts = [];
 
-  if (fs.existsSync(cacheFile)) {
-    unmodifiedPosts = lib.getUnmodifiedPosts(JSON.parse(fs.readFileSync(cacheFile)).posts);
-    var unmodifiedPostPaths = unmodifiedPosts.map(function (post) {
-      return post.sourcePath;
-    });
-  }
+  // Save start time to monitor task run time
+  var start = new Date().getTime();
 
   grunt.registerMultiTask('pages', 'Creates pages from markdown and templates.', function () {
     var done = this.async();
@@ -139,7 +137,7 @@ module.exports = function (grunt) {
    */
   lib.parsePostData = function (postPath) {
     var fileString = fs.readFileSync(postPath, 'utf8');
-    var postData = {};
+    var postData   = {};
     try {
 
       // Parse JSON metadata
@@ -267,7 +265,6 @@ module.exports = function (grunt) {
     postCollection.forEach(function (post) {
       post.dest = lib.getPostDest(post);
     });
-
   };
 
   /**
@@ -397,9 +394,10 @@ module.exports = function (grunt) {
         // If the template engine is specified, don't render templates with other filetypes
         if (!options.templateEngine || (options.templateEngine && path.extname(abspath) === '.' + options.templateEngine)) {
           var layoutString = fs.readFileSync(abspath, 'utf8');
-          var fn = templateEngine.compile(layoutString, { pretty: true, filename: abspath });
-          var dest = _this.data.dest + '/' +
-                     abspath.slice(rootdir.length + 1).replace(path.extname(abspath), '.html');
+          var fn           = templateEngine.compile(layoutString, { pretty: true, filename: abspath });
+          var dest         = _this.data.dest + '/' +
+                             abspath.slice(rootdir.length + 1).replace(path.extname(abspath), '.html');
+
           templateData.currentPage = path.basename(abspath, path.extname(abspath));
           grunt.file.write(dest, fn(templateData));
           grunt.log.ok('Created '.green + 'page'.magenta + ' at: ' + dest);
@@ -415,9 +413,9 @@ module.exports = function (grunt) {
    */
   lib.getPostGroups = function (postCollection, pagination) {
     var postsPerPage = pagination.postsPerPage;
-    var postGroups = [];
+    var postGroups   = [];
+    var i            = 0;
     var postGroup;
-    var i = 0;
 
     while ((postGroup = postCollection.slice(i * postsPerPage, (i + 1) * postsPerPage)).length) {
       postGroups.push({
@@ -442,8 +440,8 @@ module.exports = function (grunt) {
     return postGroupGetter(postCollection, pagination).map(function (postGroup) {
       return {
         posts: postGroup.posts,
-        id: postGroup.id,
-        dest: lib.getListPageDest(postGroup.id, pagination)
+        id:    postGroup.id,
+        dest:  lib.getListPageDest(postGroup.id, pagination)
       };
     });
   };
@@ -454,14 +452,14 @@ module.exports = function (grunt) {
    * @param  {Object} pagination   Configuration object for pagination
    */
   lib.paginate = function (templateData, pagination) {
-    var listPage = pagination.listPage;
-    var pages = lib.getPaginatedPages(templateData.posts, pagination);
+    var listPage     = pagination.listPage;
+    var pages        = lib.getPaginatedPages(templateData.posts, pagination);
     var layoutString = fs.readFileSync(listPage, 'utf8');
-    var fn = templateEngine.compile(layoutString, { pretty: true, filename: listPage });
+    var fn           = templateEngine.compile(layoutString, { pretty: true, filename: listPage });
 
     var pageData = pages.map(function (page) {
       return {
-        id: page.id,
+        id:  page.id,
         url: path.dirname(page.dest).slice(_this.data.dest.length) + '/'
       };
     });
@@ -471,7 +469,7 @@ module.exports = function (grunt) {
         currentIndex: pageNumber,
         pages: pageData,
         posts: page.posts,
-        data: templateData.data || {}
+        data:  templateData.data || {}
       }));
       grunt.log.ok('Created '.green + 'paginated'.rainbow + ' page'.magenta + ' at: ' + page.dest);
     });
@@ -495,34 +493,34 @@ module.exports = function (grunt) {
     }
 
     var fileName = options.rss.path || 'feed.xml';
-    var dest = path.join(_this.data.dest, fileName);
+    var dest     = path.join(_this.data.dest, fileName);
 
     // Create a new feed
     var feed = new RSS({
-      title: options.rss.title,
-      description: options.rss.description,
-      feed_url: url.resolve(options.rss.url, fileName),
-      site_url: options.rss.url,
-      image_url: options.rss.image_url,
-      docs: options.rss.docs,
-      author: options.rss.author,
+      title:          options.rss.title,
+      description:    options.rss.description,
+      feed_url:       url.resolve(options.rss.url, fileName),
+      site_url:       options.rss.url,
+      image_url:      options.rss.image_url,
+      docs:           options.rss.docs,
+      author:         options.rss.author,
       managingEditor: options.rss.managingEditor || options.rss.author,
-      webMaster: options.rss.webMaster || options.rss.author,
-      copyright: options.rss.copyRight || new Date().getFullYear() + ' ' + options.rss.author,
-      language: options.rss.language || 'en',
-      categories: options.rss.categories,
-      pubDate: options.rss.pubDate || new Date().toString(),
-      ttl: options.rss.ttl || '60'
+      webMaster:      options.rss.webMaster || options.rss.author,
+      copyright:      options.rss.copyRight || new Date().getFullYear() + ' ' + options.rss.author,
+      language:       options.rss.language || 'en',
+      categories:     options.rss.categories,
+      pubDate:        options.rss.pubDate || new Date().toString(),
+      ttl:            options.rss.ttl || '60'
     });
 
     // Add each post
     postCollection.forEach(function (post) {
       feed.item({
-        title: post.title,
+        title:       post.title,
         description: post.content,
-        url: url.resolve(options.rss.url, post.url),
-        categories: post.tags,
-        date: post.date
+        url:         url.resolve(options.rss.url, post.url),
+        categories:  post.tags,
+        date:        post.date
       });
     });
 
@@ -538,8 +536,8 @@ module.exports = function (grunt) {
    * @return {String}
    */
   lib.getListPageDest = function (pageId, pagination) {
-    var dest = _this.data.dest + '/';
-    var listPage = pagination.listPage;
+    var dest          = _this.data.dest + '/';
+    var listPage      = pagination.listPage;
     var paginationURL = pagination.url || 'page/:id/index.html';
 
     // If the pageSrc option is used generate list pages relative to pageSrc
@@ -573,20 +571,4 @@ module.exports = function (grunt) {
 
   // Return the library methods so that they can be tested
   return lib;
-};
-
-/**
- * Returns an array of unmodified posts by checking the last modified date of each post in the cache
- * @param  {Array} posts Collection of posts
- * @return {Array}       An array of posts which have not been modified and do not need to be parsed
- */
-lib.getUnmodifiedPosts = function (posts) {
-  return posts.filter(function (post) {
-    if (('' + fs.statSync(post.sourcePath).mtime) === ('' + new Date(post.lastModified))) {
-
-      // We have to restore the Date object since it is lost during JSON serialization
-      post.date = new Date(post.date);
-      return true;
-    }
-  });
 };
