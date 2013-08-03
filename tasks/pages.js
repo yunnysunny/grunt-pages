@@ -90,7 +90,7 @@ module.exports = function (grunt) {
       }
       var post = lib.parsePostData(postpath);
 
-      // Save source path for error logging in getPostDest
+      // Save source path for caching and error logging in getPostDest
       post.sourcePath = postpath;
 
       // Save the modification time of the post to allow for future caching
