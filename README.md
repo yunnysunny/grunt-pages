@@ -328,6 +328,8 @@ The file extension of the template engine to be used. This option filters templa
 
 # Changelog
 
+**0.3.3** - Added lodash as a hard dependency.
+
 **0.3.2** - Added post caching for unmodified posts to speed up task.
 
 **0.3.1** - Added [rss option](https://github.com/ChrisWren/grunt-pages#rss) to generates feeds.
