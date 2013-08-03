@@ -45,6 +45,7 @@ module.exports = function (grunt) {
   grunt.registerMultiTask('pages', 'Creates pages from markdown and templates.', function () {
     var done = this.async();
 
+    // Create a reference to the the grunt object and task options that is available to all lib methods
     _this = this;
     options = this.options();
 
