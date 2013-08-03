@@ -252,8 +252,11 @@ module.exports = function (grunt) {
     }
 
     fs.writeFileSync(cacheFile, JSON.stringify(cachedPosts));
-    var message = 'Took ' + (new Date().getTime() - start) / 1000 + 's';
-    console.log(message.yellow);
+
+    if (grunt.option('bench')) {
+      var message = 'Took ' + (new Date().getTime() - start) / 1000 + ' seconds.';
+      console.log(message.green);
+    }
     done();
   };
 
