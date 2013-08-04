@@ -44,7 +44,7 @@ describe('grunt-pages', function () {
     post.sourcePath.should.equal('test/fixtures/posts/post2.md');
   });
 
-  describe('when ran with the RSS object set with default options', function () {
+  describe('when run with the RSS object set with default options', function () {
 
     before(function (done) {
       var buildProcess = spawn('grunt', ['pages:rss_default']);
