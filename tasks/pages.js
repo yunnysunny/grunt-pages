@@ -45,7 +45,7 @@ module.exports = function (grunt) {
   grunt.registerMultiTask('pages', 'Creates pages from markdown and templates.', function () {
     var done = this.async();
 
-    // Create a reference to the the grunt object and task options that is available to all lib methods
+    // Create a reference to the the context object and task options so that they are available to all lib methods
     _this = this;
     options = this.options();
 
@@ -206,8 +206,8 @@ module.exports = function (grunt) {
 
   /**
    * Renders posts and pages once all posts have been parsed
-   * @param  {Array}   postCollection Collection of parsed posts with the content and metadata properties
-   * @param  {String}  cacheFile      Pathname of file to write post data to for future caching of unmodified posts
+   * @param  {Array}    postCollection Collection of parsed posts with the content and metadata properties
+   * @param  {String}   cacheFile      Pathname of file to write post data to for future caching of unmodified posts
    * @param  {Function} done           Callback to call once grunt-pages is done
    */
   lib.renderPostsAndPages = function (postCollection, cacheFile, done) {
