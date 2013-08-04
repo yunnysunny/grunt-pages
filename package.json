@@ -1,6 +1,6 @@
 {
   "name": "grunt-pages",
-  "version": "0.3.3",
+  "version": "0.4.0",
   "description": "Grunt task to create pages using markdown and templates",
   "main": "Gruntfile.js",
   "dependencies": {
@@ -24,7 +24,8 @@
     "grunt-contrib-copy": "~0.4.1",
     "grunt-contrib-clean": "~0.4.1",
     "should": "~1.2.2",
-    "sinon": "~1.7.3"
+    "sinon": "~1.7.3",
+    "grunt-release": "~0.4.0"
   },
   "peerDependencies": {
     "grunt": "~0.4.1"
