@@ -103,7 +103,7 @@ describe('grunt-pages library', function () {
 
   });
 
-  describe('getPostDest', function () {
+  describe('getPostUrl', function () {
 
     it('should log an error if the dest property isn\'t specified', function () {
       lib = pages.call(_.extend(grunt, {
@@ -114,7 +114,7 @@ describe('grunt-pages library', function () {
         }
       }), grunt);
 
-      lib.getPostDest({});
+      lib.getPostUrl({});
       failStub.lastCall.args[0].should.include('Please specify the dest property in your config.');
     });
 
@@ -128,7 +128,7 @@ describe('grunt-pages library', function () {
         }
       }), grunt);
 
-      lib.getPostDest({});
+      lib.getPostUrl({});
       failStub.lastCall.args[0].should.include('required title attribute not found');
     });
 
@@ -136,15 +136,15 @@ describe('grunt-pages library', function () {
       lib = pages.call(_.extend(grunt, {
         testContext: {
           data: {
-            url: 'posts/:title',
+            url: 'posts/:title/',
             dest: 'dest'
           }
         }
       }), grunt);
 
-      lib.getPostDest({
+      lib.getPostUrl({
         title: 'Cool Post'
-      }).should.include('dest/posts/cool-post.html');
+      }).should.include('posts/cool-post/');
     });
 
   });

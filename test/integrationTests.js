@@ -16,13 +16,13 @@ describe('grunt-pages', function () {
   });
 
   it('should create posts in the location specified by the url', function() {
-    fs.existsSync('dev/blog/posts/Post_1.html').should.be.ok;
-    fs.existsSync('dev/blog/posts/Post_2.html').should.be.ok;
+    fs.existsSync('dev/blog/posts/Post_1/index.html').should.be.ok;
+    fs.existsSync('dev/blog/posts/Post_2/index.html').should.be.ok;
   });
 
   it('should create posts by correctly parsing the markdown content', function () {
-    fs.readFileSync('dev/blog/posts/Post_1.html', 'utf8').should.equal(fs.readFileSync('test/output/blog/posts/Post1.html', 'utf8'));
-    fs.readFileSync('dev/blog/posts/Post_2.html', 'utf8').should.equal(fs.readFileSync('test/output/blog/posts/Post2.html', 'utf8'));
+    fs.readFileSync('dev/blog/posts/Post_1/index.html', 'utf8').should.equal(fs.readFileSync('test/output/blog/posts/Post1/index.html', 'utf8'));
+    fs.readFileSync('dev/blog/posts/Post_2/index.html', 'utf8').should.equal(fs.readFileSync('test/output/blog/posts/Post2/index.html', 'utf8'));
   });
 
   it('should create pages in the location specified by the url', function() {
