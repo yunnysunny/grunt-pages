@@ -82,7 +82,7 @@ The [jade](https://github.com/visionmedia/jade) or [ejs](https://github.com/visi
 #### url
 Type: `String`
 
-The url of each post. The url string takes variables as parameters using the `:variable` syntax. Variable(s) specified in the url are required in each post's metadata.
+The url of each post. The url string takes variables as parameters using the `:variable` syntax. Variable(s) specified in the url are required in each post's metadata. Urls ending with a trailing `/` will generate posts as index.html files inside of the url's folder.
 
 ### Options
 
@@ -328,6 +328,12 @@ The file extension of the template engine to be used. This option filters templa
 
 # Changelog
 
+**0.4.0** - Altered post url to not automatically add `.html` to urls.
+
+**Breaking changes:**
+
+- Post urls will now require .html to be listed explicitly to be in the url. The recommended convention is to put each post in its own folder, like `posts/:title/` so that a post with the title `hello` would be generated at posts/hello/index.html.
+
 **0.3.3** - Added lodash as a hard dependency.
 
 **0.3.2** - Added post caching for unmodified posts to speed up task.
@@ -338,7 +344,7 @@ The file extension of the template engine to be used. This option filters templa
 
 **Breaking changes:**
 
-- Paginated pages no longer have a `currentPage` as a property of the current page in the `pages` array, rather it is exposed as a global variable called  `currentIndex` for easier accesibility.
+- Paginated pages no longer have a `currentPage` as a property of the current page in the `pages` array, rather it is exposed as a global variable called  `currentIndex` for easier accessibility.
 
 **0.2.5** - Fixed metadata parsing bug, added `formatPostUrl` option & added `pagination.url` option.
 
