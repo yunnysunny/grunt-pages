@@ -217,8 +217,8 @@ module.exports = function (grunt) {
       lib.setData(templateData);
     }
 
-    lib.setPostDests(postCollection);
     lib.setPostUrls(postCollection);
+    lib.setPostDests(postCollection);
     lib.sortPosts(postCollection);
 
     var cachedPosts = _.cloneDeep(templateData);
@@ -265,27 +265,30 @@ module.exports = function (grunt) {
    * Updates the post collection with each post's destination
    * @param {Array} postCollection Collection of parsed posts with the content and metadata properties
    */
-  lib.setPostDests = function (postCollection) {
+  lib.setPostUrls = function (postCollection) {
     postCollection.forEach(function (post) {
-      post.dest = lib.getPostDest(post);
+      post.url = lib.getPostUrl(post);
     });
   };
 
   /**
-   * Returns the post destination based on the url property and postData
+   * Returns the post url based on the url property and postData
    * @param  {Object} post Post object containing all metadata properties of the post
    * @return {String}
    */
-  lib.getPostDest = function (post) {
+  lib.getPostUrl = function (post) {
     if (typeof _this.data.dest === 'undefined') {
       grunt.fail.fatal('Please specify the dest property in your config.');
     }
-    var dest = _this.data.dest + '/' + _this.data.url + '.html';
+
+    // Strip .html from url so it isn
+    var url = _this.data.url;
 
     var formatPostUrl = options.formatPostUrl || function (urlSegment) {
       return urlSegment.replace(/[^\w\s\-]/gi, '').replace(/\s{2,}/gi, ' ').replace(/\s/gi, '-').toLowerCase();
     };
 
+    // Extract dynamic url segments and replace them with post metadata
     _this.data.url.split('/')
 
       .filter(function (urlSegment) {
@@ -301,24 +304,29 @@ module.exports = function (grunt) {
 
         // Make sure the post has the dynamic segment as a metadata property
         if (urlSegment in post) {
-          dest = dest.replace(':' + urlSegment, formatPostUrl(post[urlSegment]));
+          url = url.replace(':' + urlSegment, formatPostUrl(post[urlSegment]));
         } else {
           grunt.fail.fatal('required ' + urlSegment + ' attribute not found in the following post\'s metadata: ' + post.sourcePath + '.');
         }
       });
 
-    return dest;
+    return url;
   };
 
   /**
-   * Updates the post collection with each post's url
+   * Updates the post collection with each post's destination
    * @param {Array} postCollection Collection of parsed posts with the content and metadata properties
    */
-  lib.setPostUrls = function (postCollection) {
+  lib.setPostDests = function (postCollection) {
     postCollection.forEach(function (post) {
-
-      // Slice the destination folder from the beginning of the url
-      post.url = post.dest.slice((_this.data.dest + '/').length);
+      post.dest = _this.data.dest + '/' + post.url;
+      if (post.dest.indexOf('.html') === -1) {
+        if (post.dest.lastIndexOf('/') === post.dest.length - 1) {
+          post.dest += 'index.html';
+        } else {
+          post.dest += '.html';
+        }
+      }
     });
   };
 
