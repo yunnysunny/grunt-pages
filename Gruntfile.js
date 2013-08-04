@@ -11,7 +11,7 @@ module.exports = function (grunt) {
         src: 'test/fixtures/posts/',
         dest: 'dev',
         layout: 'test/fixtures/ejs/layouts/post.ejs',
-        url: 'blog/posts/:title',
+        url: 'blog/posts/:title/',
         options: {
           formatPostUrl: function (urlSegment) {
             return urlSegment.replace(/[^a-zA-Z0-9]/g, '_');
@@ -25,7 +25,7 @@ module.exports = function (grunt) {
         src: 'test/fixtures/posts/',
         dest: 'dev',
         layout: 'test/fixtures/ejs/layouts/post.ejs',
-        url: 'blog/posts/:title',
+        url: 'blog/posts/:title/',
         options: {
           rss: {
             author: 'The Author',
@@ -43,7 +43,7 @@ module.exports = function (grunt) {
         src: 'test/fixtures/posts/',
         dest: 'dev',
         layout: 'test/fixtures/ejs/layouts/post.ejs',
-        url: 'blog/posts/:title',
+        url: 'blog/posts/:title/',
         options: {
           rss: {
             path: 'rss/rss.xml',
@@ -70,7 +70,7 @@ module.exports = function (grunt) {
         src: 'test/fixtures/posts/',
         dest: 'dev',
         layout: 'test/fixtures/jade/layouts/post.jade',
-        url: 'blog/posts/:title',
+        url: 'blog/posts/:title/',
         options: {
           sortFunction: function (a, b) {
             return a.date - b.date;

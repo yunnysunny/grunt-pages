@@ -29,7 +29,7 @@ pages: {
     src: 'src/posts',
     dest: 'dev',
     layout: 'src/layouts/post.jade',
-    url: 'blog/posts/:title' 
+    url: 'blog/posts/:title/' 
   }
 }
 ```
@@ -143,7 +143,7 @@ pages: {
     src: 'src/posts',
     dest: 'dev',
     layout: 'src/layouts/post.jade',
-    url: 'blog/posts/:title'
+    url: 'blog/posts/:title/'
   }
 }
 ```
@@ -192,7 +192,7 @@ pages: {
     src: 'src/posts',
     dest: 'dev',
     layout: 'src/layouts/post.jade',
-    url: 'posts/:title'
+    url: 'posts/:title/'
   }
 }
 ```
