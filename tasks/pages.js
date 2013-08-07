@@ -149,12 +149,11 @@ module.exports = function (grunt) {
 
       // Parse YAML metadata
       } else if (fileString.indexOf('----') === 0) {
-        postData = jsYAML.load(fileString.split('----')[1]);
+        var sections = fileString.split('----');
+        postData = jsYAML.load(sections[1]);
 
         // Extract the content by removing the metadata section
-        var sections = fileString.split('----')
-                                 .slice(2);
-        postData.markdown = sections.join('----');
+        postData.markdown = sections.slice(2).join('----');
       } else {
         grunt.fail.fatal('the metadata for the following post is formatted incorrectly: ' + postPath.red);
       }
