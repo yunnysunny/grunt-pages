@@ -149,6 +149,30 @@ describe('grunt-pages library', function () {
 
   });
 
+  describe('setPostDests', function () {
+    lib = pages.call(_.extend(grunt, {
+      testContext: {
+        data: {
+          dest: 'dest'
+        }
+      }
+    }), grunt);
+
+    it('should return the post destinations by adding a .html to the url', function () {
+      var posts = [{
+        url: 'post1/'
+      }, {
+        url: 'post2'
+      }];
+
+      lib.setPostDests(posts);
+
+      posts[0].dest.should.eql('dest/post1/index.html');
+      posts[1].dest.should.eql('dest/post2.html');
+    });
+
+  });
+
   describe('getPostGroups', function () {
 
     it('should return post groups based on the pagination.postsPerPage\'s value', function () {
