@@ -60,7 +60,7 @@ describe('grunt-pages library', function () {
 
       lib = pages.call(_.extend(grunt, {
         testOptions: {
-          data: 'test/fixtures/unit/data/data.json'
+          data: data
         }
       }), grunt);
       lib.setData(templateData);
@@ -72,7 +72,7 @@ describe('grunt-pages library', function () {
 
       lib = pages.call(_.extend(grunt, {
         testOptions: {
-          data: data
+          data: 'test/fixtures/unit/data/gooddata.json'
         }
       }), grunt);
 
