@@ -17,20 +17,20 @@ describe('grunt-pages library', function () {
     });
 
     it('should log an error if the post metadata is not YAML or a JavaScript Object', function () {
-      lib.parsePostData(__dirname + '/fixtures/lib/post/badmetadata.md');
+      lib.parsePostData(__dirname + '/fixtures/unit/post/badmetadata.md');
       failStub.lastCall.args[0].should.include('the metadata for the following post is formatted incorrectly:');
     });
 
     describe('when parsing JavaScript Object metadata', function () {
 
       it('should log an error if the post metadata is not a valid JavaScript Object', function () {
-        lib.parsePostData(__dirname + '/fixtures/lib/post/badobjectmetadata.md');
+        lib.parsePostData(__dirname + '/fixtures/unit/post/badobjectmetadata.md');
         failStub.lastCall.args[0].should.include('the metadata for the following post is formatted incorrectly:');
       });
 
       it('should return the post metadata and markdown if the metadata is a valid JavaScript Object', function () {
-        lib.parsePostData(__dirname + '/fixtures/lib/post/goodobjectmetadata.md').title.should.eql('Good Post :)');
-        lib.parsePostData(__dirname + '/fixtures/lib/post/goodobjectmetadata.md').markdown.should.eql('\n\n# Hello');
+        lib.parsePostData(__dirname + '/fixtures/unit/post/goodobjectmetadata.md').title.should.eql('Good Post :)');
+        lib.parsePostData(__dirname + '/fixtures/unit/post/goodobjectmetadata.md').markdown.should.eql('\n\n# Hello');
       });
 
     });
@@ -38,13 +38,13 @@ describe('grunt-pages library', function () {
     describe('when parsing YAML metadata', function () {
 
       it('should log an error if the data is not valid YAML', function () {
-        lib.parsePostData(__dirname + '/fixtures/lib/post/badyamlmetadata.md');
+        lib.parsePostData(__dirname + '/fixtures/unit/post/badyamlmetadata.md');
         failStub.lastCall.args[0].should.include('the metadata for the following post is formatted incorrectly:');
       });
 
       it('should return the post metadata and markdown if the metadata is valid YAML', function () {
-        lib.parsePostData(__dirname + '/fixtures/lib/post/goodobjectmetadata.md').title.should.eql('Good Post :)');
-        lib.parsePostData(__dirname + '/fixtures/lib/post/goodobjectmetadata.md').markdown.should.eql('\n\n# Hello');
+        lib.parsePostData(__dirname + '/fixtures/unit/post/goodobjectmetadata.md').title.should.eql('Good Post :)');
+        lib.parsePostData(__dirname + '/fixtures/unit/post/goodobjectmetadata.md').markdown.should.eql('\n\n# Hello');
       });
 
     });
@@ -60,7 +60,7 @@ describe('grunt-pages library', function () {
 
       lib = pages.call(_.extend(grunt, {
         testOptions: {
-          data: 'test/fixtures/lib/data.json'
+          data: 'test/fixtures/unit/data.json'
         }
       }), grunt);
       lib.setData(templateData);
@@ -83,7 +83,7 @@ describe('grunt-pages library', function () {
     it('should log an error if the JSON file specified by the options.data String is invalid', function () {
       lib = pages.call(_.extend(grunt, {
         testOptions: {
-          data: 'test/fixtures/lib/baddata.json'
+          data: 'test/fixtures/unit/baddata.json'
         }
       }), grunt);
 
