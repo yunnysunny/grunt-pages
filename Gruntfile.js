@@ -8,23 +8,23 @@ module.exports = function (grunt) {
     globalConfig: globalConfig,
     pages: {
       posts: {
-        src: 'test/fixtures/posts/',
+        src: 'test/fixtures/integration/input/posts/',
         dest: 'dev',
-        layout: 'test/fixtures/ejs/layouts/post.ejs',
+        layout: 'test/fixtures/integration/input/ejs/layouts/post.ejs',
         url: 'blog/posts/:title/',
         options: {
           formatPostUrl: function (urlSegment) {
             return urlSegment.replace(/[^a-zA-Z0-9]/g, '_');
           },
-          pageSrc: 'test/fixtures/ejs/pages',
+          pageSrc: 'test/fixtures/integration/input/ejs/pages',
           templateEngine: 'ejs',
-          data: 'test/fixtures/data/data.json'
+          data: 'test/fixtures/integration/input/data/data.json'
         }
       },
       rss_default: {
-        src: 'test/fixtures/posts/',
+        src: 'test/fixtures/integration/input/posts/',
         dest: 'dev',
-        layout: 'test/fixtures/ejs/layouts/post.ejs',
+        layout: 'test/fixtures/integration/input/ejs/layouts/post.ejs',
         url: 'blog/posts/:title/',
         options: {
           rss: {
@@ -34,15 +34,15 @@ module.exports = function (grunt) {
             url: 'http://the.url.com',
             pubDate: new Date(1000) // Must pass date for output to match
           },
-          pageSrc: 'test/fixtures/ejs/pages',
+          pageSrc: 'test/fixtures/integration/input/ejs/pages',
           templateEngine: 'ejs',
-          data: 'test/fixtures/data/data.json'
+          data: 'test/fixtures/integration/input/data/data.json'
         }
       },
       rss_custom: {
-        src: 'test/fixtures/posts/',
+        src: 'test/fixtures/integration/input/posts/',
         dest: 'dev',
-        layout: 'test/fixtures/ejs/layouts/post.ejs',
+        layout: 'test/fixtures/integration/input/ejs/layouts/post.ejs',
         url: 'blog/posts/:title/',
         options: {
           rss: {
@@ -61,15 +61,15 @@ module.exports = function (grunt) {
             ttl: '40',
             pubDate: new Date(1000) // Must pass date for output to match
           },
-          pageSrc: 'test/fixtures/ejs/pages',
+          pageSrc: 'test/fixtures/integration/input/ejs/pages',
           templateEngine: 'ejs',
-          data: 'test/fixtures/data/data.json'
+          data: 'test/fixtures/integration/input/data/data.json'
         }
       },
       paginated: {
-        src: 'test/fixtures/posts/',
+        src: 'test/fixtures/integration/input/posts/',
         dest: 'dev',
-        layout: 'test/fixtures/jade/layouts/post.jade',
+        layout: 'test/fixtures/integration/input/jade/layouts/post.jade',
         url: 'blog/posts/:title/',
         options: {
           sortFunction: function (a, b) {
@@ -80,10 +80,10 @@ module.exports = function (grunt) {
           },
           pagination: [{
             postsPerPage: 1,
-            listPage: 'test/fixtures/jade/pages/blog/index.jade',
+            listPage: 'test/fixtures/integration/input/jade/pages/blog/index.jade',
             url: 'list/:id/index.html'
           }, {
-            listPage: 'test/fixtures/jade/pages/blog/index.jade',
+            listPage: 'test/fixtures/integration/input/jade/pages/blog/index.jade',
             getPostGroups: function (posts) {
               var postGroups = {};
               posts.forEach(function (post) {
@@ -119,7 +119,7 @@ module.exports = function (grunt) {
         files: [{
           expand: true,
           flatten: true,
-          src: ['test/fixtures/styles/*'],
+          src: ['test/fixtures/integration/input/styles/*'],
           dest: 'dev/styles/'
         }]
       }
@@ -159,7 +159,7 @@ module.exports = function (grunt) {
         livereload: true
       },
       src: {
-        files: ['tasks/*.js', 'test/fixtures/**'],
+        files: ['tasks/*.js', 'test/fixtures/integration/input/**'],
         tasks: ['jshint', 'build']
       },
       tests: {
