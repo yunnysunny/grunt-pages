@@ -231,8 +231,15 @@ module.exports = function (grunt) {
       delete post.sourcePath;
     });
 
+    var postStart = new Date().getTime();
     lib.generatePosts(templateData);
+    var message = '';
+    if (grunt.option('bench')) {
+      message = '\nPosts'.blue + ' took ' + (new Date().getTime() - postStart) / 1000 + ' seconds.\n';
+      console.log(message);
+    }
 
+    var pageStart = new Date().getTime();
     if (options.pageSrc) {
       lib.generatePages(templateData);
     }
@@ -246,6 +253,10 @@ module.exports = function (grunt) {
         lib.paginate(templateData, options.pagination);
       }
     }
+    if (grunt.option('bench')) {
+      message = '\nPages'.magenta + ' took ' + (new Date().getTime() - pageStart) / 1000 + ' seconds.\n';
+      console.log(message);
+    }
 
     if (options.rss) {
       lib.generateRSS(postCollection);
@@ -254,8 +265,8 @@ module.exports = function (grunt) {
     fs.writeFileSync(cacheFile, JSON.stringify(cachedPosts));
 
     if (grunt.option('bench')) {
-      var message = 'Took ' + (new Date().getTime() - start) / 1000 + ' seconds.';
-      console.log(message.green);
+      message = 'Task'.yellow + ' took ' + (new Date().getTime() - start) / 1000 + ' seconds.';
+      console.log(message);
     }
     done();
   };
