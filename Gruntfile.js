@@ -203,6 +203,11 @@ module.exports = function (grunt) {
   grunt.registerTask('test', ['clean', 'jshint', 'simplemocha:all']);
   grunt.registerTask('default', ['concurrent']);
 
+  grunt.registerTask('bench', 'Runs a grunt-pages config and measures performance', function (target) {
+    grunt.option('bench', true);
+    grunt.task.run('clean', 'pages:' + target);
+  });
+
   grunt.registerTask('spec', 'Runs a task on a specified file', function (fileName) {
     globalConfig.file = fileName;
     grunt.task.run('simplemocha:spec');
