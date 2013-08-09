@@ -328,7 +328,7 @@ The file extension of the template engine to be used. This option filters templa
 
 # Changelog
 
-**0.4.0** - Altered post url to not automatically add `.html` to urls.
+**0.4.0** - Altered post url to *not* automatically add `.html` to urls.
 
 **Breaking changes:**
 
