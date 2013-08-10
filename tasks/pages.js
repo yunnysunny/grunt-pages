@@ -311,7 +311,9 @@ module.exports = function (grunt) {
 
       // Replace dynamic url segments
       .forEach(function (urlSegment) {
-
+        if (urlSegment.indexOf('.html') !== -1) {
+          urlSegment = urlSegment.slice(0, - '.html'.length);
+        }
         // Make sure the post has the dynamic segment as a metadata property
         if (urlSegment in post) {
           url = url.replace(':' + urlSegment, formatPostUrl(post[urlSegment]));

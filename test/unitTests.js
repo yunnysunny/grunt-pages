@@ -147,6 +147,21 @@ describe('grunt-pages library', function () {
       }).should.include('posts/cool-post/');
     });
 
+    it('should ignore .html when replacing the :variables in the url with its metadata', function () {
+      lib = pages.call(_.extend(grunt, {
+        testContext: {
+          data: {
+            url: 'posts/:title.html',
+            dest: 'dest'
+          }
+        }
+      }), grunt);
+
+      lib.getPostUrl({
+        title: 'Cool Post'
+      }).should.include('posts/cool-post.html');
+    });
+
   });
 
   describe('setPostDests', function () {
