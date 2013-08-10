@@ -328,6 +328,8 @@ The file extension of the template engine to be used. This option filters templa
 
 # Changelog
 
+**0.4.1** - `.html` excluded from post url :variable replacement.
+
 **0.4.0** - Altered post url to *not* automatically add `.html` to urls.
 
 **Breaking changes:**
