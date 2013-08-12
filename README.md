@@ -1,9 +1,13 @@
 # grunt-pages
 > Grunt task to create pages using markdown and templates
 
-[![NPM version](https://badge.fury.io/js/grunt-pages.png)](http://badge.fury.io/js/grunt-pages)  
-[![Dependency Status](https://gemnasium.com/ChrisWren/grunt-pages.png)](https://gemnasium.com/ChrisWren/grunt-pages)   
+[![NPM version](https://badge.fury.io/js/grunt-pages.png)](http://badge.fury.io/js/grunt-pages)
+[![Dependency Status](https://gemnasium.com/ChrisWren/grunt-pages.png)](https://gemnasium.com/ChrisWren/grunt-pages)
 [![Travis Status](https://travis-ci.org/ChrisWren/grunt-pages.png?branch=master)](https://travis-ci.org/ChrisWren/grunt-pages)
+
+## Prerequisites
+This grunt task uses [pygments](#syntax-highlighting), which relies on [Python](http://www.python.org/getit/) version `2.7.x`.
+   > Please note that grunt-pages will **not** run on the `3.x` branch of Python
 
 ## Getting Started
 If you haven't used grunt before, be sure to check out the [Getting Started](http://gruntjs.com/getting-started) guide, as it explains how to create a gruntfile as well as install and use grunt plugins. Once you're familiar with that process, install this plugin with this command:
@@ -29,7 +33,7 @@ pages: {
     src: 'src/posts',
     dest: 'dev',
     layout: 'src/layouts/post.jade',
-    url: 'blog/posts/:title/' 
+    url: 'blog/posts/:title/'
   }
 }
 ```
@@ -72,7 +76,7 @@ The directory where the source posts are located.
 #### dest
 Type: `String`
 
-The directory where pages are generated. 
+The directory where pages are generated.
 
 #### layout
 Type: `String`
@@ -107,7 +111,7 @@ function (a, b) {
 }
 ```
 
-A compare function used by [Array.sort](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort) to sort posts. 
+A compare function used by [Array.sort](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort) to sort posts.
 
 #### formatPostUrl
 Type: `Function`
@@ -123,7 +127,7 @@ A function that takes a `url` as a parameter and returns a formatted url string.
 #### rss
 Type: `Object`
 
-An object containing config for RSS feed generation. 
+An object containing config for RSS feed generation.
 
 All [options accepted by dylang/node-rss](https://github.com/dylang/node-rss#feed-options) are supported, with notable options listed below.
 
@@ -234,7 +238,7 @@ The location of the generated list pages relative to the `pagination.listPage`. 
 To paginate in a custom manor, you can use the following parameter:
 
 ##### pagination.getPostGroups
-Type: `Function` 
+Type: `Function`
 
 Default: `Group by postsPerPage`
 
@@ -363,4 +367,3 @@ The file extension of the template engine to be used. This option filters templa
 **0.1.0** - Added `data` option, added `templateEngine` option, added `pagination` option, and changed post data format to be a `post` object rather than global variables for each post property.
 
 **0.0.0** - Initial release.
-
