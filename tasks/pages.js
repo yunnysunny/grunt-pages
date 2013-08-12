@@ -419,8 +419,8 @@ module.exports = function (grunt) {
         if (!options.templateEngine || (options.templateEngine && path.extname(abspath) === '.' + options.templateEngine)) {
           var layoutString = fs.readFileSync(abspath, 'utf8');
           var fn           = templateEngine.compile(layoutString, { pretty: true, filename: abspath });
-          var dest         = _this.data.dest + '/' +
-                             abspath.slice(rootdir.length + 1).replace(path.extname(abspath), '.html');
+          var dest         = path.normalize(_this.data.dest + '/' +
+                             path.normalize(abspath).slice(path.normalize(rootdir).length + 1).replace(path.extname(abspath), '.html'));
 
           templateData.currentPage = path.basename(abspath, path.extname(abspath));
           grunt.file.write(dest, fn(templateData));
