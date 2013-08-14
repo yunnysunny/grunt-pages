@@ -6,7 +6,7 @@
 [![Travis Status](https://travis-ci.org/ChrisWren/grunt-pages.png?branch=master)](https://travis-ci.org/ChrisWren/grunt-pages)
 
 ## Prerequisites
-This grunt task uses [pygments](#syntax-highlighting), which relies on [Python](http://www.python.org/getit/) version `2.7.x`.
+This Grunt task uses [pygments](#syntax-highlighting), which relies on [Python](http://www.python.org/getit/) version `2.7.x`.
    > Please note that grunt-pages will **not** run on the `3.x` branch of Python
 
 ## Getting Started
@@ -344,7 +344,7 @@ The file extension of the template engine to be used. This option filters templa
 
 **0.3.2** - Added post caching for unmodified posts to speed up task.
 
-**0.3.1** - Added [rss option](https://github.com/ChrisWren/grunt-pages#rss) to generates feeds.
+**0.3.1** - Added [rss option](https://github.com/ChrisWren/grunt-pages#rss) to generates feeds thanks to [@lazd](https://github.com/lazd).
 
 **0.3.0** - Altered pagination API to allow for custom pagination schemes.
 
