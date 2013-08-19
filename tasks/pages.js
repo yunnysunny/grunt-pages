@@ -113,7 +113,7 @@ module.exports = function (grunt) {
         anchors: true
       });
 
-      // Parse post using marked
+      // Parse post using [marked](https://github.com/chjj/marked)
       marked(post.markdown, function (err, content) {
         if (err) throw err;
 
@@ -291,7 +291,6 @@ module.exports = function (grunt) {
       grunt.fail.fatal('Please specify the dest property in your config.');
     }
 
-    // Strip .html from url so it isn
     var url = _this.data.url;
 
     var formatPostUrl = options.formatPostUrl || function (urlSegment) {
