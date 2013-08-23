@@ -201,7 +201,7 @@ module.exports = function (grunt) {
 
   grunt.loadTasks('./tasks');
   grunt.registerTask('build', ['clean:build', 'copy', 'pages:paginated']);
-  grunt.registerTask('test', ['clean', 'jshint', 'mdlint', 'simplemocha:all']);
+  grunt.registerTask('test', ['clean', 'jshint', 'mdlint', 'simplemocha:all', 'clean']);
   grunt.registerTask('default', ['concurrent']);
 
   grunt.registerTask('bench', 'Runs a grunt-pages config and measures performance', function (target) {
