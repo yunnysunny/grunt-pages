@@ -61,11 +61,12 @@ module.exports = function (grunt) {
 
     // Don't include draft posts or dotfiles when counting the number of posts
     var numPosts = grunt.file.expand({
-      filter: 'isFile'
+      filter: 'isFile',
+      cwd: this.data.src
     }, [
-      this.data.src + '/**',
-      '!**/_**',
-      '!**/.**'
+      '**',
+      '!_**',
+      '!.**'
     ]).length;
 
     var parsedPosts    = unmodifiedPosts.length;
