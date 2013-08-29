@@ -295,7 +295,13 @@ module.exports = function (grunt) {
     var url = _this.data.url;
 
     var formatPostUrl = options.formatPostUrl || function (urlSegment) {
-      return urlSegment.replace(/[^\w\s\-]/gi, '').replace(/\s{2,}/gi, ' ').replace(/\s/gi, '-').toLowerCase();
+      return urlSegment
+        .toLowerCase() // change everything to lowercase
+        .replace(/^\s+|\s+$/g, '') // trim leading and trailing spaces
+        .replace(/[_|\s|\.]+/g, '-') // change all spaces, periods and underscores to a hyphen
+        .replace(/[^a-z\u0400-\u04FF0-9-]+/g, '') // remove all non-cyrillic, non-numeric characters except the hyphen
+        .replace(/[-]+/g, '-') // replace multiple instances of the hyphen with a single instance
+        .replace(/^-+|-+$/g, ''); // trim leading and trailing hyphens
     };
 
     // Extract dynamic url segments and replace them with post metadata

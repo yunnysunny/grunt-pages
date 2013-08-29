@@ -119,7 +119,13 @@ Type: `Function`
 Default:
 ```js
 function (url) {
-  return url.replace(/[^\w\s\-]/gi, '').replace(/\s{2,}/gi, ' ').replace(/\s/gi, '-').toLowerCase();
+  return url
+    .toLowerCase() // change everything to lowercase
+    .replace(/^\s+|\s+$/g, '') // trim leading and trailing spaces
+    .replace(/[_|\s|\.]+/g, '-') // change all spaces, periods and underscores to a hyphen
+    .replace(/[^a-z\u0400-\u04FF0-9-]+/g, '') // remove all non-cyrillic, non-numeric characters except the hyphen
+    .replace(/[-]+/g, '-') // replace multiple instances of the hyphen with a single instance
+    .replace(/^-+|-+$/g, ''); // trim leading and trailing hyphens
 }
 ```
 A function that takes a `url` as a parameter and returns a formatted url string. This is primarily used to remove special characters and replace whitespace.
