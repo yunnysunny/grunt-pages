@@ -338,6 +338,12 @@ The file extension of the template engine to be used. This option filters templa
 
 # Changelog
 
+**0.5.0** - Updated default post url regex to capture more cases thanks to [@justinhelmer](https://github.com/justinhelmer). Fixed bugs regarding normalizing the post dest and ignoring draft posts thanks to [@justinhelmer](https://github.com/justinhelmer).
+
+**Breaking changes:**
+
+- Post urls will potentially be altered because of the new regex. To update, you will have to provide redirects to altered post urls if you need to maintain them i.e. social media share buttons.
+
 **0.4.1** - `.html` excluded from post url :variable replacement.
 
 **0.4.0** - Altered post url to *not* automatically add `.html` to urls.
