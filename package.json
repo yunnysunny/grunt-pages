@@ -36,7 +36,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/ChrisWren/grunt-pages.git"
+    "url": "https://github.com/CabinJS/grunt-pages.git"
   },
   "keywords": [
     "grunt",
@@ -48,7 +48,8 @@
   ],
   "contributors": [
     "Larry Davis <lazd@lazd.net>",
-    "Colin Wren <colin@cawren.com>"
+    "Colin Wren <colin@cawren.com>",
+    "Justin Helmer <jhelmer25@gmail.com>"
   ],
   "author": "ChrisWren",
   "license": "MIT"

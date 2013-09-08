@@ -1,8 +1,8 @@
 /*
  * grunt-pages
- * https://github.com/ChrisWren/grunt-pages
+ * https://github.com/CabinJS/grunt-pages
  *
- * Copyright (c) 2013 Chris Wren
+ * Copyright (c) 2013 Chris Wren & contributors
  * Licensed under the MIT license.
  */
 
