@@ -81,7 +81,7 @@ The directory where pages are generated.
 #### layout
 Type: `String`
 
-The [jade](https://github.com/visionmedia/jade) or [ejs](https://github.com/visionmedia/ejs) layout template used for each post. The post metadata will be stored in a `post` object to be rendered in the layout template. [Here](https://github.com/ChrisWren/grunt-pages/blob/master/test/fixtures/integration/input/jade/layouts/post.jade) is an example post layout template.
+The [jade](https://github.com/visionmedia/jade) or [ejs](https://github.com/visionmedia/ejs) layout template used for each post. The post metadata will be stored in a `post` object to be rendered in the layout template. [Here](https://github.com/CabinJS/grunt-pages/blob/master/test/fixtures/integration/input/jade/layouts/post.jade) is an example post layout template.
 
 #### url
 Type: `String`
@@ -217,7 +217,7 @@ The number of posts each list page will contain.
 ##### pagination.listPage
 Type: `String`
 
-The location of the layout template which is used for each list page. [Here](https://github.com/ChrisWren/grunt-pages/blob/master/test/fixtures/integration/input/jade/pages/blog/index.jade) is a sample `listPage` template. This template has access to the following variables:
+The location of the layout template which is used for each list page. [Here](https://github.com/CabinJS/grunt-pages/blob/master/test/fixtures/integration/input/jade/pages/blog/index.jade) is a sample `listPage` template. This template has access to the following variables:
 
 ###### posts
 Type: `Array` of `Object`s
@@ -362,7 +362,7 @@ The file extension of the template engine to be used. This option filters templa
 
 **0.3.2** - Added post caching for unmodified posts to speed up task.
 
-**0.3.1** - Added [rss option](https://github.com/ChrisWren/grunt-pages#rss) to generates feeds thanks to [@lazd](https://github.com/lazd).
+**0.3.1** - Added [rss option](#rss) to generates feeds thanks to [@lazd](https://github.com/lazd).
 
 **0.3.0** - Altered pagination API to allow for custom pagination schemes.
 
