@@ -50,6 +50,7 @@ module.exports = function (grunt) {
     options = this.options();
 
     // Get the content and metadata of unmodified posts so that they don't have to be parsed
+    // if they haven't been modified
     var unmodifiedPosts = [];
     var cacheFile = path.normalize(__dirname + '/../.' + this.target + '-post-cache.json');
     if (fs.existsSync(cacheFile)) {
@@ -90,9 +91,10 @@ module.exports = function (grunt) {
           path.basename(postpath).indexOf('.') === 0) {
         return;
       }
+
       var post = lib.parsePostData(postpath);
 
-      // Save source path for caching and error logging in getPostDest
+      // Save source path for caching as well as error logging in getPostDest
       post.sourcePath = postpath;
 
       // Save the modification time of the post to allow for future caching
@@ -177,6 +179,7 @@ module.exports = function (grunt) {
         return false;
       }
 
+      // Check if the post was last modified when the cached version was last modifie
       if (('' + fs.statSync(post.sourcePath).mtime) === ('' + new Date(post.lastModified))) {
 
         // We have to restore the Date object since it is lost during JSON serialization
