@@ -231,16 +231,15 @@ module.exports = function (grunt) {
       // Remove the lastModified attribute as it only used for caching
       delete post.lastModified;
 
-      // Remove the source path from the post as it is only used for error logging in getPostDest
+      // Remove the source path from the post as it is only used for caching and error logging in getPostDest
       delete post.sourcePath;
     });
 
     var postStart = new Date().getTime();
     lib.generatePosts(templateData);
-    var message = '';
+
     if (grunt.option('bench')) {
-      message = '\nPosts'.blue + ' took ' + (new Date().getTime() - postStart) / 1000 + ' seconds.\n';
-      console.log(message);
+      console.log('\nPosts'.blue + ' took ' + (new Date().getTime() - postStart) / 1000 + ' seconds.\n');
     }
 
     var pageStart = new Date().getTime();
@@ -257,9 +256,9 @@ module.exports = function (grunt) {
         lib.paginate(templateData, options.pagination);
       }
     }
+
     if (grunt.option('bench')) {
-      message = '\nPages'.magenta + ' took ' + (new Date().getTime() - pageStart) / 1000 + ' seconds.\n';
-      console.log(message);
+      console.log('\nPages'.magenta + ' took ' + (new Date().getTime() - pageStart) / 1000 + ' seconds.\n');
     }
 
     if (options.rss) {
@@ -269,8 +268,7 @@ module.exports = function (grunt) {
     fs.writeFileSync(cacheFile, JSON.stringify(cachedPosts));
 
     if (grunt.option('bench')) {
-      message = 'Task'.yellow + ' took ' + (new Date().getTime() - start) / 1000 + ' seconds.';
-      console.log(message);
+      console.log('Task'.yellow + ' took ' + (new Date().getTime() - start) / 1000 + ' seconds.');
     }
     done();
   };
