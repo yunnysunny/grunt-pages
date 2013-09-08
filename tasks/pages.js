@@ -491,7 +491,7 @@ module.exports = function (grunt) {
     var pageData = pages.map(function (page) {
       return {
         id:  page.id,
-        url: path.dirname(page.dest).slice(_this.data.dest.length) + '/'
+        url: path.dirname(page.dest).slice(_this.data.dest.length + 1) + '/'
       };
     });
 
