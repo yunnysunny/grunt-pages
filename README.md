@@ -338,6 +338,12 @@ The file extension of the template engine to be used. This option filters templa
 
 # Changelog
 
+**0.6.0** - Updated pagination urls to not have a leading `/`.
+
+**Breaking changes:**
+
+- Pagination urls will no longer have a leading `/` by default. This is a bug fix and the implementation now matches what is documented in the [pagination.url](#paginationurl) API.
+
 **0.5.0** - Updated default post url regex to capture more cases thanks to [@justinhelmer](https://github.com/justinhelmer). Fixed bugs regarding normalizing the post dest and ignoring draft posts thanks to [@justinhelmer](https://github.com/justinhelmer).
 
 **Breaking changes:**
