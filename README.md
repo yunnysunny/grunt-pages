@@ -235,7 +235,7 @@ Type: `Number`
 A reference to the index of the page currently being rendered. This can be used to display the current page differently than the rest of the pages in a list, or to display links to the surrounding pages based on their position relative to the `currentIndex`.
 
 ##### pagination.url
-Type: `String` Default: `pages/:id/index.html`
+Type: `String` Default: `pages/:id/`
 
 The location of the generated list pages relative to the `pagination.listPage`. You can override this property to have a custom url scheme for list pages. You **must** have a `:id` variable in your url scheme which will be replaced by the page's id.
 
