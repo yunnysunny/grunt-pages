@@ -402,9 +402,31 @@ module.exports = function (grunt) {
    */
   lib.generatePages = function (templateData) {
 
+    grunt.file.recurse(options.pageSrc, function (abspath, rootdir) {
+      if (lib.shouldRenderPage(abspath)) {
+        var layoutString = fs.readFileSync(abspath, 'utf8');
+        var fn           = templateEngine.compile(layoutString, { pretty: true, filename: abspath });
+        var dest         = path.normalize(_this.data.dest + '/' +
+                           path.normalize(abspath).slice(path.normalize(rootdir).length + 1).replace(path.extname(abspath), '.html'));
+
+        templateData.currentPage = path.basename(abspath, path.extname(abspath));
+        grunt.file.write(dest, fn(templateData));
+        grunt.log.ok('Created '.green + 'page'.magenta + ' at: ' + dest);
+      }
+    });
+  };
+
+  /**
+   * Determines if a page inside of the options.pageSrc folder should be rendered
+   * @param  {String} abspath Absolute path of the page in question
+   * @return {Boolean}
+   */
+  lib.shouldRenderPage = function (abspath) {
+    var listPages = [];
+
     // Ignore the pagination listPage(s) when generating pages if pagination is enabled
     if (options.pagination) {
-      var listPages = [];
+
       if (Array.isArray(options.pagination)) {
         listPages = options.pagination.map(function (pagination) {
           return pagination.listPage;
@@ -414,29 +436,22 @@ module.exports = function (grunt) {
       }
     }
 
-    grunt.file.recurse(options.pageSrc, function (abspath, rootdir) {
+    // Don't generate the paginated list page(s)
+    if (listPages && listPages.indexOf(abspath) !== -1) {
+      return false;
+    }
 
-      // Don't include dotfiles
-      if (path.basename(abspath).indexOf('.') === 0) {
-        return false;
-      }
+    // Don't include dotfiles
+    if (path.basename(abspath).indexOf('.') === 0) {
+      return false;
+    }
 
-      // Don't generate the paginated list page(s)
-      if (!listPages || listPages && listPages.indexOf(abspath) === -1) {
+    // If the template engine is specified, don't render templates with other filetypes
+    if (options.templateEngine && path.extname(abspath) !== '.' + options.templateEngine) {
+      return false;
+    }
 
-        // If the template engine is specified, don't render templates with other filetypes
-        if (!options.templateEngine || (options.templateEngine && path.extname(abspath) === '.' + options.templateEngine)) {
-          var layoutString = fs.readFileSync(abspath, 'utf8');
-          var fn           = templateEngine.compile(layoutString, { pretty: true, filename: abspath });
-          var dest         = path.normalize(_this.data.dest + '/' +
-                             path.normalize(abspath).slice(path.normalize(rootdir).length + 1).replace(path.extname(abspath), '.html'));
-
-          templateData.currentPage = path.basename(abspath, path.extname(abspath));
-          grunt.file.write(dest, fn(templateData));
-          grunt.log.ok('Created '.green + 'page'.magenta + ' at: ' + dest);
-        }
-      }
-    });
+    return true;
   };
 
   /**
