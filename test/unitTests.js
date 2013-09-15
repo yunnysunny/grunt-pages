@@ -297,7 +297,7 @@ describe('grunt-pages library', function () {
           }
         }), grunt);
 
-        lib.getListPageUrl(1, { listPage: 'src/listPage.jade' });
+        lib.getListPageUrl(1, { listPage: 'src/pages.jade' });
 
         failStub.lastCall.args[0].should.include('the pagination.listPage must be within the options.pageSrc directory.');
       });
