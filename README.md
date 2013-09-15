@@ -338,6 +338,8 @@ The file extension of the template engine to be used. This option filters templa
 
 # Changelog
 
+**0.6.1** - Removed accidental logging pushed to npm.
+
 **0.6.0** - Updated pagination urls to not have a leading `/`.
 
 **Breaking changes:**
