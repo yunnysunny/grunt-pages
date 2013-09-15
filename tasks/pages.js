@@ -493,7 +493,9 @@ module.exports = function (grunt) {
     pages.forEach(function (page, currentIndex) {
       grunt.file.write(lib.getDestFromUrl(page.url), fn({
         currentIndex: currentIndex,
-        pages: _.omit(pages, 'posts'),
+        pages: _.map(pages, function (page) {
+          return _.omit(page, 'posts');
+        }),
         posts: page.posts,
         data:  templateData.data || {}
       }));
