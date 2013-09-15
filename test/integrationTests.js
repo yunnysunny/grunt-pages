@@ -89,7 +89,7 @@ describe('grunt-pages', function () {
       fs.existsSync('dev/page/tutorial/index.html').should.be.ok;
     });
 
-    it('should create the a custom list page with the expected content', function () {
+    it('should create the custom list page with the expected content', function () {
       fs.readFileSync('dev/page/javascript/index.html', 'utf8').should.equal(fs.readFileSync('test/fixtures/integration/output/page/javascript/index.html', 'utf8'));
     });
 
