@@ -181,6 +181,49 @@ describe('grunt-pages library', function () {
 
   });
 
+  describe('shouldRenderPage', function () {
+
+    it('should return false when the page is configured as the options.pagination.listPage', function () {
+      lib = pages.call(_.extend(grunt, {
+        testOptions: {
+          pagination: {
+            listPage: 'list/index.jade'
+          }
+        }
+      }), grunt);
+      lib.shouldRenderPage('list/index.jade').should.not.be.ok;
+    });
+
+    it('should return false when the page is a dotfile', function () {
+      lib.shouldRenderPage('.about.jade').should.not.be.ok;
+    });
+
+    it('should return false when the templateEngine option is set and the template', function () {
+      lib = pages.call(_.extend(grunt, {
+        testOptions: {
+          templateEngine: 'ejs'
+        }
+      }), grunt);
+      lib.shouldRenderPage('about.jade').should.not.be.ok;
+    });
+
+    it('should return false when the page is configured as the options.pagination.listPage', function () {
+      lib = pages.call(_.extend(grunt, {
+        testOptions: {
+          pagination: {
+            listPage: 'list/index.jade'
+          }
+        }
+      }), grunt);
+      lib.shouldRenderPage('list/index.jade').should.not.be.ok;
+    });
+
+    it('should return true if the page doesn\'t match any of the above situations', function () {
+      lib.shouldRenderPage('about.jade').should.be.ok;
+    });
+
+  });
+
   describe('getPostGroups', function () {
 
     it('should return post groups based on the pagination.postsPerPage\'s value', function () {
