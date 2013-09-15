@@ -586,7 +586,7 @@ module.exports = function (grunt) {
     // If the pageSrc option is used, generate list pages relative to options.pageSrc
     // Otherwise, generate list pages relative to the root of the destination folder
     if (options.pageSrc) {
-      if (listPage.indexOf(options.pageSrc) !== -1) {
+      if (listPage.indexOf(options.pageSrc + '/') !== -1) {
         url += listPage.slice(options.pageSrc.length + 1);
       } else {
         grunt.fail.fatal('the pagination.listPage must be within the options.pageSrc directory.');
