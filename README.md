@@ -49,7 +49,7 @@ date:    2010-10-4
 author:  Pusha T
 ----
 ```
-The YAML data is parsed into a JavaScript object and passed to the post's template to be rendered.
+The YAML data is parsed into a JavaScript object and passed to the post's template to be rendered. Check out [js-yaml's site](http://nodeca.github.io/js-yaml/) to learn more about how the translation works.
 
 Here is a JavaScript object example:
 ```js
