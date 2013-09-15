@@ -491,7 +491,6 @@ module.exports = function (grunt) {
     var fn           = templateEngine.compile(layoutString, { pretty: true, filename: listPage });
 
     pages.forEach(function (page, currentIndex) {
-      console.log(_.omit(pages, 'posts'));
       grunt.file.write(lib.getDestFromUrl(page.url), fn({
         currentIndex: currentIndex,
         pages: _.omit(pages, 'posts'),
