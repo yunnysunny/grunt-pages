@@ -615,6 +615,7 @@ module.exports = function (grunt) {
       }
     }
 
+    // Removed trailing index.html from urls
     if (url.lastIndexOf('index.html') === url.length - 'index.html'.length) {
       url = url.slice(0, - 'index.html'.length);
     }
