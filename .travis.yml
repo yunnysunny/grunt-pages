@@ -5,5 +5,7 @@ node_js:
   - "0.8"
 before_script:
   - npm install -g grunt-cli
+script:
+  - NODE_ENV=ci npm test
 notifications:
   email: false
