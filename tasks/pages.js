@@ -106,7 +106,7 @@ module.exports = function (grunt) {
 
       // Parse post using [marked](https://github.com/chjj/marked)
       marked(post.markdown, {
-        on: {
+        on: _.extend({
           heading : function (token, callback) {
             callback(null, '<a name="' +
                              token.text.toLowerCase().replace(/[^\w]+/g, '-') +
@@ -115,7 +115,7 @@ module.exports = function (grunt) {
                             '"><span class="header-link"></span></a>' +
                             token.text);
           }
-        },
+        }, options.listeners || {}),
         highlight: function (code, lang, callback) {
 
           // Use [pygments](http://pygments.org/) for highlighting
