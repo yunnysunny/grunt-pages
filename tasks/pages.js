@@ -160,6 +160,7 @@ module.exports = function (grunt) {
       } else {
         grunt.fail.fatal('the metadata for the following post is formatted incorrectly: ' + postPath.red);
       }
+      postData.date = new Date(postData.date.getUTCFullYear(), postData.date.getUTCMonth(), postData.date.getUTCDate(),  postData.date.getUTCHours(), postData.date.getUTCMinutes(), postData.date.getUTCSeconds());
       return postData;
     } catch (e) {
       grunt.fail.fatal('the metadata for the following post is formatted incorrectly: ' + postPath.red);
