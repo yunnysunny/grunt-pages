@@ -342,7 +342,7 @@ The file extension of the template engine to be used. This option filters templa
 
 **Breaking changes:**
 
-- Pagination urls now have trailing `index.html` sections removed by default. The pagination url for a root list page is now '' instead of '/' to allow for [base](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base) tags. Updated default [pagination.url](#paginationurl) to `pages/:id/` following new scheme that doesn't use index.html's.
+- Pagination urls now have trailing `index.html` sections removed by default. The pagination url for a root list page is now `''` instead of `/` to allow for [base](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base) tags. Updated default [pagination.url](#paginationurl) to `pages/:id/` following new scheme that doesn't use `index.html`'s.
 
 **0.6.1** - Removed accidental logging pushed to npm.
 
