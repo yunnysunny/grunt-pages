@@ -221,7 +221,9 @@ module.exports = function (grunt) {
     }
 
     lib.setPostUrls(postCollection);
-    lib.setPostDests(postCollection);
+    postCollection.forEach( function (post) {
+      post.dest = lib.getDestFromUrl(post.url);
+    });
     lib.sortPosts(postCollection);
 
     var cachedPosts = _.cloneDeep(templateData);
@@ -333,20 +335,20 @@ module.exports = function (grunt) {
   };
 
   /**
-   * Updates the post collection with each post's destination
-   * @param {Array} postCollection Collection of parsed posts with the content and metadata properties
+   * Gets a post's or page's destionation based on its url
+   * @param {String} url Url to determine the destination from
    */
-  lib.setPostDests = function (postCollection) {
-    postCollection.forEach(function (post) {
-      post.dest = _this.data.dest + '/' + post.url;
-      if (post.dest.indexOf('.html') === -1) {
-        if (post.dest.lastIndexOf('/') === post.dest.length - 1) {
-          post.dest += 'index.html';
-        } else {
-          post.dest += '.html';
-        }
+  lib.getDestFromUrl = function (url) {
+    var dest = _this.data.dest + '/' + url;
+    if (dest.indexOf('.html') === -1) {
+      if (dest.lastIndexOf('/') === dest.length - 1) {
+        dest += 'index.html';
+      } else {
+        dest += '.html';
       }
-    });
+    }
+
+    return dest;
   };
 
   /**
@@ -400,9 +402,31 @@ module.exports = function (grunt) {
    */
   lib.generatePages = function (templateData) {
 
-    // Ignore the listPage(s) when generating pages if pagination is enabled
+    grunt.file.recurse(options.pageSrc, function (abspath, rootdir) {
+      if (lib.shouldRenderPage(abspath)) {
+        var layoutString = fs.readFileSync(abspath, 'utf8');
+        var fn           = templateEngine.compile(layoutString, { pretty: true, filename: abspath });
+        var dest         = path.normalize(_this.data.dest + '/' +
+                           path.normalize(abspath).slice(path.normalize(rootdir).length + 1).replace(path.extname(abspath), '.html'));
+
+        templateData.currentPage = path.basename(abspath, path.extname(abspath));
+        grunt.file.write(dest, fn(templateData));
+        grunt.log.ok('Created '.green + 'page'.magenta + ' at: ' + dest);
+      }
+    });
+  };
+
+  /**
+   * Determines if a page inside of the options.pageSrc folder should be rendered
+   * @param  {String} abspath Absolute path of the page in question
+   * @return {Boolean}
+   */
+  lib.shouldRenderPage = function (abspath) {
+    var listPages = [];
+
+    // Ignore the pagination listPage(s) when generating pages if pagination is enabled
     if (options.pagination) {
-      var listPages = [];
+
       if (Array.isArray(options.pagination)) {
         listPages = options.pagination.map(function (pagination) {
           return pagination.listPage;
@@ -412,29 +436,22 @@ module.exports = function (grunt) {
       }
     }
 
-    grunt.file.recurse(options.pageSrc, function (abspath, rootdir) {
+    // Don't generate the paginated list page(s)
+    if (listPages && listPages.indexOf(abspath) !== -1) {
+      return false;
+    }
 
-      // Don't include dotfiles
-      if (path.basename(abspath).indexOf('.') === 0) {
-        return false;
-      }
+    // Don't include dotfiles
+    if (path.basename(abspath).indexOf('.') === 0) {
+      return false;
+    }
 
-      // Don't generate the paginated list page(s)
-      if (!listPages || listPages && listPages.indexOf(abspath) === -1) {
+    // If the template engine is specified, don't render templates with other filetypes
+    if (options.templateEngine && path.extname(abspath) !== '.' + options.templateEngine) {
+      return false;
+    }
 
-        // If the template engine is specified, don't render templates with other filetypes
-        if (!options.templateEngine || (options.templateEngine && path.extname(abspath) === '.' + options.templateEngine)) {
-          var layoutString = fs.readFileSync(abspath, 'utf8');
-          var fn           = templateEngine.compile(layoutString, { pretty: true, filename: abspath });
-          var dest         = path.normalize(_this.data.dest + '/' +
-                             path.normalize(abspath).slice(path.normalize(rootdir).length + 1).replace(path.extname(abspath), '.html'));
-
-          templateData.currentPage = path.basename(abspath, path.extname(abspath));
-          grunt.file.write(dest, fn(templateData));
-          grunt.log.ok('Created '.green + 'page'.magenta + ' at: ' + dest);
-        }
-      }
-    });
+    return true;
   };
 
   /**
@@ -472,7 +489,7 @@ module.exports = function (grunt) {
       return {
         posts: postGroup.posts,
         id:    postGroup.id,
-        dest:  lib.getListPageDest(postGroup.id, pagination)
+        url:   lib.getListPageUrl(postGroup.id, pagination)
       };
     });
   };
@@ -488,21 +505,16 @@ module.exports = function (grunt) {
     var layoutString = fs.readFileSync(listPage, 'utf8');
     var fn           = templateEngine.compile(layoutString, { pretty: true, filename: listPage });
 
-    var pageData = pages.map(function (page) {
-      return {
-        id:  page.id,
-        url: path.dirname(page.dest).slice(_this.data.dest.length + 1) + '/'
-      };
-    });
-
-    pages.forEach(function (page, pageNumber) {
-      grunt.file.write(page.dest, fn({
-        currentIndex: pageNumber,
-        pages: pageData,
+    pages.forEach(function (page, currentIndex) {
+      grunt.file.write(lib.getDestFromUrl(page.url), fn({
+        currentIndex: currentIndex,
+        pages: _.map(pages, function (page) {
+          return _.omit(page, 'posts');
+        }),
         posts: page.posts,
         data:  templateData.data || {}
       }));
-      grunt.log.ok('Created '.green + 'paginated'.rainbow + ' page'.magenta + ' at: ' + page.dest);
+      grunt.log.ok('Created '.green + 'paginated'.rainbow + ' page'.magenta + ' at: ' + lib.getDestFromUrl(page.url));
     });
   };
 
@@ -566,38 +578,49 @@ module.exports = function (grunt) {
    * @param  {Object} pagination Configuration object for pagination
    * @return {String}
    */
-  lib.getListPageDest = function (pageId, pagination) {
-    var dest          = _this.data.dest + '/';
-    var listPage      = pagination.listPage;
-    var paginationURL = pagination.url || 'page/:id/index.html';
+  lib.getListPageUrl = function (pageId, pagination) {
+    var listPage  = pagination.listPage;
+    var url       = '';
+    var urlFormat = pagination.url || 'page/:id/';
 
-    // If the pageSrc option is used generate list pages relative to pageSrc
-    // Otherwise, generate list pages in the root of 'dest'
+    // If the pageSrc option is used, generate list pages relative to options.pageSrc
+    // Otherwise, generate list pages relative to the root of the destination folder
     if (options.pageSrc) {
-      if (listPage.indexOf(options.pageSrc) !== -1) {
-        dest += listPage.slice(options.pageSrc.length + 1);
+      if (listPage.indexOf(options.pageSrc + '/') !== -1) {
+        url += listPage.slice(options.pageSrc.length + 1);
       } else {
-        grunt.fail.fatal('the listPage must be within the pageSrc directory.');
+        grunt.fail.fatal('the pagination.listPage must be within the options.pageSrc directory.');
       }
     }
 
+    // The root list page is either the template file's location relative to options.pageSrc
+    // or a blank url for the site root
     if (pageId === 0) {
       if (options.pageSrc) {
-        dest = dest.replace(path.extname(listPage), '.html');
+        url = url.replace(path.extname(listPage), '.html');
       } else {
-        dest += 'index.html';
+        url = '';
       }
+
+    // Every other list page's url is generated using the urlFormat property and is either generated
+    // relative to the folder that contains the listPage or relative to the root of the site
     } else {
-      if (paginationURL.indexOf(':id') === -1) {
-        grunt.fail.fatal('The pagination url property must include an \':id\' variable which is replaced by the page\'s identifier.');
+      if (urlFormat.indexOf(':id') === -1) {
+        grunt.fail.fatal('The pagination.url property must include an \':id\' variable which is replaced by the page\'s identifier.');
       }
-      if (!options.pageSrc) {
-        dest += paginationURL.replace(':id', pageId);
+      if (options.pageSrc) {
+        url = url.replace(path.basename(listPage), urlFormat.replace(':id', pageId));
       } else {
-        dest = dest.replace(path.basename(listPage), paginationURL.replace(':id', pageId));
+        url += urlFormat.replace(':id', pageId);
       }
     }
-    return dest;
+
+    // Removed trailing index.html from urls
+    if (url.lastIndexOf('index.html') === url.length - 'index.html'.length) {
+      url = url.slice(0, - 'index.html'.length);
+    }
+
+    return url;
   };
 
   // Return the library methods so that they can be tested

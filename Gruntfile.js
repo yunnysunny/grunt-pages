@@ -21,6 +21,50 @@ module.exports = function (grunt) {
           data: 'test/fixtures/integration/input/data/data.json'
         }
       },
+      paginated: {
+        src: 'test/fixtures/integration/input/posts/',
+        dest: 'dev',
+        layout: 'test/fixtures/integration/input/jade/layouts/post.jade',
+        url: 'blog/posts/:title/',
+        options: {
+          pageSrc: 'test/fixtures/integration/input/jade/pages/blog',
+          sortFunction: function (a, b) {
+            return a.date - b.date;
+          },
+          data: {
+            test: 1
+          },
+          pagination: [{
+            postsPerPage: 1,
+            listPage: 'test/fixtures/integration/input/jade/pages/blog/index.jade',
+            url: 'list/:id/index.html'
+          }, {
+            listPage: 'test/fixtures/integration/input/jade/pages/blog/index.jade',
+            getPostGroups: function (posts) {
+              var postGroups = {};
+              posts.forEach(function (post) {
+                post.tags.forEach(function (tag) {
+                  tag = tag.toLowerCase();
+                  if (postGroups[tag]) {
+                    postGroups[tag].posts.push(post);
+                  } else {
+                    postGroups[tag] = {
+                      posts: [post]
+                    };
+                  }
+                });
+              });
+
+              return grunt.util._.map(postGroups, function (postGroup, id) {
+                return {
+                  id: id,
+                  posts: postGroup.posts
+                };
+              });
+            }
+          }]
+        }
+      },
       rss_default: {
         src: 'test/fixtures/integration/input/posts/',
         dest: 'dev',
@@ -64,49 +108,6 @@ module.exports = function (grunt) {
           pageSrc: 'test/fixtures/integration/input/ejs/pages',
           templateEngine: 'ejs',
           data: 'test/fixtures/integration/input/data/data.json'
-        }
-      },
-      paginated: {
-        src: 'test/fixtures/integration/input/posts/',
-        dest: 'dev',
-        layout: 'test/fixtures/integration/input/jade/layouts/post.jade',
-        url: 'blog/posts/:title/',
-        options: {
-          sortFunction: function (a, b) {
-            return a.date - b.date;
-          },
-          data: {
-            test: 1
-          },
-          pagination: [{
-            postsPerPage: 1,
-            listPage: 'test/fixtures/integration/input/jade/pages/blog/index.jade',
-            url: 'list/:id/index.html'
-          }, {
-            listPage: 'test/fixtures/integration/input/jade/pages/blog/index.jade',
-            getPostGroups: function (posts) {
-              var postGroups = {};
-              posts.forEach(function (post) {
-                post.tags.forEach(function (tag) {
-                  tag = tag.toLowerCase();
-                  if (postGroups[tag]) {
-                    postGroups[tag].posts.push(post);
-                  } else {
-                    postGroups[tag] = {
-                      posts: [post]
-                    };
-                  }
-                });
-              });
-
-              return grunt.util._.map(postGroups, function (postGroup, id) {
-                return {
-                  id: id,
-                  posts: postGroup.posts
-                };
-              });
-            }
-          }]
         }
       }
     },

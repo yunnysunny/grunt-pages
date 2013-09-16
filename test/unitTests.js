@@ -164,26 +164,62 @@ describe('grunt-pages library', function () {
 
   });
 
-  describe('setPostDests', function () {
-    lib = pages.call(_.extend(grunt, {
-      testContext: {
-        data: {
-          dest: 'dest'
-        }
-      }
-    }), grunt);
+  describe('getDestFromUrl', function () {
 
     it('should return the post destinations by adding a .html to the url', function () {
-      var posts = [{
-        url: 'post1/'
-      }, {
-        url: 'post2'
-      }];
+      lib = pages.call(_.extend(grunt, {
+        testContext: {
+          data: {
+            dest: 'dest'
+          }
+        }
+      }), grunt);
 
-      lib.setPostDests(posts);
+      lib.getDestFromUrl('blog/').should.eql('dest/blog/index.html');
+      lib.getDestFromUrl('about').should.eql('dest/about.html');
+    });
 
-      posts[0].dest.should.eql('dest/post1/index.html');
-      posts[1].dest.should.eql('dest/post2.html');
+  });
+
+  describe('shouldRenderPage', function () {
+
+    it('should return false when the page is configured as the options.pagination.listPage', function () {
+      lib = pages.call(_.extend(grunt, {
+        testOptions: {
+          pagination: {
+            listPage: 'list/index.jade'
+          }
+        }
+      }), grunt);
+      lib.shouldRenderPage('list/index.jade').should.not.be.ok;
+    });
+
+    it('should return false when the page is a dotfile', function () {
+      lib.shouldRenderPage('.about.jade').should.not.be.ok;
+    });
+
+    it('should return false when the templateEngine option is set and the template', function () {
+      lib = pages.call(_.extend(grunt, {
+        testOptions: {
+          templateEngine: 'ejs'
+        }
+      }), grunt);
+      lib.shouldRenderPage('about.jade').should.not.be.ok;
+    });
+
+    it('should return false when the page is configured as the options.pagination.listPage', function () {
+      lib = pages.call(_.extend(grunt, {
+        testOptions: {
+          pagination: {
+            listPage: 'list/index.jade'
+          }
+        }
+      }), grunt);
+      lib.shouldRenderPage('list/index.jade').should.not.be.ok;
+    });
+
+    it('should return true if the page doesn\'t match any of the above situations', function () {
+      lib.shouldRenderPage('about.jade').should.be.ok;
     });
 
   });
@@ -202,7 +238,7 @@ describe('grunt-pages library', function () {
 
   });
 
-  describe('getListPageDest', function () {
+  describe('getListPageUrl', function () {
 
     it('should log an error when the pagination.url doesn\'t contain \':id\'', function () {
       lib = pages.call(_.extend(grunt, {
@@ -213,12 +249,12 @@ describe('grunt-pages library', function () {
         }
       }), grunt);
 
-      lib.getListPageDest(1, {
+      lib.getListPageUrl(1, {
         listPage: 'src/pages/blog/index.jade',
         url: 'pages/:i/index.html'
       });
 
-      failStub.lastCall.args[0].should.include('The pagination url property must include an \':id\' variable which is replaced by the page\'s identifier.');
+      failStub.lastCall.args[0].should.include('The pagination.url property must include an \':id\' variable which is replaced by the page\'s identifier.');
     });
 
     describe('when options.pageSrc is not set', function () {
@@ -232,13 +268,13 @@ describe('grunt-pages library', function () {
           }
         }), grunt);
 
-        lib.getListPageDest(1, {
+        lib.getListPageUrl(1, {
           listPage: 'src/pages/index.jade',
-          url: 'pages/:id/index.html'
-        }).should.eql('dest/pages/1/index.html');
+          url: 'pages/:id/'
+        }).should.eql('pages/1/');
       });
 
-      it('should return the root /index.html as the dest of page 0', function () {
+      it('should return the root as the dest of page 0', function () {
         lib = pages.call(_.extend(grunt, {
           testContext: {
             data: {
@@ -248,7 +284,7 @@ describe('grunt-pages library', function () {
           testOptions: {}
         }), grunt);
 
-        lib.getListPageDest(0, { listPage: 'src/listPage.jade' }).should.eql('dest/index.html');
+        lib.getListPageUrl(0, { listPage: 'src/listPage.jade' }).should.eql('');
       });
     });
 
@@ -261,9 +297,9 @@ describe('grunt-pages library', function () {
           }
         }), grunt);
 
-        lib.getListPageDest(1, { listPage: 'src/listPage.jade' });
+        lib.getListPageUrl(1, { listPage: 'src/pages.jade' });
 
-        failStub.lastCall.args[0].should.include('the listPage must be within the pageSrc directory.');
+        failStub.lastCall.args[0].should.include('the pagination.listPage must be within the options.pageSrc directory.');
       });
 
       it('should return the listPage\'s relative location to options.pageSrc as the dest of page 0', function () {
@@ -278,7 +314,7 @@ describe('grunt-pages library', function () {
           }
         }), grunt);
 
-        lib.getListPageDest(0, { listPage: 'src/pages/blog/index.jade' }).should.eql('dest/blog/index.html');
+        lib.getListPageUrl(0, { listPage: 'src/pages/blog/index.jade' }).should.eql('blog/');
       });
 
       it('should replace options.pageSrc\'s basename with the pagination.url including the page\'s id', function () {
@@ -293,10 +329,10 @@ describe('grunt-pages library', function () {
           }
         }), grunt);
 
-        lib.getListPageDest(1, {
+        lib.getListPageUrl(1, {
           listPage: 'src/pages/blog/index.jade',
           url: ':id/index.html'
-        }).should.eql('dest/blog/1/index.html');
+        }).should.eql('blog/1/');
       });
     });
   });
