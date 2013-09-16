@@ -3,6 +3,6 @@ block title
   title= post.title
 block content
   h1= post.title
-  h2= post.date
+  h2= post.date.getUTCDay()
   div!= post.content
 

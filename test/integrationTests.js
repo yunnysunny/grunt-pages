@@ -54,7 +54,12 @@ describe('grunt-pages', function () {
     });
 
     it('should create feed.xml from the posts and default options', function () {
-      stripBuildDate(fs.readFileSync('dev/feed.xml', 'utf8')).should.equal(stripBuildDate(fs.readFileSync('test/fixtures/integration/output/feed.xml', 'utf8')));
+      var fileSuffix = '';
+      if (process.env.NODE_ENV === 'ci') {
+        fileSuffix = '-ci';
+      }
+
+      stripBuildDate(fs.readFileSync('dev/feed.xml', 'utf8')).should.equal(stripBuildDate(fs.readFileSync('test/fixtures/integration/output/feed' + fileSuffix + '.xml', 'utf8')));
     });
   });
 
@@ -68,7 +73,11 @@ describe('grunt-pages', function () {
     });
 
     it('should create rss.xml from the posts and provided options', function () {
-      stripBuildDate(fs.readFileSync('dev/rss/rss.xml', 'utf8')).should.equal(stripBuildDate(fs.readFileSync('test/fixtures/integration/output/rss/rss.xml', 'utf8')));
+      var fileSuffix = '';
+      if (process.env.NODE_ENV === 'ci') {
+        fileSuffix = '-ci';
+      }
+      stripBuildDate(fs.readFileSync('dev/rss/rss.xml', 'utf8')).should.equal(stripBuildDate(fs.readFileSync('test/fixtures/integration/output/rss/rss' + fileSuffix + '.xml', 'utf8')));
     });
   });
 
