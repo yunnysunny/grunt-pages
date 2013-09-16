@@ -104,7 +104,18 @@ module.exports = function (grunt) {
         grunt.fail.fatal('the following post is blank, please add some content to it or delete it: ' + postpath.red);
       }
 
-      marked.setOptions({
+      // Parse post using [marked](https://github.com/chjj/marked)
+      marked(post.markdown, {
+        on: {
+          heading : function (token, callback) {
+            callback(null, '<a name="' +
+                             token.text.toLowerCase().replace(/[^\w]+/g, '-') +
+                            '"class="anchor" href="#' +
+                            token.text.toLowerCase().replace(/[^\w]+/g, '-') +
+                            '"><span class="header-link"></span></a>' +
+                            token.text);
+          }
+        },
         highlight: function (code, lang, callback) {
 
           // Use [pygments](http://pygments.org/) for highlighting
@@ -114,10 +125,7 @@ module.exports = function (grunt) {
         },
         gfm: true,
         anchors: true
-      });
-
-      // Parse post using [marked](https://github.com/chjj/marked)
-      marked(post.markdown, function (err, content) {
+      }, function (err, content) {
         if (err) throw err;
 
         // Replace markdown source with content property
