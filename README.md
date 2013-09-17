@@ -6,8 +6,7 @@
 [![Travis Status](https://travis-ci.org/CabinJS/grunt-pages.png?branch=master)](https://travis-ci.org/CabinJS/grunt-pages)
 
 ## Prerequisites
-This Grunt task uses [pygments](#syntax-highlighting), which relies on [Python](http://www.python.org/getit/) version `2.7.x`.
-   > Please note that grunt-pages will **not** run on the `3.x` branch of Python
+This Grunt task uses [pygments](http://pygments.org/) which requires [Python](http://www.python.org/getit/) to be installed.
 
 ## Getting Started
 If you haven't used grunt before, be sure to check out the [Getting Started](http://gruntjs.com/getting-started) guide, as it explains how to create a gruntfile as well as install and use grunt plugins. Once you're familiar with that process, install this plugin with this command:
@@ -337,6 +336,8 @@ Type: `String`
 The file extension of the template engine to be used. This option filters template files in the `pageSrc` folder when developing a grunt-pages configuration for multiple template engines.
 
 # Changelog
+
+**0.7.2** - Added support for Python 3 due to updating of [node-pygmentize-bundled](https://github.com/rvagg/node-pygmentize-bundled/) dependency. 
 
 **0.7.1** - Wrong node_modules were pushed to npm. Pushed correct dependencies listed in package.json to fix bug. 
 
