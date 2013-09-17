@@ -338,6 +338,8 @@ The file extension of the template engine to be used. This option filters templa
 
 # Changelog
 
+**0.7.1** - Wrong node_modules were pushed to npm. Pushed correct dependencies listed in package.json to fix bug. 
+
 **0.7.0** - See breaking changes below. 
 
 **Breaking changes:**
