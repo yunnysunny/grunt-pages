@@ -29,7 +29,7 @@ pages: {
     pageSrc: 'src/pages'
   },
   posts: {
-    src: 'src/posts',
+    src: 'posts',
     dest: 'dev',
     layout: 'src/layouts/post.jade',
     url: 'blog/posts/:title/'
@@ -143,7 +143,7 @@ pages: {
     }
   },
   posts: {
-    src: 'src/posts',
+    src: 'posts',
     dest: 'dev',
     layout: 'src/layouts/post.jade',
     url: 'blog/posts/:title/'
@@ -192,7 +192,7 @@ pages: {
     }
   },
   posts: {
-    src: 'src/posts',
+    src: 'posts',
     dest: 'dev',
     layout: 'src/layouts/post.jade',
     url: 'posts/:title/'
