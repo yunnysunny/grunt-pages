@@ -154,6 +154,9 @@ module.exports = function (grunt) {
   lib.parsePostData = function (postPath) {
     var fileString = fs.readFileSync(postPath, 'utf8');
     var postData   = {};
+    var errMessage = 'the metadata for the following post is formatted incorrectly: ' + postPath.red + '\n' +
+                     'Go to the following link to learn more about post formatting:\n\n' +
+                     'https://github.com/CabinJS/grunt-pages#authoring-posts';
     try {
 
       // Parse JSON metadata
