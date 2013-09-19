@@ -36,16 +36,19 @@ module.exports = function (grunt) {
   var _this   = grunt.testContext || {};
   var options = grunt.testOptions || {};
 
-  // Create a reference to the template engine that is available to all lib methods
+  // Create a reference to the template engine that is available to all library methods
   var templateEngine;
 
   // Save start time to monitor task run time
   var start = new Date().getTime();
 
   grunt.registerMultiTask('pages', 'Creates pages from markdown and templates.', function () {
+
+    // Task is asynchronous due to usage of pygments syntax highlighter written in python
     var done = this.async();
 
-    // Create a reference to the the context object and task options so that they are available to all lib methods
+    // Create a reference to the the context object and task options
+    // so that they are available to all library methods
     _this = this;
     options = this.options();
 
@@ -70,10 +73,11 @@ module.exports = function (grunt) {
       '!.**'
     ]).length;
 
+    // Start off the parsing with unmodified posts already included
     var parsedPosts    = unmodifiedPosts.length;
     var postCollection = unmodifiedPosts;
 
-    // If there are no posts to parse, immediately render the posts and pages
+    // If none of the posts have been modified, immediately render the posts and pages
     if (parsedPosts === numPosts) {
       lib.renderPostsAndPages(postCollection, cacheFile, done);
       return;
@@ -118,7 +122,7 @@ module.exports = function (grunt) {
         }, options.listeners || {}),
         highlight: function (code, lang, callback) {
 
-          // Use [pygments](http://pygments.org/) for highlighting
+          // Use [pygments](http://pygments.org/) for syntax highlighting
           pygmentize({ lang: lang, format: 'html' }, code, function (err, result) {
             callback(err, result.toString());
           });
@@ -128,7 +132,7 @@ module.exports = function (grunt) {
       }, function (err, content) {
         if (err) throw err;
 
-        // Replace markdown source with content property
+        // Replace markdown property with parsed content property
         post.content = content;
         delete post.markdown;
 
@@ -166,12 +170,14 @@ module.exports = function (grunt) {
         // Extract the content by removing the metadata section
         postData.markdown = sections.slice(2).join('----');
       } else {
-        grunt.fail.fatal('the metadata for the following post is formatted incorrectly: ' + postPath.red);
+        grunt.fail.fatal(errMessage);
       }
+
+      // Normalize date to UTC format
       postData.date = new Date(postData.date.getUTCFullYear(), postData.date.getUTCMonth(), postData.date.getUTCDate(),  postData.date.getUTCHours(), postData.date.getUTCMinutes(), postData.date.getUTCSeconds());
       return postData;
     } catch (e) {
-      grunt.fail.fatal('the metadata for the following post is formatted incorrectly: ' + postPath.red);
+      grunt.fail.fatal(errMessage);
     }
   };
 
@@ -188,7 +194,7 @@ module.exports = function (grunt) {
         return false;
       }
 
-      // Check if the post was last modified when the cached version was last modifie
+      // Check if the post was last modified when the cached version was last modified
       if (('' + fs.statSync(post.sourcePath).mtime) === ('' + new Date(post.lastModified))) {
 
         // We have to restore the Date object since it is lost during JSON serialization
@@ -230,13 +236,16 @@ module.exports = function (grunt) {
     }
 
     lib.setPostUrls(postCollection);
-    postCollection.forEach( function (post) {
+
+    postCollection.forEach(function (post) {
       post.dest = lib.getDestFromUrl(post.url);
     });
+
     lib.sortPosts(postCollection);
 
     var cachedPosts = _.cloneDeep(templateData);
 
+    // Remove data that will not be passed to templates for rendering
     templateData.posts.forEach(function (post) {
 
       // Remove the lastModified attribute as it only used for caching
@@ -246,14 +255,18 @@ module.exports = function (grunt) {
       delete post.sourcePath;
     });
 
+    // Record how long it takes to generate posts
     var postStart = new Date().getTime();
+
     lib.generatePosts(templateData);
 
     if (grunt.option('bench')) {
       console.log('\nPosts'.blue + ' took ' + (new Date().getTime() - postStart) / 1000 + ' seconds.\n');
     }
 
+    // Record how long it takes to generate pages
     var pageStart = new Date().getTime();
+
     if (options.pageSrc) {
       lib.generatePages(templateData);
     }
@@ -285,7 +298,7 @@ module.exports = function (grunt) {
   };
 
   /**
-   * Updates the post collection with each post's destination
+   * Updates the post collection with each post's url
    * @param {Array} postCollection Collection of parsed posts with the content and metadata properties
    */
   lib.setPostUrls = function (postCollection) {
@@ -295,7 +308,7 @@ module.exports = function (grunt) {
   };
 
   /**
-   * Returns the post url based on the url property and postData
+   * Returns the post url based on the url property and post metadata
    * @param  {Object} post Post object containing all metadata properties of the post
    * @return {String}
    */
@@ -344,11 +357,13 @@ module.exports = function (grunt) {
   };
 
   /**
-   * Gets a post's or page's destionation based on its url
+   * Gets a post's or page's destination based on its url
    * @param {String} url Url to determine the destination from
    */
   lib.getDestFromUrl = function (url) {
     var dest = _this.data.dest + '/' + url;
+
+    // Ensures that a .html is present at the end of the file's destination path
     if (dest.indexOf('.html') === -1) {
       if (dest.lastIndexOf('/') === dest.length - 1) {
         dest += 'index.html';
@@ -464,7 +479,7 @@ module.exports = function (grunt) {
   };
 
   /**
-   * Default function to get post groups for each paginated list page by grouping a specified number of posts per page
+   * Default function to get post groups for each paginated page by grouping a specified number of posts per page
    * @param  {Array} postCollection Collection of parsed posts with the content and metadata properties
    * @return {Array}                Array of post arrays to be displayed on each paginated page
    */
@@ -504,7 +519,7 @@ module.exports = function (grunt) {
   };
 
   /**
-   * Creates paginated pages with a specified number of posts per page
+   * Creates paginated pages based on a scheme to group posts
    * @param  {Object} templateData Data to be passed to templates for rendering
    * @param  {Object} pagination   Configuration object for pagination
    */
@@ -582,7 +597,7 @@ module.exports = function (grunt) {
   };
 
   /**
-   * Gets a list page's destination to be written
+   * Gets a list page's url based on its id, pagination.url, and options.pageSrc
    * @param  {Number} pageId     Identifier of current page to be written
    * @param  {Object} pagination Configuration object for pagination
    * @return {String}
@@ -611,7 +626,7 @@ module.exports = function (grunt) {
         url = '';
       }
 
-    // Every other list page's url is generated using the urlFormat property and is either generated
+    // Every other list page's url is generated using the pagination.url property and is either generated
     // relative to the folder that contains the listPage or relative to the root of the site
     } else {
       if (urlFormat.indexOf(':id') === -1) {
@@ -624,7 +639,7 @@ module.exports = function (grunt) {
       }
     }
 
-    // Removed trailing index.html from urls
+    // Remove unnecessary trailing index.html from urls
     if (url.lastIndexOf('index.html') === url.length - 'index.html'.length) {
       url = url.slice(0, - 'index.html'.length);
     }
