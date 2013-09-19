@@ -9,7 +9,6 @@
     "colors": "~0.6.0-1",
     "pygmentize-bundled": "~2.1.0",
     "marked": "git://github.com/ChrisWren/marked.git#listener",
-    "js-yaml": "~2.1.0",
     "rss": "~0.2.0",
     "lodash": "~2.0.0"
   },

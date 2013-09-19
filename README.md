@@ -40,17 +40,8 @@ pages: {
 ### Authoring posts
 
 #### Post Format
-Posts are written in markdown and include a metadata section at the top to provide information about the post. There are two accepted metadata formats, YAML and a JavaScript object. Here is a YAML example:
-```yaml
-----
-title:   The Versace Sofa Thesis Vol. I
-date:    2010-10-4
-author:  Pusha T
-----
-```
-The YAML data is parsed into a JavaScript object and passed to the post's template to be rendered. Check out [js-yaml's site](http://nodeca.github.io/js-yaml/) to learn more about how the translation works.
+Posts are written in markdown and include a metadata section at the top to provide information about the post. The metadata format is a JavaScript Object, and here is an example:
 
-Here is a JavaScript object example:
 ```js
 {
   title: "Art Ballin': Explorations in New-Weird-American Expressionism",
@@ -58,7 +49,8 @@ Here is a JavaScript object example:
   author: "Highroller, Jody"
 }
 ```
-The only property that is not interpreted literally is the `date`. It is used as a `dateString` when constructing a [Date object](https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Date) in JavaScript, and must be in a [parseable format](https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Date/parse). For both YAML and JavaScript object metadata, the JavaScript `Date` object is available in the layout.
+
+The only property that is not interpreted literally is the `date`. It is used as a `dateString` when constructing a [Date object](https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Date) in JavaScript, and must be in a [parseable format](https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Date/parse).
 
 #### Syntax Highlighting
 For adding code to your posts, grunt-pages has [GitHub flavoured markdown](https://help.github.com/articles/github-flavored-markdown) syntax highlighting using [pygments](http://pygments.org/).
