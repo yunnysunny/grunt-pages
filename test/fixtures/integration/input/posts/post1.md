@@ -1,6 +1,6 @@
 {
   title: "Post 1",
-  date: "2013-05-12",
+  date: "2013-5-12",
   tags: ['JavaScript', 'Tutorial']
 }
 
