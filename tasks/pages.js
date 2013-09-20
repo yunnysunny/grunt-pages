@@ -401,6 +401,7 @@ module.exports = function (grunt) {
       // Pass the post data to the template via a post object
       templateData.post = post;
 
+      grunt.log.debug(JSON.stringify(templateData, null, '  '));
       grunt.file.write(post.dest, fn(templateData));
       grunt.log.ok('Created '.green + 'post'.blue + ' at: ' + post.dest);
     });
@@ -428,6 +429,7 @@ module.exports = function (grunt) {
                            path.normalize(abspath).slice(path.normalize(rootdir).length + 1).replace(path.extname(abspath), '.html'));
 
         templateData.currentPage = path.basename(abspath, path.extname(abspath));
+        grunt.log.debug(JSON.stringify(templateData, null, '  '));
         grunt.file.write(dest, fn(templateData));
         grunt.log.ok('Created '.green + 'page'.magenta + ' at: ' + dest);
       }
@@ -524,14 +526,18 @@ module.exports = function (grunt) {
     var fn           = templateEngine.compile(layoutString, { pretty: true, filename: listPage });
 
     pages.forEach(function (page, currentIndex) {
-      grunt.file.write(lib.getDestFromUrl(page.url), fn({
+
+      var templateRenderData = {
         currentIndex: currentIndex,
         pages: _.map(pages, function (page) {
           return _.omit(page, 'posts');
         }),
         posts: page.posts,
         data:  templateData.data || {}
-      }));
+      };
+
+      grunt.log.debug(JSON.stringify(templateRenderData, null, '  '));
+      grunt.file.write(lib.getDestFromUrl(page.url), fn(templateRenderData));
       grunt.log.ok('Created '.green + 'paginated'.rainbow + ' page'.magenta + ' at: ' + lib.getDestFromUrl(page.url));
     });
   };
