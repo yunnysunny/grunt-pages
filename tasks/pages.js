@@ -166,9 +166,6 @@ module.exports = function (grunt) {
       } else {
         grunt.fail.fatal(errMessage);
       }
-
-      // Normalize date to UTC format
-      postData.date = new Date(postData.date.getUTCFullYear(), postData.date.getUTCMonth(), postData.date.getUTCDate(),  postData.date.getUTCHours(), postData.date.getUTCMinutes(), postData.date.getUTCSeconds());
       return postData;
     } catch (e) {
       grunt.fail.fatal(errMessage);
