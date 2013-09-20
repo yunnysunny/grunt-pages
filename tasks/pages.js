@@ -390,8 +390,8 @@ module.exports = function (grunt) {
    */
   lib.generatePosts = function (templateData) {
 
-    // Determine the template engine based on the file's extention name
-    templateEngine = templateEngines[path.extname(_this.data.layout).slice(1)];
+    // Determine the template engine based on the file's extension name
+    templateEngine = templateEngines[path.extname(_this.data.layout).slice(1).toLowerCase()];
 
     var layoutString = fs.readFileSync(_this.data.layout, 'utf8');
     var fn = templateEngine.compile(layoutString, { pretty: true, filename: _this.data.layout });
@@ -464,8 +464,8 @@ module.exports = function (grunt) {
       return false;
     }
 
-    // If the template engine is specified, don't render templates with other filetypes
-    if (options.templateEngine && path.extname(abspath) !== '.' + options.templateEngine) {
+    // If options.templateEngine is specified, don't render templates with other file extensions
+    if (options.templateEngine && path.extname(abspath).toLowerCase() !== '.' + options.templateEngine) {
       return false;
     }
 
