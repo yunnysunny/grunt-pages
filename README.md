@@ -21,6 +21,7 @@ grunt.loadNpmTasks('grunt-pages');
 ```
 
 ## Documentation
+
 ### Sample config
 Here is a sample config to create a blog using grunt-pages:
 ```js
@@ -74,6 +75,8 @@ The directory where pages are generated.
 Type: `String`
 
 The [jade](https://github.com/visionmedia/jade) or [ejs](https://github.com/visionmedia/ejs) layout template used for each post. The post metadata will be stored in a `post` object to be rendered in the layout template. [Here](https://github.com/CabinJS/grunt-pages/blob/master/test/fixtures/integration/input/jade/layouts/post.jade) is an example post layout template.
+
+**Note: you can run grunt-pages with the --debug flag set to see all the data passed to templates for rendering**
 
 #### url
 Type: `String`
