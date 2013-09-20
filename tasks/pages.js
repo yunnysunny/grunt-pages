@@ -104,7 +104,7 @@ module.exports = function (grunt) {
       post.lastModified = fs.statSync(post.sourcePath).mtime;
 
       if (post.markdown.length <= 1) {
-        grunt.fail.fatal('the following post is blank, please add some content to it or delete it: ' + postpath.red);
+        grunt.fail.fatal('The following post is blank, please add some content to it or delete it: ' + postpath.red + '.');
       }
 
       // Parse post using [marked](https://github.com/chjj/marked)
@@ -153,7 +153,7 @@ module.exports = function (grunt) {
   lib.parsePostData = function (postPath) {
     var fileString = fs.readFileSync(postPath, 'utf8');
     var postData   = {};
-    var errMessage = 'the metadata for the following post is formatted incorrectly: ' + postPath.red + '\n' +
+    var errMessage = 'The metadata for the following post is formatted incorrectly: ' + postPath.red + '\n' +
                      'Go to the following link to learn more about post formatting:\n\n' +
                      'https://github.com/CabinJS/grunt-pages#authoring-posts';
     try {
@@ -204,12 +204,12 @@ module.exports = function (grunt) {
       try {
         templateData.data = JSON.parse(fs.readFileSync(options.data));
       } catch (e) {
-        grunt.fail.fatal('data could not be parsed from ' + options.data + '.');
+        grunt.fail.fatal('Data could not be parsed from ' + options.data + '.');
       }
     } else if (typeof options.data === 'object') {
       templateData.data = options.data;
     } else {
-      grunt.fail.fatal('data format not recognized.');
+      grunt.fail.fatal('options.data format not recognized. Must be an Object or String.');
     }
   };
 
@@ -340,7 +340,7 @@ module.exports = function (grunt) {
         if (urlSegment in post) {
           url = url.replace(':' + urlSegment, formatPostUrl(post[urlSegment]));
         } else {
-          grunt.fail.fatal('required ' + urlSegment + ' attribute not found in the following post\'s metadata: ' + post.sourcePath + '.');
+          grunt.fail.fatal('Required ' + urlSegment + ' attribute not found in the following post\'s metadata: ' + post.sourcePath + '.');
         }
       });
 
@@ -610,7 +610,7 @@ module.exports = function (grunt) {
       if (listPage.indexOf(options.pageSrc + '/') !== -1) {
         url += listPage.slice(options.pageSrc.length + 1);
       } else {
-        grunt.fail.fatal('the pagination.listPage must be within the options.pageSrc directory.');
+        grunt.fail.fatal('The pagination.listPage must be within the options.pageSrc directory.');
       }
     }
 
