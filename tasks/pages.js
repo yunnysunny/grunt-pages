@@ -146,6 +146,43 @@ module.exports = function (grunt) {
   });
 
   /**
+   * Gets the end of the metadata section to allow for the metadata to be JSON.parsed
+   * and for the content to be extracted
+   * @param  {String} fileString   Contents of entire post
+   * @param  {Number} currentIndex Index delimiting the substring to be searched for {'s and }'s
+   * @return {String}
+   */
+  lib.getMetadataEnd = function (fileString, currentIndex) {
+
+    var curlyNest = 1;
+
+    while (curlyNest !== 0 && fileString.substr(currentIndex).length > 0) {
+      if (fileString.substr(currentIndex).indexOf('}') === -1 &&
+          fileString.substr(currentIndex).indexOf('{') === -1) {
+        return false;
+      }
+      if (fileString.substr(currentIndex).indexOf('}') !== -1) {
+        if (fileString.substr(currentIndex).indexOf('{') !== -1) {
+          if (fileString.substr(currentIndex).indexOf('}') < fileString.substr(currentIndex).indexOf('{')) {
+            currentIndex += fileString.substr(currentIndex).indexOf('}') + 1;
+            curlyNest--;
+          } else {
+            currentIndex += fileString.substr(currentIndex).indexOf('{') + 1;
+            curlyNest++;
+          }
+        } else {
+          currentIndex += fileString.substr(currentIndex).indexOf('}') + 1;
+          curlyNest--;
+        }
+      } else {
+        currentIndex += fileString.substr(currentIndex).indexOf('{') + 1;
+        curlyNest++;
+      }
+    }
+    return curlyNest === 0 ? currentIndex : false;
+  };
+
+  /**
    * Parses the metadata and markdown from a post
    * @param  {String} postPath Absolute path of the post to be parsed
    * @return {Object} Object
@@ -158,14 +195,24 @@ module.exports = function (grunt) {
                      'https://github.com/CabinJS/grunt-pages#authoring-posts';
     try {
 
-      // Parse JSON metadata
-      if (fileString.indexOf('{') === 0) {
-        postData = eval('(' + fileString.substr(0, fileString.indexOf('\n}') + 2) + ')');
-        postData.date = new Date(postData.date);
-        postData.markdown = fileString.slice(fileString.indexOf('\n}') + 2);
+      var metaDataStart;
+
+      if (fileString.indexOf('{') < fileString.indexOf('}')) {
+        metaDataStart = fileString.indexOf('{');
       } else {
-        grunt.fail.fatal(errMessage);
+        return grunt.fail.fatal(errMessage);
       }
+
+      // Parse JSON metadata
+      var metaDataEnd = lib.getMetadataEnd(fileString, metaDataStart + 1);
+
+      if (!metaDataEnd) {
+        return grunt.fail.fatal(errMessage);
+      }
+
+      postData = eval('(' + fileString.substr(metaDataStart, metaDataEnd) + ')');
+      postData.date = new Date(postData.date);
+      postData.markdown = fileString.slice(metaDataEnd);
       return postData;
     } catch (e) {
       grunt.fail.fatal(errMessage);
