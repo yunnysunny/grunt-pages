@@ -10,6 +10,24 @@ var failStub = sinon.stub(grunt.fail, 'fatal');
 
 describe('grunt-pages library', function () {
 
+  describe('getMetadataEnd', function () {
+
+    before(function () {
+      lib = pages(grunt);
+    });
+
+    it('should return the index of the file string where the metadata ends', function () {
+      var fileString = ' {title: "test", people: { me: true}}';
+      lib.getMetadataEnd(fileString, 2).should.eql(fileString.length);
+    });
+
+    it('should return false if there isn\'t matching closing } for every opening {', function () {
+      var fileString = '{title: "test", people: { me: true}';
+      lib.getMetadataEnd(fileString, 1).should.not.be.ok;
+    });
+
+  });
+
   describe('parsePostData', function () {
 
     before(function () {
@@ -18,6 +36,11 @@ describe('grunt-pages library', function () {
 
     it('should log an error if the post metadata is not a JavaScript Object', function () {
       lib.parsePostData(__dirname + '/fixtures/unit/posts/badmetadata.md');
+      failStub.lastCall.args[0].should.include('The metadata for the following post is formatted incorrectly:');
+    });
+
+    it('should log an error if there isn\'t an opening { and closing } present', function () {
+      lib.parsePostData(__dirname + '/fixtures/unit/posts/badobjectformat.md');
       failStub.lastCall.args[0].should.include('The metadata for the following post is formatted incorrectly:');
     });
 
