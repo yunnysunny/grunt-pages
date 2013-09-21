@@ -338,6 +338,13 @@ The file extension of the template engine to be used. This option filters templa
 
 # Changelog
 
+**0.8.0** - Header tags are now rendered with a child span and anchor tag for linking into post sections. Removed support for YAML metadata. Added more robust metadata extraction for JavaScript object metadata. Added `--debug` flag to debug template data rendering. Standardized error logging to use the same format. 
+
+**Breaking changes:**
+
+- Header tags are now rendered with a nested span and anchor tag for linking into post sections instead of being wrapped with anchor tags
+- No more YAML metadata in posts
+
 **0.7.2** - Added support for Python 3 due to updating of [node-pygmentize-bundled](https://github.com/rvagg/node-pygmentize-bundled/) dependency. 
 
 **0.7.1** - Wrong node_modules were pushed to npm. Pushed correct dependencies listed in package.json to fix bug. 
