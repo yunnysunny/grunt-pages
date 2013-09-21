@@ -152,6 +152,7 @@ module.exports = function (grunt) {
     },
     concurrent: {
       tasks: ['connect:server', 'watch'],
+      test: ['node-inspector', 'shell:debugtest'],
       options: {
         logConcurrentOutput: true
       }
@@ -197,6 +198,17 @@ module.exports = function (grunt) {
       files: {
         src:  ['*.js', 'test/*.js', 'tasks/*.js']
       }
+    },
+    shell: {
+      debugtest: {
+        options: {
+          stdout: true
+        },
+        command: 'node --debug-brk $(which grunt) test'
+      }
+    },
+    'node-inspector': {
+      dev: {}
     }
   });
 
