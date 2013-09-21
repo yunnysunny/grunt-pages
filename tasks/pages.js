@@ -12,7 +12,6 @@ var path = require('path');
 var url  = require('url');
 
 require('colors');
-var jsYAML     = require('js-yaml');
 var _          = require('lodash');
 var marked     = require('marked');
 var pygmentize = require('pygmentize-bundled');
@@ -36,16 +35,19 @@ module.exports = function (grunt) {
   var _this   = grunt.testContext || {};
   var options = grunt.testOptions || {};
 
-  // Create a reference to the template engine that is available to all lib methods
+  // Create a reference to the template engine that is available to all library methods
   var templateEngine;
 
   // Save start time to monitor task run time
   var start = new Date().getTime();
 
   grunt.registerMultiTask('pages', 'Creates pages from markdown and templates.', function () {
+
+    // Task is asynchronous due to usage of pygments syntax highlighter written in python
     var done = this.async();
 
-    // Create a reference to the the context object and task options so that they are available to all lib methods
+    // Create a reference to the the context object and task options
+    // so that they are available to all library methods
     _this = this;
     options = this.options();
 
@@ -70,10 +72,11 @@ module.exports = function (grunt) {
       '!.**'
     ]).length;
 
+    // Start off the parsing with unmodified posts already included
     var parsedPosts    = unmodifiedPosts.length;
     var postCollection = unmodifiedPosts;
 
-    // If there are no posts to parse, immediately render the posts and pages
+    // If none of the posts have been modified, immediately render the posts and pages
     if (parsedPosts === numPosts) {
       lib.renderPostsAndPages(postCollection, cacheFile, done);
       return;
@@ -101,7 +104,7 @@ module.exports = function (grunt) {
       post.lastModified = fs.statSync(post.sourcePath).mtime;
 
       if (post.markdown.length <= 1) {
-        grunt.fail.fatal('the following post is blank, please add some content to it or delete it: ' + postpath.red);
+        grunt.fail.fatal('The following post is blank, please add some content to it or delete it: ' + postpath.red + '.');
       }
 
       // Parse post using [marked](https://github.com/chjj/marked)
@@ -118,7 +121,7 @@ module.exports = function (grunt) {
         }, options.listeners || {}),
         highlight: function (code, lang, callback) {
 
-          // Use [pygments](http://pygments.org/) for highlighting
+          // Use [pygments](http://pygments.org/) for syntax highlighting
           pygmentize({ lang: lang, format: 'html' }, code, function (err, result) {
             callback(err, result.toString());
           });
@@ -128,7 +131,7 @@ module.exports = function (grunt) {
       }, function (err, content) {
         if (err) throw err;
 
-        // Replace markdown source with content property
+        // Replace markdown property with parsed content property
         post.content = content;
         delete post.markdown;
 
@@ -143,6 +146,43 @@ module.exports = function (grunt) {
   });
 
   /**
+   * Gets the end of the metadata section to allow for the metadata to be JSON.parsed
+   * and for the content to be extracted
+   * @param  {String} fileString   Contents of entire post
+   * @param  {Number} currentIndex Index delimiting the substring to be searched for {'s and }'s
+   * @return {String}
+   */
+  lib.getMetadataEnd = function (fileString, currentIndex) {
+
+    var curlyNest = 1;
+
+    while (curlyNest !== 0 && fileString.substr(currentIndex).length > 0) {
+      if (fileString.substr(currentIndex).indexOf('}') === -1 &&
+          fileString.substr(currentIndex).indexOf('{') === -1) {
+        return false;
+      }
+      if (fileString.substr(currentIndex).indexOf('}') !== -1) {
+        if (fileString.substr(currentIndex).indexOf('{') !== -1) {
+          if (fileString.substr(currentIndex).indexOf('}') < fileString.substr(currentIndex).indexOf('{')) {
+            currentIndex += fileString.substr(currentIndex).indexOf('}') + 1;
+            curlyNest--;
+          } else {
+            currentIndex += fileString.substr(currentIndex).indexOf('{') + 1;
+            curlyNest++;
+          }
+        } else {
+          currentIndex += fileString.substr(currentIndex).indexOf('}') + 1;
+          curlyNest--;
+        }
+      } else {
+        currentIndex += fileString.substr(currentIndex).indexOf('{') + 1;
+        curlyNest++;
+      }
+    }
+    return curlyNest === 0 ? currentIndex : false;
+  };
+
+  /**
    * Parses the metadata and markdown from a post
    * @param  {String} postPath Absolute path of the post to be parsed
    * @return {Object} Object
@@ -150,28 +190,32 @@ module.exports = function (grunt) {
   lib.parsePostData = function (postPath) {
     var fileString = fs.readFileSync(postPath, 'utf8');
     var postData   = {};
+    var errMessage = 'The metadata for the following post is formatted incorrectly: ' + postPath.red + '\n' +
+                     'Go to the following link to learn more about post formatting:\n\n' +
+                     'https://github.com/CabinJS/grunt-pages#authoring-posts';
     try {
 
-      // Parse JSON metadata
-      if (fileString.indexOf('{') === 0) {
-        postData = eval('(' + fileString.substr(0, fileString.indexOf('\n}') + 2) + ')');
-        postData.date = new Date(postData.date);
-        postData.markdown = fileString.slice(fileString.indexOf('\n}') + 2);
+      var metaDataStart;
 
-      // Parse YAML metadata
-      } else if (fileString.indexOf('----') === 0) {
-        var sections = fileString.split('----');
-        postData = jsYAML.load(sections[1]);
-
-        // Extract the content by removing the metadata section
-        postData.markdown = sections.slice(2).join('----');
+      if (fileString.indexOf('{') < fileString.indexOf('}')) {
+        metaDataStart = fileString.indexOf('{');
       } else {
-        grunt.fail.fatal('the metadata for the following post is formatted incorrectly: ' + postPath.red);
+        return grunt.fail.fatal(errMessage);
       }
-      postData.date = new Date(postData.date.getUTCFullYear(), postData.date.getUTCMonth(), postData.date.getUTCDate(),  postData.date.getUTCHours(), postData.date.getUTCMinutes(), postData.date.getUTCSeconds());
+
+      // Parse JSON metadata
+      var metaDataEnd = lib.getMetadataEnd(fileString, metaDataStart + 1);
+
+      if (!metaDataEnd) {
+        return grunt.fail.fatal(errMessage);
+      }
+
+      postData = eval('(' + fileString.substr(metaDataStart, metaDataEnd) + ')');
+      postData.date = new Date(postData.date);
+      postData.markdown = fileString.slice(metaDataEnd);
       return postData;
     } catch (e) {
-      grunt.fail.fatal('the metadata for the following post is formatted incorrectly: ' + postPath.red);
+      grunt.fail.fatal(errMessage);
     }
   };
 
@@ -188,7 +232,7 @@ module.exports = function (grunt) {
         return false;
       }
 
-      // Check if the post was last modified when the cached version was last modifie
+      // Check if the post was last modified when the cached version was last modified
       if (('' + fs.statSync(post.sourcePath).mtime) === ('' + new Date(post.lastModified))) {
 
         // We have to restore the Date object since it is lost during JSON serialization
@@ -207,12 +251,12 @@ module.exports = function (grunt) {
       try {
         templateData.data = JSON.parse(fs.readFileSync(options.data));
       } catch (e) {
-        grunt.fail.fatal('data could not be parsed from ' + options.data + '.');
+        grunt.fail.fatal('Data could not be parsed from ' + options.data + '.');
       }
     } else if (typeof options.data === 'object') {
       templateData.data = options.data;
     } else {
-      grunt.fail.fatal('data format not recognized.');
+      grunt.fail.fatal('options.data format not recognized. Must be an Object or String.');
     }
   };
 
@@ -230,13 +274,16 @@ module.exports = function (grunt) {
     }
 
     lib.setPostUrls(postCollection);
-    postCollection.forEach( function (post) {
+
+    postCollection.forEach(function (post) {
       post.dest = lib.getDestFromUrl(post.url);
     });
+
     lib.sortPosts(postCollection);
 
     var cachedPosts = _.cloneDeep(templateData);
 
+    // Remove data that will not be passed to templates for rendering
     templateData.posts.forEach(function (post) {
 
       // Remove the lastModified attribute as it only used for caching
@@ -246,14 +293,18 @@ module.exports = function (grunt) {
       delete post.sourcePath;
     });
 
+    // Record how long it takes to generate posts
     var postStart = new Date().getTime();
+
     lib.generatePosts(templateData);
 
     if (grunt.option('bench')) {
       console.log('\nPosts'.blue + ' took ' + (new Date().getTime() - postStart) / 1000 + ' seconds.\n');
     }
 
+    // Record how long it takes to generate pages
     var pageStart = new Date().getTime();
+
     if (options.pageSrc) {
       lib.generatePages(templateData);
     }
@@ -285,7 +336,7 @@ module.exports = function (grunt) {
   };
 
   /**
-   * Updates the post collection with each post's destination
+   * Updates the post collection with each post's url
    * @param {Array} postCollection Collection of parsed posts with the content and metadata properties
    */
   lib.setPostUrls = function (postCollection) {
@@ -295,7 +346,7 @@ module.exports = function (grunt) {
   };
 
   /**
-   * Returns the post url based on the url property and postData
+   * Returns the post url based on the url property and post metadata
    * @param  {Object} post Post object containing all metadata properties of the post
    * @return {String}
    */
@@ -336,7 +387,7 @@ module.exports = function (grunt) {
         if (urlSegment in post) {
           url = url.replace(':' + urlSegment, formatPostUrl(post[urlSegment]));
         } else {
-          grunt.fail.fatal('required ' + urlSegment + ' attribute not found in the following post\'s metadata: ' + post.sourcePath + '.');
+          grunt.fail.fatal('Required ' + urlSegment + ' attribute not found in the following post\'s metadata: ' + post.sourcePath + '.');
         }
       });
 
@@ -344,11 +395,13 @@ module.exports = function (grunt) {
   };
 
   /**
-   * Gets a post's or page's destionation based on its url
+   * Gets a post's or page's destination based on its url
    * @param {String} url Url to determine the destination from
    */
   lib.getDestFromUrl = function (url) {
     var dest = _this.data.dest + '/' + url;
+
+    // Ensures that a .html is present at the end of the file's destination path
     if (dest.indexOf('.html') === -1) {
       if (dest.lastIndexOf('/') === dest.length - 1) {
         dest += 'index.html';
@@ -381,8 +434,8 @@ module.exports = function (grunt) {
    */
   lib.generatePosts = function (templateData) {
 
-    // Determine the template engine based on the file's extention name
-    templateEngine = templateEngines[path.extname(_this.data.layout).slice(1)];
+    // Determine the template engine based on the file's extension name
+    templateEngine = templateEngines[path.extname(_this.data.layout).slice(1).toLowerCase()];
 
     var layoutString = fs.readFileSync(_this.data.layout, 'utf8');
     var fn = templateEngine.compile(layoutString, { pretty: true, filename: _this.data.layout });
@@ -392,6 +445,7 @@ module.exports = function (grunt) {
       // Pass the post data to the template via a post object
       templateData.post = post;
 
+      grunt.log.debug(JSON.stringify(templateData, null, '  '));
       grunt.file.write(post.dest, fn(templateData));
       grunt.log.ok('Created '.green + 'post'.blue + ' at: ' + post.dest);
     });
@@ -419,6 +473,7 @@ module.exports = function (grunt) {
                            path.normalize(abspath).slice(path.normalize(rootdir).length + 1).replace(path.extname(abspath), '.html'));
 
         templateData.currentPage = path.basename(abspath, path.extname(abspath));
+        grunt.log.debug(JSON.stringify(templateData, null, '  '));
         grunt.file.write(dest, fn(templateData));
         grunt.log.ok('Created '.green + 'page'.magenta + ' at: ' + dest);
       }
@@ -455,8 +510,8 @@ module.exports = function (grunt) {
       return false;
     }
 
-    // If the template engine is specified, don't render templates with other filetypes
-    if (options.templateEngine && path.extname(abspath) !== '.' + options.templateEngine) {
+    // If options.templateEngine is specified, don't render templates with other file extensions
+    if (options.templateEngine && path.extname(abspath).toLowerCase() !== '.' + options.templateEngine) {
       return false;
     }
 
@@ -464,7 +519,7 @@ module.exports = function (grunt) {
   };
 
   /**
-   * Default function to get post groups for each paginated list page by grouping a specified number of posts per page
+   * Default function to get post groups for each paginated page by grouping a specified number of posts per page
    * @param  {Array} postCollection Collection of parsed posts with the content and metadata properties
    * @return {Array}                Array of post arrays to be displayed on each paginated page
    */
@@ -504,7 +559,7 @@ module.exports = function (grunt) {
   };
 
   /**
-   * Creates paginated pages with a specified number of posts per page
+   * Creates paginated pages based on a scheme to group posts
    * @param  {Object} templateData Data to be passed to templates for rendering
    * @param  {Object} pagination   Configuration object for pagination
    */
@@ -515,14 +570,18 @@ module.exports = function (grunt) {
     var fn           = templateEngine.compile(layoutString, { pretty: true, filename: listPage });
 
     pages.forEach(function (page, currentIndex) {
-      grunt.file.write(lib.getDestFromUrl(page.url), fn({
+
+      var templateRenderData = {
         currentIndex: currentIndex,
         pages: _.map(pages, function (page) {
           return _.omit(page, 'posts');
         }),
         posts: page.posts,
         data:  templateData.data || {}
-      }));
+      };
+
+      grunt.log.debug(JSON.stringify(templateRenderData, null, '  '));
+      grunt.file.write(lib.getDestFromUrl(page.url), fn(templateRenderData));
       grunt.log.ok('Created '.green + 'paginated'.rainbow + ' page'.magenta + ' at: ' + lib.getDestFromUrl(page.url));
     });
   };
@@ -582,7 +641,7 @@ module.exports = function (grunt) {
   };
 
   /**
-   * Gets a list page's destination to be written
+   * Gets a list page's url based on its id, pagination.url, and options.pageSrc
    * @param  {Number} pageId     Identifier of current page to be written
    * @param  {Object} pagination Configuration object for pagination
    * @return {String}
@@ -598,7 +657,7 @@ module.exports = function (grunt) {
       if (listPage.indexOf(options.pageSrc + '/') !== -1) {
         url += listPage.slice(options.pageSrc.length + 1);
       } else {
-        grunt.fail.fatal('the pagination.listPage must be within the options.pageSrc directory.');
+        grunt.fail.fatal('The pagination.listPage must be within the options.pageSrc directory.');
       }
     }
 
@@ -611,7 +670,7 @@ module.exports = function (grunt) {
         url = '';
       }
 
-    // Every other list page's url is generated using the urlFormat property and is either generated
+    // Every other list page's url is generated using the pagination.url property and is either generated
     // relative to the folder that contains the listPage or relative to the root of the site
     } else {
       if (urlFormat.indexOf(':id') === -1) {
@@ -624,7 +683,7 @@ module.exports = function (grunt) {
       }
     }
 
-    // Removed trailing index.html from urls
+    // Remove unnecessary trailing index.html from urls
     if (url.lastIndexOf('index.html') === url.length - 'index.html'.length) {
       url = url.slice(0, - 'index.html'.length);
     }

@@ -10,39 +10,48 @@ var failStub = sinon.stub(grunt.fail, 'fatal');
 
 describe('grunt-pages library', function () {
 
+  describe('getMetadataEnd', function () {
+
+    before(function () {
+      lib = pages(grunt);
+    });
+
+    it('should return the index of the file string where the metadata ends', function () {
+      var fileString = ' {title: "test", people: { me: true}}';
+      lib.getMetadataEnd(fileString, 2).should.eql(fileString.length);
+    });
+
+    it('should return false if there isn\'t matching closing } for every opening {', function () {
+      var fileString = '{title: "test", people: { me: true}';
+      lib.getMetadataEnd(fileString, 1).should.not.be.ok;
+    });
+
+  });
+
   describe('parsePostData', function () {
 
     before(function () {
       lib = pages(grunt);
     });
 
-    it('should log an error if the post metadata is not YAML or a JavaScript Object', function () {
+    it('should log an error if the post metadata is not a JavaScript Object', function () {
       lib.parsePostData(__dirname + '/fixtures/unit/posts/badmetadata.md');
-      failStub.lastCall.args[0].should.include('the metadata for the following post is formatted incorrectly:');
+      failStub.lastCall.args[0].should.include('The metadata for the following post is formatted incorrectly:');
+    });
+
+    it('should log an error if there isn\'t an opening { and closing } present', function () {
+      lib.parsePostData(__dirname + '/fixtures/unit/posts/badobjectformat.md');
+      failStub.lastCall.args[0].should.include('The metadata for the following post is formatted incorrectly:');
     });
 
     describe('when parsing JavaScript Object metadata', function () {
 
       it('should log an error if the post metadata is not a valid JavaScript Object', function () {
         lib.parsePostData(__dirname + '/fixtures/unit/posts/badobjectmetadata.md');
-        failStub.lastCall.args[0].should.include('the metadata for the following post is formatted incorrectly:');
+        failStub.lastCall.args[0].should.include('The metadata for the following post is formatted incorrectly:');
       });
 
       it('should return the post metadata and markdown if the metadata is a valid JavaScript Object', function () {
-        lib.parsePostData(__dirname + '/fixtures/unit/posts/goodobjectmetadata.md').title.should.eql('Good Post :)');
-        lib.parsePostData(__dirname + '/fixtures/unit/posts/goodobjectmetadata.md').markdown.should.eql('\n\n# Hello');
-      });
-
-    });
-
-    describe('when parsing YAML metadata', function () {
-
-      it('should log an error if the data is not valid YAML', function () {
-        lib.parsePostData(__dirname + '/fixtures/unit/posts/badyamlmetadata.md');
-        failStub.lastCall.args[0].should.include('the metadata for the following post is formatted incorrectly:');
-      });
-
-      it('should return the post metadata and markdown if the metadata is valid YAML', function () {
         lib.parsePostData(__dirname + '/fixtures/unit/posts/goodobjectmetadata.md').title.should.eql('Good Post :)');
         lib.parsePostData(__dirname + '/fixtures/unit/posts/goodobjectmetadata.md').markdown.should.eql('\n\n# Hello');
       });
@@ -88,7 +97,7 @@ describe('grunt-pages library', function () {
       }), grunt);
 
       lib.setData({});
-      failStub.lastCall.args[0].should.include('data could not be parsed');
+      failStub.lastCall.args[0].should.include('Data could not be parsed');
     });
 
     it('should log an error if the options.data format is not an Object or String', function () {
@@ -98,7 +107,7 @@ describe('grunt-pages library', function () {
         }
       }), grunt);
       lib.setData({});
-      failStub.lastCall.args[0].should.include('data format not recognized.');
+      failStub.lastCall.args[0].should.include('options.data format not recognized.');
     });
 
   });
@@ -129,7 +138,7 @@ describe('grunt-pages library', function () {
       }), grunt);
 
       lib.getPostUrl({});
-      failStub.lastCall.args[0].should.include('required title attribute not found');
+      failStub.lastCall.args[0].should.include('Required title attribute not found');
     });
 
     it('should return the post destination after replacing the :variables in the url with its metadata', function () {
@@ -299,7 +308,7 @@ describe('grunt-pages library', function () {
 
         lib.getListPageUrl(1, { listPage: 'src/pages.jade' });
 
-        failStub.lastCall.args[0].should.include('the pagination.listPage must be within the options.pageSrc directory.');
+        failStub.lastCall.args[0].should.include('The pagination.listPage must be within the options.pageSrc directory.');
       });
 
       it('should return the listPage\'s relative location to options.pageSrc as the dest of page 0', function () {

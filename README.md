@@ -9,7 +9,7 @@
 This Grunt task uses [pygments](http://pygments.org/) which requires [Python](http://www.python.org/getit/) to be installed.
 
 ## Getting Started
-If you haven't used grunt before, be sure to check out the [Getting Started](http://gruntjs.com/getting-started) guide, as it explains how to create a gruntfile as well as install and use grunt plugins. Once you're familiar with that process, install this plugin with this command:
+If you haven't used Grunt before, be sure to check out the [Getting Started](http://gruntjs.com/getting-started) guide, as it explains how to create a Gruntfile as well as install and use Grunt plugins. Once you're familiar with that process, install this plugin with this command:
 ```shell
 npm install grunt-pages --save-dev
 ```
@@ -21,6 +21,7 @@ grunt.loadNpmTasks('grunt-pages');
 ```
 
 ## Documentation
+
 ### Sample config
 Here is a sample config to create a blog using grunt-pages:
 ```js
@@ -29,7 +30,7 @@ pages: {
     pageSrc: 'src/pages'
   },
   posts: {
-    src: 'src/posts',
+    src: 'posts',
     dest: 'dev',
     layout: 'src/layouts/post.jade',
     url: 'blog/posts/:title/'
@@ -40,17 +41,8 @@ pages: {
 ### Authoring posts
 
 #### Post Format
-Posts are written in markdown and include a metadata section at the top to provide information about the post. There are two accepted metadata formats, YAML and a JavaScript object. Here is a YAML example:
-```yaml
-----
-title:   The Versace Sofa Thesis Vol. I
-date:    2010-10-4
-author:  Pusha T
-----
-```
-The YAML data is parsed into a JavaScript object and passed to the post's template to be rendered. Check out [js-yaml's site](http://nodeca.github.io/js-yaml/) to learn more about how the translation works.
+Posts are written in markdown and include a metadata section at the top to provide information about the post. The metadata format is a JavaScript Object, and here is an example:
 
-Here is a JavaScript object example:
 ```js
 {
   title: "Art Ballin': Explorations in New-Weird-American Expressionism",
@@ -58,15 +50,17 @@ Here is a JavaScript object example:
   author: "Highroller, Jody"
 }
 ```
-The only property that is not interpreted literally is the `date`. It is used as a `dateString` when constructing a [Date object](https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Date) in JavaScript, and must be in a [parseable format](https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Date/parse). For both YAML and JavaScript object metadata, the JavaScript `Date` object is available in the layout.
+
+The only property that is not interpreted literally is the `date`. It is used as a `dateString` when constructing a [Date object](https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Date) in JavaScript, and must be in a [parseable format](https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Date/parse).
 
 #### Syntax Highlighting
-For adding code to your posts, grunt-pages has [GitHub flavoured markdown](https://help.github.com/articles/github-flavored-markdown) syntax highlighting using [pygments](http://pygments.org/).
+For adding code to your posts, grunt-pages has [GitHub flavoured markdown](https://help.github.com/articles/github-flavored-markdown) and syntax highlighting using [pygments](http://pygments.org/).
 
 #### Draft Posts
-To make a post a draft, simply prefix its filename with a `_`. These posts will not be rendered or available in list pages.
+To make a post a draft when deploying your site, simply prefix its filename with a `_`. These posts will not be rendered or available in list pages.
 
 ### Required properties
+
 #### src
 Type: `String`
 
@@ -82,17 +76,19 @@ Type: `String`
 
 The [jade](https://github.com/visionmedia/jade) or [ejs](https://github.com/visionmedia/ejs) layout template used for each post. The post metadata will be stored in a `post` object to be rendered in the layout template. [Here](https://github.com/CabinJS/grunt-pages/blob/master/test/fixtures/integration/input/jade/layouts/post.jade) is an example post layout template.
 
+**Note: you can run grunt-pages with the --debug flag set to see all the data passed to templates for rendering**
+
 #### url
 Type: `String`
 
-The url of each post. The url string takes variables as parameters using the `:variable` syntax. Variable(s) specified in the url are required in each post's metadata. Urls ending with a trailing `/` will generate posts as index.html files inside of the url's folder.
+The URL of each post. The URL string takes variables as parameters using the `:variable` syntax. Variables specified in the URL are required in each post's metadata. URLs ending with a trailing `/` will generate posts as index.html files inside of the URL's folder.
 
 ### Options
 
 #### pageSrc
 Type: `String`
 
-The folder where the ejs or jade source pages of your website are located. These pages have access to each post's `content` and metadata properties via a `posts` array. Additionally, pages have access to their own filename(without extension) via the `currentPage` variable. All of the files in this folder are generated in the `dest` folder maintaining the same relative path from `pageSrc`.
+The folder where the ejs or jade source pages of your website are located. These pages have access to each post's `content` and metadata properties via a `posts` array. Additionally, pages have access to their own filename(without extension) via the `currentPage` variable to optionally display it differently when linking to pages. All of the files in this folder are generated in the `dest` folder maintaining the same relative path from `pageSrc`.
 
 #### data
 Type: `Object || String`
@@ -127,6 +123,7 @@ function (url) {
     .replace(/^-+|-+$/g, ''); // trim leading and trailing hyphens
 }
 ```
+
 A function that takes a `url` as a parameter and returns a formatted url string. This is primarily used to remove special characters and replace whitespace.
 
 #### rss
@@ -149,7 +146,7 @@ pages: {
     }
   },
   posts: {
-    src: 'src/posts',
+    src: 'posts',
     dest: 'dev',
     layout: 'src/layouts/post.jade',
     url: 'blog/posts/:title/'
@@ -198,7 +195,7 @@ pages: {
     }
   },
   posts: {
-    src: 'src/posts',
+    src: 'posts',
     dest: 'dev',
     layout: 'src/layouts/post.jade',
     url: 'posts/:title/'
@@ -216,7 +213,7 @@ The number of posts each list page will contain.
 ##### pagination.listPage
 Type: `String`
 
-The location of the layout template which is used for each list page. [Here](https://github.com/CabinJS/grunt-pages/blob/master/test/fixtures/integration/input/jade/pages/blog/index.jade) is a sample `listPage` template. This template has access to the following variables:
+The location of the layout template which is used for each list page. This page will not be rendered as a regular page if inside the options.pageSrc folder and instead will be rendered as the root list page with the first post group. [Here](https://github.com/CabinJS/grunt-pages/blob/master/test/fixtures/integration/input/jade/pages/blog/index.jade) is a sample `listPage` template. This template has access to the following variables:
 
 ###### posts
 Type: `Array` of `Object`s
@@ -271,8 +268,8 @@ This function returns an array of post groups to be rendered as list pages. It t
 [{
   id: 'javascript',
   posts: [{
-    title: 'ES6',
-    tags: ['javascript'],
+    title: 'Front end web development',
+    tags: ['javascript', 'css'],
     content: '...'
   }, {
     title: 'Backbone.js',
@@ -284,6 +281,10 @@ This function returns an array of post groups to be rendered as list pages. It t
   posts: [{
     title: 'Style and Sass',
     tags: ['css'],
+    content: '...'
+  },{
+    title: 'Front end web development',
+    tags: ['javascript', 'css'],
     content: '...'
   }]
 }];
