@@ -367,7 +367,7 @@ module.exports = function (grunt) {
         .replace(/^-+|-+$/g, ''); // trim leading and trailing hyphens
     };
 
-    // Extract dynamic url segments and replace them with post metadata
+    // Extract dynamic URL segments and replace them with post metadata
     _this.data.url.split('/')
 
       .filter(function (urlSegment) {
@@ -378,13 +378,18 @@ module.exports = function (grunt) {
         return urlSegment.slice(urlSegment.indexOf(':') + 1);
       })
 
-      // Replace dynamic url segments
+      // Replace dynamic URL segments
       .forEach(function (urlSegment) {
+
+        // Don't replace the .html part of the URL segment
         if (urlSegment.indexOf('.html') !== -1) {
           urlSegment = urlSegment.slice(0, - '.html'.length);
         }
+
         // Make sure the post has the dynamic segment as a metadata property
         if (urlSegment in post) {
+
+          // Format dynamic sections of the URL
           url = url.replace(':' + urlSegment, formatPostUrl(post[urlSegment]));
         } else {
           grunt.fail.fatal('Required ' + urlSegment + ' attribute not found in the following post\'s metadata: ' + post.sourcePath + '.');
@@ -403,8 +408,12 @@ module.exports = function (grunt) {
 
     // Ensures that a .html is present at the end of the file's destination path
     if (dest.indexOf('.html') === -1) {
+
+      // If the URL ends with a '/', simply add index.html
       if (dest.lastIndexOf('/') === dest.length - 1) {
         dest += 'index.html';
+
+      // Otherwise add .html
       } else {
         dest += '.html';
       }
@@ -469,6 +478,9 @@ module.exports = function (grunt) {
       if (lib.shouldRenderPage(abspath)) {
         var layoutString = fs.readFileSync(abspath, 'utf8');
         var fn           = templateEngine.compile(layoutString, { pretty: true, filename: abspath });
+
+        // Determine the page's destination by prepending the dest folder, then finding its relative location
+        // to options.pageSrc and replacing its file extension with 'html'
         var dest         = path.normalize(_this.data.dest + '/' +
                            path.normalize(abspath).slice(path.normalize(rootdir).length + 1).replace(path.extname(abspath), '.html'));
 
@@ -521,7 +533,7 @@ module.exports = function (grunt) {
   /**
    * Default function to get post groups for each paginated page by grouping a specified number of posts per page
    * @param  {Array} postCollection Collection of parsed posts with the content and metadata properties
-   * @return {Array}                Array of post arrays to be displayed on each paginated page
+   * @return {Array}                Array of post groups to each be displayed on a corresponding paginated page
    */
   lib.getPostGroups = function (postCollection, pagination) {
     var postsPerPage = pagination.postsPerPage;
@@ -549,6 +561,7 @@ module.exports = function (grunt) {
     var postGroupGetter = pagination.getPostGroups ||
                           lib.getPostGroups;
 
+    // Get the post groups, then determine each list page's URL
     return postGroupGetter(postCollection, pagination).map(function (postGroup) {
       return {
         posts: postGroup.posts,
@@ -571,8 +584,12 @@ module.exports = function (grunt) {
 
     pages.forEach(function (page, currentIndex) {
 
+      // Prepare the template render data by composing the page's index, other page's ids and URLs,
+      // the current page's posts, and an optional data object into a single object
       var templateRenderData = {
         currentIndex: currentIndex,
+
+        // Omit each other list page's posts array as only the id and url are needed
         pages: _.map(pages, function (page) {
           return _.omit(page, 'posts');
         }),
@@ -674,7 +691,7 @@ module.exports = function (grunt) {
     // relative to the folder that contains the listPage or relative to the root of the site
     } else {
       if (urlFormat.indexOf(':id') === -1) {
-        grunt.fail.fatal('The pagination.url property must include an \':id\' variable which is replaced by the page\'s identifier.');
+        grunt.fail.fatal('The pagination.url property must include an \':id\' variable which is replaced by the list page\'s identifier.');
       }
       if (options.pageSrc) {
         url = url.replace(path.basename(listPage), urlFormat.replace(':id', pageId));

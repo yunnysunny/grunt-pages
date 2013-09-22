@@ -263,7 +263,7 @@ describe('grunt-pages library', function () {
         url: 'pages/:i/index.html'
       });
 
-      failStub.lastCall.args[0].should.include('The pagination.url property must include an \':id\' variable which is replaced by the page\'s identifier.');
+      failStub.lastCall.args[0].should.include('The pagination.url property must include an \':id\' variable which is replaced by the list page\'s identifier.');
     });
 
     describe('when options.pageSrc is not set', function () {
