@@ -154,7 +154,7 @@ pages: {
     rss: {
       author: 'Chris Wren',
       title: 'Chris Wren\'s Blog',
-      description: 'A blog about software, music, and commerce.',
+      description: 'A blog about code.',
       url: 'http://chrisawren.com'
     }
   },
