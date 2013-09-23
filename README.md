@@ -351,6 +351,8 @@ The file extension of the template engine to be used. This option filters templa
 
 # Changelog
 
+**0.8.1** - Fixed bug where draft posts in nested folders weren't ignored properly. 
+
 **0.8.0** - Header tags are now rendered with a child span and anchor tag for linking into post sections. Removed support for YAML metadata. Added more robust metadata extraction for JavaScript object metadata. Added `--debug` flag to debug template data rendering. Standardized error logging to use the same format. 
 
 **Breaking changes:**
