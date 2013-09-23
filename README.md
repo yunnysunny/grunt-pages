@@ -59,6 +59,19 @@ For adding code to your posts, grunt-pages has [GitHub flavoured markdown](https
 #### Draft Posts
 To make a post a draft when deploying your site, simply prefix its filename with a `_`. These posts will not be rendered or available in list pages.
 
+### Styling Headers
+
+By default, grunt-pages generates header tags that include nested anchor tags with span's to allow for header section linking. Here is an example of the HTML that the above header would generate:
+```html
+<h3>
+  <a name="styling-headers" class="anchor" href="#styling-headers">
+    <span class="header-link"></span>
+  </a>
+  "Styling Headers"
+</h3>
+```
+The generated markup follows the same format as GitHub README's and it is recommended to reference [Cabin theme](http://www.cabinjs.com/#themes)'s styling when trying to create header linking. 
+
 ### Required properties
 
 #### src
