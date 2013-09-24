@@ -62,39 +62,38 @@ module.exports = function (grunt) {
       });
     }
 
-    var postsToParse = grunt.file.expand({
+    // Don't include draft posts or dotfiles when counting the number of posts
+    var numPosts = grunt.file.expand({
       filter: 'isFile',
       cwd: this.data.src
-    }, ['**'])
+    }, [
+      '**',
+      '!_**',
+      '!.**'
+    ]).length;
 
-      // Don't include draft posts or unmodified posts
-      .filter(function (post) {
-        if (path.basename(post).indexOf('_') === 0) {
-          return false;
-        } else if (unmodifiedPostPaths && unmodifiedPostPaths.indexOf(post) !== -1) {
-          return false;
-        } else {
-          return true;
-        }
-      })
-
-      // Return the full path of the post
-      .map (function (post) {
-        return path.normalize(_this.data.src + path.sep + post);
-      });
-
-    // Start off the post collection with the unmodified posts
+    // Start off the parsing with unmodified posts already included
+    var parsedPosts    = unmodifiedPosts.length;
     var postCollection = unmodifiedPosts;
 
     // If none of the posts have been modified, immediately render the posts and pages
-    if (postsToParse.length === unmodifiedPosts.length) {
+    if (parsedPosts === numPosts) {
       lib.renderPostsAndPages(postCollection, cacheFile, done);
       return;
     }
 
-    var parsedPosts = 0;
+    grunt.file.recurse(this.data.src, function (postpath) {
 
-    postsToParse.forEach(function (postpath) {
+      // Don't parse unmodified posts
+      if (unmodifiedPostPaths && unmodifiedPostPaths.indexOf(postpath) !== -1) {
+        return;
+      }
+
+      // Don't include draft posts or dotfiles
+      if (path.basename(postpath).indexOf('_') === 0 ||
+          path.basename(postpath).indexOf('.') === 0) {
+        return;
+      }
 
       var post = lib.parsePostData(postpath);
 
@@ -139,7 +138,7 @@ module.exports = function (grunt) {
         postCollection.push(post);
 
         // Once all the source posts are parsed, we can generate the html posts
-        if (++parsedPosts === postsToParse.length) {
+        if (++parsedPosts === numPosts) {
           lib.renderPostsAndPages(postCollection, cacheFile, done);
         }
       });
