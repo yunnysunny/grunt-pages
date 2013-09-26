@@ -197,7 +197,8 @@ module.exports = function (grunt) {
 
       var metaDataStart;
 
-      if (fileString.indexOf('{') < fileString.indexOf('}')) {
+      if (fileString.indexOf('{') >= 0 &&
+          fileString.indexOf('{') < fileString.indexOf('}')) {
         metaDataStart = fileString.indexOf('{');
       } else {
         return grunt.fail.fatal(errMessage);
