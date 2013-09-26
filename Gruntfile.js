@@ -6,6 +6,8 @@ module.exports = function (grunt) {
 
   grunt.initConfig({
     globalConfig: globalConfig,
+
+    // Tests EJS template rendering, post destination, post url formatting and options.data
     pages: {
       posts: {
         src: 'test/fixtures/integration/input/posts/',
@@ -21,6 +23,8 @@ module.exports = function (grunt) {
           data: 'test/fixtures/integration/input/data/data.json'
         }
       },
+
+      // Tests pagination, including sorting, custom post grouping, and custom urls
       paginated: {
         src: 'test/fixtures/integration/input/posts/',
         dest: 'dev',
@@ -34,10 +38,16 @@ module.exports = function (grunt) {
           data: {
             test: 1
           },
+
+          // First pagination config object tests default pagination grouping
+          // using a custom url
           pagination: [{
             postsPerPage: 1,
             listPage: 'test/fixtures/integration/input/jade/pages/blog/index.jade',
             url: 'list/:id/index.html'
+
+          // Second pagination config tests a custom post grouping by the 'tags'
+          // metadata property
           }, {
             listPage: 'test/fixtures/integration/input/jade/pages/blog/index.jade',
             getPostGroups: function (posts) {
@@ -65,6 +75,8 @@ module.exports = function (grunt) {
           }]
         }
       },
+
+      // Tests default RSS config
       rss_default: {
         src: 'test/fixtures/integration/input/posts/',
         dest: 'dev',
@@ -83,6 +95,8 @@ module.exports = function (grunt) {
           data: 'test/fixtures/integration/input/data/data.json'
         }
       },
+
+      // Tests custom RSS config
       rss_custom: {
         src: 'test/fixtures/integration/input/posts/',
         dest: 'dev',
@@ -151,7 +165,7 @@ module.exports = function (grunt) {
       }
     },
     concurrent: {
-      tasks: ['connect:server', 'watch'],
+      tasks: ['connect:server', 'watch', 'open'],
       test: ['node-inspector', 'shell:debugtest'],
       options: {
         logConcurrentOutput: true
