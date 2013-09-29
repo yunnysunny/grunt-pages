@@ -21,7 +21,7 @@ describe('grunt-pages library', function () {
       lib.getMetadataEnd(fileString, 2).should.eql(fileString.length);
     });
 
-    it('should return false if there isn\'t matching closing } for every opening {', function () {
+    it('should return false if there isn\'t a closing } for every opening {', function () {
       var fileString = '{title: "test", people: { me: true}';
       lib.getMetadataEnd(fileString, 1).should.not.be.ok;
     });
@@ -34,12 +34,7 @@ describe('grunt-pages library', function () {
       lib = pages(grunt);
     });
 
-    it('should log an error if the post metadata is not a JavaScript Object', function () {
-      lib.parsePostData(__dirname + '/fixtures/unit/posts/badmetadata.md');
-      failStub.lastCall.args[0].should.include('The metadata for the following post is formatted incorrectly:');
-    });
-
-    it('should log an error if there isn\'t an opening { and closing } present', function () {
+    it('should log an error if there isn\'t an opening { before a } in the file string', function () {
       lib.parsePostData(__dirname + '/fixtures/unit/posts/badobjectformat.md');
       failStub.lastCall.args[0].should.include('The metadata for the following post is formatted incorrectly:');
     });
@@ -64,40 +59,47 @@ describe('grunt-pages library', function () {
 
     var data = { test: 'testval' };
 
-    it('should add the options.data property directly to the templateData object when options.data is an Object', function () {
-      var templateData = {};
+    describe('when options.data is an Object', function () {
 
-      lib = pages.call(_.extend(grunt, {
-        testOptions: {
-          data: data
-        }
-      }), grunt);
-      lib.setData(templateData);
-      templateData.data.should.eql(data);
+      it('should add the options.data property directly to the templateData object', function () {
+        var templateData = {};
+
+        lib = pages.call(_.extend(grunt, {
+          testOptions: {
+            data: data
+          }
+        }), grunt);
+        lib.setData(templateData);
+        templateData.data.should.eql(data);
+      });
     });
 
-    it('should read a JSON file specified by the options.data property directly to the templateData object when options.data is a String', function () {
-      var templateData = {};
+    describe('when options.data is a String', function () {
 
-      lib = pages.call(_.extend(grunt, {
-        testOptions: {
-          data: 'test/fixtures/unit/data/gooddata.json'
-        }
-      }), grunt);
+      it('should read a JSON file specified by the options.data property and copy it directly to the templateData object', function () {
+        var templateData = {};
 
-      lib.setData(templateData);
-      templateData.data.should.eql(data);
-    });
+        lib = pages.call(_.extend(grunt, {
+          testOptions: {
+            data: 'test/fixtures/unit/data/gooddata.json'
+          }
+        }), grunt);
 
-    it('should log an error if the JSON file specified by the options.data String is invalid', function () {
-      lib = pages.call(_.extend(grunt, {
-        testOptions: {
-          data: 'test/fixtures/unit/data/baddata.json'
-        }
-      }), grunt);
+        lib.setData(templateData);
+        templateData.data.should.eql(data);
+      });
 
-      lib.setData({});
-      failStub.lastCall.args[0].should.include('Data could not be parsed');
+      it('should log an error if the JSON file specified by the options.data String is invalid', function () {
+        lib = pages.call(_.extend(grunt, {
+          testOptions: {
+            data: 'test/fixtures/unit/data/baddata.json'
+          }
+        }), grunt);
+
+        lib.setData({});
+        failStub.lastCall.args[0].should.include('Data could not be parsed');
+      });
+
     });
 
     it('should log an error if the options.data format is not an Object or String', function () {
@@ -107,9 +109,8 @@ describe('grunt-pages library', function () {
         }
       }), grunt);
       lib.setData({});
-      failStub.lastCall.args[0].should.include('options.data format not recognized.');
+      failStub.lastCall.args[0].should.include('`options.data` format not recognized.');
     });
-
   });
 
   describe('getPostUrl', function () {
@@ -127,7 +128,7 @@ describe('grunt-pages library', function () {
       failStub.lastCall.args[0].should.include('Please specify the dest property in your config.');
     });
 
-    it('should log an error if the post doesn\'t contain metadata specified as a :variable in its url', function () {
+    it('should log an error if the post doesn\'t contain metadata specified as a :variable in its URL', function () {
       lib = pages.call(_.extend(grunt, {
         testContext: {
           data: {
@@ -141,7 +142,7 @@ describe('grunt-pages library', function () {
       failStub.lastCall.args[0].should.include('Required title attribute not found');
     });
 
-    it('should return the post destination after replacing the :variables in the url with its metadata', function () {
+    it('should return the post destination after replacing the :variables in the URL with its metadata', function () {
       lib = pages.call(_.extend(grunt, {
         testContext: {
           data: {
@@ -156,7 +157,7 @@ describe('grunt-pages library', function () {
       }).should.include('posts/cool-post/');
     });
 
-    it('should ignore .html when replacing the :variables in the url with its metadata', function () {
+    it('should ignore .html when replacing the :variables in the URL with its metadata', function () {
       lib = pages.call(_.extend(grunt, {
         testContext: {
           data: {
@@ -175,19 +176,25 @@ describe('grunt-pages library', function () {
 
   describe('getDestFromUrl', function () {
 
-    it('should return the post destinations by adding a .html to the url', function () {
-      lib = pages.call(_.extend(grunt, {
-        testContext: {
-          data: {
-            dest: 'dest'
-          }
+    lib = pages.call(_.extend(grunt, {
+      testContext: {
+        data: {
+          dest: 'dest'
         }
-      }), grunt);
+      }
+    }), grunt);
 
-      lib.getDestFromUrl('blog/').should.eql('dest/blog/index.html');
-      lib.getDestFromUrl('about').should.eql('dest/about.html');
+    describe('if the post\'s url ends with a /', function () {
+      it('should return the post destinations by adding index.html to the URL', function () {
+        lib.getDestFromUrl('blog/').should.eql('dest/blog/index.html');
+      });
     });
 
+    describe('if the post\'s url doesn\'t end with a /', function () {
+      it('should return the post destinations by adding .html to the URL', function () {
+        lib.getDestFromUrl('about').should.eql('dest/about.html');
+      });
+    });
   });
 
   describe('shouldRenderPage', function () {
@@ -203,11 +210,11 @@ describe('grunt-pages library', function () {
       lib.shouldRenderPage('list/index.jade').should.not.be.ok;
     });
 
-    it('should return false when the page is a dotfile', function () {
+    it('should return false when the page is a .dotfile', function () {
       lib.shouldRenderPage('.about.jade').should.not.be.ok;
     });
 
-    it('should return false when the templateEngine option is set and the template', function () {
+    it('should return false when the options.templateEngine is set and the template extension is not from that engine', function () {
       lib = pages.call(_.extend(grunt, {
         testOptions: {
           templateEngine: 'ejs'
@@ -249,6 +256,18 @@ describe('grunt-pages library', function () {
 
   describe('getListPageUrl', function () {
 
+    it('should log an error if `options.pagination.listPage` doesn\'t exist', function () {
+      lib = pages.call(_.extend(grunt, {
+        testOptions: {
+          pageSrc: 'test/fixtures/unit/pages'
+        }
+      }), grunt);
+
+      lib.getListPageUrl(1, { listPage: 'test/fixtures/unit/typo.jade' });
+
+      failStub.lastCall.args[0].should.include('No `options.pagination.listPage` found at ');
+    });
+
     it('should log an error when the pagination.url doesn\'t contain \':id\'', function () {
       lib = pages.call(_.extend(grunt, {
         testContext: {
@@ -259,59 +278,28 @@ describe('grunt-pages library', function () {
       }), grunt);
 
       lib.getListPageUrl(1, {
-        listPage: 'src/pages/blog/index.jade',
+        listPage: 'test/fixtures/unit/pages/blog/index.jade',
         url: 'pages/:i/index.html'
       });
 
-      failStub.lastCall.args[0].should.include('The pagination.url property must include an \':id\' variable which is replaced by the list page\'s identifier.');
-    });
-
-    describe('when options.pageSrc is not set', function () {
-
-      it('should return pagination.url replaced with the page\'s id', function () {
-        lib = pages.call(_.extend(grunt, {
-          testContext: {
-            data: {
-              dest: 'dest'
-            }
-          }
-        }), grunt);
-
-        lib.getListPageUrl(1, {
-          listPage: 'src/pages/index.jade',
-          url: 'pages/:id/'
-        }).should.eql('pages/1/');
-      });
-
-      it('should return the root as the dest of page 0', function () {
-        lib = pages.call(_.extend(grunt, {
-          testContext: {
-            data: {
-              dest: 'dest'
-            }
-          },
-          testOptions: {}
-        }), grunt);
-
-        lib.getListPageUrl(0, { listPage: 'src/listPage.jade' }).should.eql('');
-      });
+      failStub.lastCall.args[0].should.include('The `options.pagination.url` must include an \':id\' variable which is replaced by the list page\'s identifier.');
     });
 
     describe('when options.pageSrc is set', function () {
 
-      it('should log an error if options.pagination.listPage isn\'t a subdirectory of options.pageSrc', function () {
+      it('should log an error if `options.pagination.listPage` isn\'t located inside the options.pageSrc directory', function () {
         lib = pages.call(_.extend(grunt, {
           testOptions: {
-            pageSrc: 'src/pages'
+            pageSrc: 'test/fixtures/unit/pages'
           }
         }), grunt);
 
-        lib.getListPageUrl(1, { listPage: 'src/pages.jade' });
+        lib.getListPageUrl(1, { listPage: 'test/fixtures/unit/pages.jade' });
 
-        failStub.lastCall.args[0].should.include('The pagination.listPage must be within the options.pageSrc directory.');
+        failStub.lastCall.args[0].should.include('The `options.pagination.listPage` must be within the options.pageSrc directory.');
       });
 
-      it('should return the listPage\'s relative location to options.pageSrc as the dest of page 0', function () {
+      it('should return the listPage\'s relative location to options.pageSrc as the url of page 0', function () {
         lib = pages.call(_.extend(grunt, {
           testContext: {
             data: {
@@ -319,11 +307,11 @@ describe('grunt-pages library', function () {
             }
           },
           testOptions: {
-            pageSrc: 'src/pages'
+            pageSrc: 'test/fixtures/unit/pages'
           }
         }), grunt);
 
-        lib.getListPageUrl(0, { listPage: 'src/pages/blog/index.jade' }).should.eql('blog/');
+        lib.getListPageUrl(0, { listPage: 'test/fixtures/unit/pages/blog/index.jade' }).should.eql('blog/');
       });
 
       it('should replace options.pageSrc\'s basename with the pagination.url including the page\'s id', function () {
@@ -334,14 +322,45 @@ describe('grunt-pages library', function () {
             }
           },
           testOptions: {
-            pageSrc: 'src/pages'
+            pageSrc: 'test/fixtures/unit/pages'
           }
         }), grunt);
 
         lib.getListPageUrl(1, {
-          listPage: 'src/pages/blog/index.jade',
+          listPage: 'test/fixtures/unit/pages/blog/index.jade',
           url: ':id/index.html'
         }).should.eql('blog/1/');
+      });
+    });
+
+    describe('when options.pageSrc is not set', function () {
+
+      it('should return an empty string as the url of page 0', function () {
+        lib = pages.call(_.extend(grunt, {
+          testContext: {
+            data: {
+              dest: 'dest'
+            }
+          },
+          testOptions: {}
+        }), grunt);
+
+        lib.getListPageUrl(0, { listPage: 'test/fixtures/unit/pages/blog/index.jade' }).should.eql('');
+      });
+
+      it('should return pagination.url replaced with the page\'s id as the url of every other list page', function () {
+        lib = pages.call(_.extend(grunt, {
+          testContext: {
+            data: {
+              dest: 'dest'
+            }
+          }
+        }), grunt);
+
+        lib.getListPageUrl(1, {
+          listPage: 'test/fixtures/unit/pages/blog/index.jade',
+          url: 'pages/:id/'
+        }).should.eql('pages/1/');
       });
     });
   });

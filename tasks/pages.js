@@ -18,8 +18,14 @@ var pygmentize = require('pygmentize-bundled');
 var RSS        = require('rss');
 
 var templateEngines = {
-  ejs:  require('ejs'),
-  jade: require('jade')
+  ejs: {
+    engine: require('ejs'),
+    extensions: ['.ejs']
+  },
+  jade: {
+    engine: require('jade'),
+    extensions: ['.jade']
+  }
 };
 
 // Define lib object to attach library methods to
@@ -67,9 +73,7 @@ module.exports = function (grunt) {
       filter: 'isFile',
       cwd: this.data.src
     }, [
-      '**',
-      '!_**',
-      '!.**'
+      '**'
     ]).length;
 
     // Start off the parsing with unmodified posts already included
@@ -89,9 +93,16 @@ module.exports = function (grunt) {
         return;
       }
 
-      // Don't include draft posts or dotfiles
-      if (path.basename(postpath).indexOf('_') === 0 ||
-          path.basename(postpath).indexOf('.') === 0) {
+      // Don't include draft posts
+      if (path.basename(postpath).indexOf('_') === 0) {
+        if (++parsedPosts === numPosts) {
+          lib.renderPostsAndPages(postCollection, cacheFile, done);
+        }
+        return;
+      }
+
+      // Don't include dotfiles
+      if (path.basename(postpath).indexOf('.') === 0) {
         return;
       }
 
@@ -110,7 +121,7 @@ module.exports = function (grunt) {
       // Parse post using [marked](https://github.com/chjj/marked)
       marked(post.markdown, {
         on: _.extend({
-          heading : function (token, callback) {
+          heading: function (token, callback) {
             callback(null, '<a name="' +
                              token.text.toLowerCase().replace(/[^\w]+/g, '-') +
                             '"class="anchor" href="#' +
@@ -197,7 +208,8 @@ module.exports = function (grunt) {
 
       var metaDataStart;
 
-      if (fileString.indexOf('{') < fileString.indexOf('}')) {
+      if (fileString.indexOf('{') >= 0 &&
+          fileString.indexOf('{') < fileString.indexOf('}')) {
         metaDataStart = fileString.indexOf('{');
       } else {
         return grunt.fail.fatal(errMessage);
@@ -256,8 +268,17 @@ module.exports = function (grunt) {
     } else if (typeof options.data === 'object') {
       templateData.data = options.data;
     } else {
-      grunt.fail.fatal('options.data format not recognized. Must be an Object or String.');
+      grunt.fail.fatal('`options.data` format not recognized. Must be an Object or String.');
     }
+  };
+
+  /**
+   * Determines the template engine based on the `layout`'s file extension
+   */
+  lib.setTemplateEngine = function () {
+    templateEngine = _.find(templateEngines, function (engine) {
+      return _.contains(engine.extensions, path.extname(_this.data.layout).toLowerCase());
+    }).engine;
   };
 
   /**
@@ -268,6 +289,8 @@ module.exports = function (grunt) {
    */
   lib.renderPostsAndPages = function (postCollection, cacheFile, done) {
     var templateData = { posts: postCollection };
+
+    lib.setTemplateEngine();
 
     if (options.data) {
       lib.setData(templateData);
@@ -442,10 +465,6 @@ module.exports = function (grunt) {
    * @param  {Object} templateData Data to be passed to templates for rendering
    */
   lib.generatePosts = function (templateData) {
-
-    // Determine the template engine based on the file's extension name
-    templateEngine = templateEngines[path.extname(_this.data.layout).slice(1).toLowerCase()];
-
     var layoutString = fs.readFileSync(_this.data.layout, 'utf8');
     var fn = templateEngine.compile(layoutString, { pretty: true, filename: _this.data.layout });
 
@@ -668,13 +687,17 @@ module.exports = function (grunt) {
     var url       = '';
     var urlFormat = pagination.url || 'page/:id/';
 
+    if (!fs.existsSync(listPage)) {
+      return grunt.fail.fatal('No `options.pagination.listPage` found at ' + listPage);
+    }
+
     // If the pageSrc option is used, generate list pages relative to options.pageSrc
     // Otherwise, generate list pages relative to the root of the destination folder
     if (options.pageSrc) {
       if (listPage.indexOf(options.pageSrc + '/') !== -1) {
         url += listPage.slice(options.pageSrc.length + 1);
       } else {
-        grunt.fail.fatal('The pagination.listPage must be within the options.pageSrc directory.');
+        return grunt.fail.fatal('The `options.pagination.listPage` must be within the options.pageSrc directory.');
       }
     }
 
@@ -691,7 +714,7 @@ module.exports = function (grunt) {
     // relative to the folder that contains the listPage or relative to the root of the site
     } else {
       if (urlFormat.indexOf(':id') === -1) {
-        grunt.fail.fatal('The pagination.url property must include an \':id\' variable which is replaced by the list page\'s identifier.');
+        return grunt.fail.fatal('The `options.pagination.url` must include an \':id\' variable which is replaced by the list page\'s identifier.');
       }
       if (options.pageSrc) {
         url = url.replace(path.basename(listPage), urlFormat.replace(':id', pageId));

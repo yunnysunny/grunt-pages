@@ -4,6 +4,8 @@
   tags: ['JavaScript', 'Tutorial']
 }
 
+## Header 2
+
 This is a JavaScript object:
 ```js
 {

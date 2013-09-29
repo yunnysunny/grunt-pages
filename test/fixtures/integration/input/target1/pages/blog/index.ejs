@@ -1,0 +1,6 @@
+<% include ../../layouts/base %>
+<% posts.forEach(function(post){ %>
+  <li><a href="/<%= post.url %>"><%= post.title %></a>
+  </li>
+<% });%>
+<div><%= currentPage %></div>
