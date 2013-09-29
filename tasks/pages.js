@@ -18,8 +18,14 @@ var pygmentize = require('pygmentize-bundled');
 var RSS        = require('rss');
 
 var templateEngines = {
-  ejs:  require('ejs'),
-  jade: require('jade')
+  ejs: {
+    engine: require('ejs'),
+    extensions: ['.ejs']
+  },
+  jade: {
+    engine: require('jade'),
+    extensions: ['.jade']
+  }
 };
 
 // Define lib object to attach library methods to
@@ -262,6 +268,15 @@ module.exports = function (grunt) {
   };
 
   /**
+   * Determines the template engine based on the `layout`'s file extension
+   */
+  lib.setTemplateEngine = function () {
+    templateEngine = _.find(templateEngines, function (engine) {
+      return _.contains(engine.extensions, path.extname(_this.data.layout).toLowerCase());
+    }).engine;
+  };
+
+  /**
    * Renders posts and pages once all posts have been parsed
    * @param  {Array}    postCollection Collection of parsed posts with the content and metadata properties
    * @param  {String}   cacheFile      Pathname of file to write post data to for future caching of unmodified posts
@@ -269,6 +284,8 @@ module.exports = function (grunt) {
    */
   lib.renderPostsAndPages = function (postCollection, cacheFile, done) {
     var templateData = { posts: postCollection };
+
+    lib.setTemplateEngine();
 
     if (options.data) {
       lib.setData(templateData);
@@ -443,10 +460,6 @@ module.exports = function (grunt) {
    * @param  {Object} templateData Data to be passed to templates for rendering
    */
   lib.generatePosts = function (templateData) {
-
-    // Determine the template engine based on the file's extension name
-    templateEngine = templateEngines[path.extname(_this.data.layout).slice(1).toLowerCase()];
-
     var layoutString = fs.readFileSync(_this.data.layout, 'utf8');
     var fn = templateEngine.compile(layoutString, { pretty: true, filename: _this.data.layout });
 
