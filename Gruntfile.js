@@ -7,49 +7,88 @@ module.exports = function (grunt) {
   grunt.initConfig({
     globalConfig: globalConfig,
 
-    // Tests EJS template rendering, post destination, post url formatting and options.data
     pages: {
-      posts: {
+
+      // Tests EJS template rendering, default post URL formatting destinations,
+      // page destinations/content, templateEngine page filtering and options.data as a String
+      target1: {
         src: 'test/fixtures/integration/input/posts/',
-        dest: 'dev',
-        layout: 'test/fixtures/integration/input/ejs/layouts/post.ejs',
+        dest: 'dest1',
+        layout: 'test/fixtures/integration/input/target1/layouts/post.ejs',
         url: 'blog/posts/:title/',
         options: {
-          formatPostUrl: function (urlSegment) {
-            return urlSegment.replace(/[^a-zA-Z0-9]/g, '_');
-          },
-          pageSrc: 'test/fixtures/integration/input/ejs/pages',
+          pageSrc: 'test/fixtures/integration/input/target1/pages',
+
+          // ignored.jade file in option.pageSrc is expected to be ignored
           templateEngine: 'ejs',
-          data: 'test/fixtures/integration/input/data/data.json'
+
+          // Test passing data as a String
+          data: 'test/fixtures/integration/input/target1/data/data.json',
+
+          // TestRSS config using default options
+          rss: {
+            author: 'The Author',
+            title: 'Blog of Blogs',
+            description: 'The Description',
+            url: 'http://the.url.com',
+            pubDate: new Date(1000) // Must pass date for output to match
+          }
         }
       },
 
-      // Tests pagination, including sorting, custom post grouping, and custom urls
-      paginated: {
+      // Tests Jade template rendering, custom post URL formatting, and pagination, custom post grouping, and custom urls
+      target2: {
         src: 'test/fixtures/integration/input/posts/',
-        dest: 'dev',
-        layout: 'test/fixtures/integration/input/jade/layouts/post.jade',
+        dest: 'dest2',
+        layout: 'test/fixtures/integration/input/target2/layouts/post.jade',
         url: 'blog/posts/:title/',
         options: {
-          pageSrc: 'test/fixtures/integration/input/jade/pages/blog',
+
+          // Test using a different post url format
+          formatPostUrl: function (urlSegment) {
+            return urlSegment.replace(/[^a-zA-Z0-9]/g, '_');
+          },
+          pageSrc: 'test/fixtures/integration/input/target2/pages',
+
+          // Instead of sorting by date descending, sort by date ascending
           sortFunction: function (a, b) {
             return a.date - b.date;
           },
+
+          // Test passing data as an Object
           data: {
-            test: 1
+            test: 'object'
+          },
+
+          // Test RSS config using all custom options
+          rss: {
+            path: 'rss/rss.xml',
+            author: 'The Author',
+            title: 'Blog of Blogs',
+            description: 'The Description',
+            url: 'http://the.url.com',
+            image_url: 'http://the.url.com/image.jpg',
+            docs: 'The Docs',
+            managingEditor: 'The Managing Editor',
+            webMaster: 'The Web Master',
+            copyRight: '2044 Industries Inc.',
+            language: 'sp',
+            categories: ['stuff', 'things', 'items', 'widgets'],
+            ttl: '40',
+            pubDate: new Date(1000) // Must pass date for output to match
           },
 
           // First pagination config object tests default pagination grouping
           // using a custom url
           pagination: [{
             postsPerPage: 1,
-            listPage: 'test/fixtures/integration/input/jade/pages/blog/index.jade',
+            listPage: 'test/fixtures/integration/input/target2/pages/blog/index.jade',
             url: 'list/:id/index.html'
 
           // Second pagination config tests a custom post grouping by the 'tags'
           // metadata property
           }, {
-            listPage: 'test/fixtures/integration/input/jade/pages/blog/index.jade',
+            listPage: 'test/fixtures/integration/input/target2/pages/blog/index.jade',
             getPostGroups: function (posts) {
               var postGroups = {};
               posts.forEach(function (post) {
@@ -75,59 +114,23 @@ module.exports = function (grunt) {
           }]
         }
       },
-
-      // Tests default RSS config
-      rss_default: {
+      // Tests default pagination behavior without using other pages(via options.pageSrc)
+      target3: {
         src: 'test/fixtures/integration/input/posts/',
-        dest: 'dev',
-        layout: 'test/fixtures/integration/input/ejs/layouts/post.ejs',
+        dest: 'dest3',
+        layout: 'test/fixtures/integration/input/target2/layouts/post.jade',
         url: 'blog/posts/:title/',
         options: {
-          rss: {
-            author: 'The Author',
-            title: 'Blog of Blogs',
-            description: 'The Description',
-            url: 'http://the.url.com',
-            pubDate: new Date(1000) // Must pass date for output to match
-          },
-          pageSrc: 'test/fixtures/integration/input/ejs/pages',
-          templateEngine: 'ejs',
-          data: 'test/fixtures/integration/input/data/data.json'
-        }
-      },
-
-      // Tests custom RSS config
-      rss_custom: {
-        src: 'test/fixtures/integration/input/posts/',
-        dest: 'dev',
-        layout: 'test/fixtures/integration/input/ejs/layouts/post.ejs',
-        url: 'blog/posts/:title/',
-        options: {
-          rss: {
-            path: 'rss/rss.xml',
-            author: 'The Author',
-            title: 'Blog of Blogs',
-            description: 'The Description',
-            url: 'http://the.url.com',
-            image_url: 'http://the.url.com/image.jpg',
-            docs: 'The Docs',
-            managingEditor: 'The Managing Editor',
-            webMaster: 'The Web Master',
-            copyRight: '2044 Industries Inc.',
-            language: 'sp',
-            categories: ['stuff', 'things', 'items', 'widgets'],
-            ttl: '40',
-            pubDate: new Date(1000) // Must pass date for output to match
-          },
-          pageSrc: 'test/fixtures/integration/input/ejs/pages',
-          templateEngine: 'ejs',
-          data: 'test/fixtures/integration/input/data/data.json'
+          pagination: {
+            postsPerPage: 1,
+            listPage: 'test/fixtures/integration/input/target2/pages/blog/index.jade'
+          }
         }
       }
     },
     mdlint: ['README.md'],
     clean: {
-      build: ['dev'],
+      build: ['dest*'],
       cache: ['.*post-cache.json']
     },
     copy: {
@@ -166,7 +169,7 @@ module.exports = function (grunt) {
     },
     concurrent: {
       tasks: ['connect:server', 'watch', 'open'],
-      test: ['node-inspector', 'shell:debugtest'],
+      test: ['simplemocha:all', 'jshint', 'mdlint'],
       options: {
         logConcurrentOutput: true
       }
@@ -228,7 +231,7 @@ module.exports = function (grunt) {
 
   grunt.loadTasks('./tasks');
   grunt.registerTask('build', ['clean:build', 'copy', 'pages:paginated']);
-  grunt.registerTask('test', ['clean', 'jshint', 'mdlint', 'simplemocha:all', 'clean']);
+  grunt.registerTask('test', ['clean', 'jshint', 'simplemocha:all', 'mdlint', 'clean']);
   grunt.registerTask('default', ['concurrent']);
 
   grunt.registerTask('bench', 'Runs a grunt-pages config and measures performance', function (target) {
