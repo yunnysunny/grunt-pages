@@ -121,7 +121,7 @@ module.exports = function (grunt) {
       // Parse post using [marked](https://github.com/chjj/marked)
       marked(post.markdown, {
         on: _.extend({
-          heading : function (token, callback) {
+          heading: function (token, callback) {
             callback(null, '<a name="' +
                              token.text.toLowerCase().replace(/[^\w]+/g, '-') +
                             '"class="anchor" href="#' +
