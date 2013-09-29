@@ -73,9 +73,7 @@ module.exports = function (grunt) {
       filter: 'isFile',
       cwd: this.data.src
     }, [
-      '**',
-      '!_**',
-      '!.**'
+      '**'
     ]).length;
 
     // Start off the parsing with unmodified posts already included
@@ -95,9 +93,16 @@ module.exports = function (grunt) {
         return;
       }
 
-      // Don't include draft posts or dotfiles
-      if (path.basename(postpath).indexOf('_') === 0 ||
-          path.basename(postpath).indexOf('.') === 0) {
+      // Don't include draft posts
+      if (path.basename(postpath).indexOf('_') === 0) {
+        if (++parsedPosts === numPosts) {
+          lib.renderPostsAndPages(postCollection, cacheFile, done);
+        }
+        return;
+      }
+
+      // Don't include dotfiles
+      if (path.basename(postpath).indexOf('.') === 0) {
         return;
       }
 
