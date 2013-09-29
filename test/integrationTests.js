@@ -2,113 +2,178 @@ var fs = require('fs');
 require('should');
 var spawn = require('child_process').spawn;
 
-function stripBuildDate(str) {
-  return str.replace(/<lastBuildDate>.*?<\/lastBuildDate>/, '');
-}
-
 describe('grunt-pages', function () {
 
+  // Build test targets before running tests
   before(function (done) {
-    var buildProcess = spawn('grunt', ['pages:posts']);
-    buildProcess.stdout.on('close', function () {
-      done();
-    });
+
+    var builds = 0;
+    spawn('grunt', ['pages:target1'])
+      .on('close', function () {
+        if (++builds === 3) {
+          done();
+        }
+      });
+
+    spawn('grunt', ['pages:target2'])
+      .on('close', function () {
+        if (++builds === 3) {
+          done();
+        }
+      });
+
+    spawn('grunt', ['pages:target3'])
+      .on('close', function () {
+        if (++builds === 3) {
+          done();
+        }
+      });
   });
 
-  it('should create posts in the location specified by the url config property', function() {
-    fs.existsSync('dev/blog/posts/Post_1/index.html').should.eql(true, 'First post created in correct location.');
-    fs.existsSync('dev/blog/posts/Post_2/index.html').should.eql(true, 'Second post created in correct location.');
-  });
-
-  it('should create posts with the expected content by correctly parsing the metadata and markdown content and rendering the EJS layout template', function () {
-    fs.readFileSync('dev/blog/posts/Post_1/index.html', 'utf8').should.equal(fs.readFileSync('test/fixtures/integration/output/blog/posts/Post1/index.html', 'utf8'));
-    fs.readFileSync('dev/blog/posts/Post_2/index.html', 'utf8').should.equal(fs.readFileSync('test/fixtures/integration/output/blog/posts/Post2/index.html', 'utf8'));
-  });
-
-  it('should create pages in the location relative to the options.pageSrc replacing the extension with .html', function() {
-    fs.existsSync('dev/blog/index.html').should.eql(true, 'blog/index.ejs created in correct location.');
-    fs.existsSync('dev/index.html').should.eql(true, 'index.ejs created in correct location.');
-  });
-
-  it('should create pages with the expected content by rendering the page templates with the post data and options.data', function () {
-    fs.readFileSync('dev/index.html', 'utf8').should.equal(fs.readFileSync('test/fixtures/integration/output/index.html', 'utf8'));
-    fs.readFileSync('dev/blog/index.html', 'utf8').should.equal(fs.readFileSync('test/fixtures/integration/output/blog/index.html', 'utf8'));
+  it('should create posts in the `dest` folder using the `url` as a relative path ' +
+     'replacing :variables with post metadata and formatting the metadata string using the default formatting function, ' +
+     'then adding .html or index.html', function() {
+    fs.existsSync('dest1/blog/posts/post-1/index.html').should.eql(true, 'First post created in correct location.');
+    fs.existsSync('dest1/blog/posts/post-2/index.html').should.eql(true, 'Second post created in correct location.');
   });
 
   it('should ignore _ prefixed draft posts', function () {
-    fs.existsSync('dev/blog/posts/Draft.html').should.eql(false, 'Draft posts should not be generated.');
+    fs.existsSync('dest1/blog/posts/Draft.html').should.eql(false, 'Draft posts should not be generated.');
   });
 
   it('should cache posts after they have been parsed', function () {
-    var posts = JSON.parse(fs.readFileSync('.posts-post-cache.json')).posts;
+    var posts = JSON.parse(fs.readFileSync('.target1-post-cache.json')).posts;
     posts[0].sourcePath.should.equal('test/fixtures/integration/input/posts/post2.md');
     posts[1].sourcePath.should.equal('test/fixtures/integration/input/posts/post1.md');
   });
 
-  describe('when run with the RSS object set with default options', function () {
+  describe('when specifying `options.pageSrc`', function () {
 
-    before(function (done) {
-      var buildProcess = spawn('grunt', ['pages:rss_default']);
-      buildProcess.on('close', function () {
-        done();
-      });
+    it('should create pages in the `dest` folder using the page\'s relative path inside of the `options.pageSrc` folder, replacing the page template\'s extension with .html', function() {
+      fs.existsSync('dest1/blog/index.html').should.eql(true, 'blog/index.ejs created in correct location.');
+      fs.existsSync('dest1/index.html').should.eql(true, 'index.ejs created in correct location.');
     });
 
-    it('should create feed.xml from the posts and default options', function () {
+    it('should create pages with the expected content by rendering the page templates with the posts\' data', function () {
+      fs.readFileSync('dest1/index.html', 'utf8').should.equal(fs.readFileSync('test/fixtures/integration/output/target1/index.html', 'utf8'));
+      fs.readFileSync('dest1/blog/index.html', 'utf8').should.equal(fs.readFileSync('test/fixtures/integration/output/target1/blog/index.html', 'utf8'));
+    });
+  });
+
+  describe('when specifying `options.data` as an Object', function () {
+
+    it('should pass the `options.data` Object to the pages for rendering', function () {
+      fs.readFileSync('dest2/test.html', 'utf8').should.include('data sourced from object');
+    });
+  });
+
+  describe('when specifying `options.data` as a String', function () {
+
+    it('should read the JSON file specified by the String\'s pathname and pass it to the pages for rendering', function () {
+      fs.readFileSync('dest1/index.html', 'utf8').should.include('data sourced from file');
+    });
+  });
+
+  describe('when specifying `options.sortFunction`', function () {
+
+    it('should sort posts according to the provided sort function', function () {
+      fs.readFileSync('dest2/blog/index.html', 'utf8').should.include('Post 1', 'Root list page should have older post first due to options.sortFunction.');
+    });
+  });
+
+  describe('when specifying `options.formatPostUrl`', function () {
+
+    it('should format URLs according to the specified function', function () {
+      fs.existsSync('dest2/blog/posts/Post_1/index.html').should.eql(true, 'First post created in correct location.');
+      fs.existsSync('dest2/blog/posts/Post_2/index.html').should.eql(true, 'Second post created in correct location.');
+    });
+  });
+
+  describe('when specifying `options.templateEngine`', function () {
+
+    it('should ignore pages that do not have that template engine\'s file extension(s)', function () {
+      fs.existsSync('dest1/ignored.html').should.eql(false, '.jade page not generated when the options.templateEngine is set to EJS.');
+    });
+  });
+
+  function stripBuildDate(str) {
+    return str.replace(/<lastBuildDate>.*?<\/lastBuildDate>/, '');
+  }
+
+  describe('when specifying `options.rss` with the default required properties', function () {
+
+    it('should create feed.xml from the posts', function () {
       var fileSuffix = '';
       if (process.env.NODE_ENV === 'ci') {
         fileSuffix = '-ci';
       }
 
-      stripBuildDate(fs.readFileSync('dev/feed.xml', 'utf8')).should.equal(stripBuildDate(fs.readFileSync('test/fixtures/integration/output/feed' + fileSuffix + '.xml', 'utf8')));
+      stripBuildDate(fs.readFileSync('dest1/feed.xml', 'utf8')).should.equal(stripBuildDate(fs.readFileSync('test/fixtures/integration/output/target1/feed' + fileSuffix + '.xml', 'utf8')));
     });
   });
 
-  describe('when run with the RSS object set with custom options', function () {
+  describe('when specifying `options.rss` with custom properties', function () {
 
-    before(function (done) {
-      var buildProcess = spawn('grunt', ['pages:rss_custom']);
-      buildProcess.on('close', function () {
-        done();
-      });
-    });
-
-    it('should create rss.xml from the posts and provided options', function () {
+    it('should create an xml file in the location specified by `options.rss.path` from the posts', function () {
       var fileSuffix = '';
       if (process.env.NODE_ENV === 'ci') {
         fileSuffix = '-ci';
       }
-      stripBuildDate(fs.readFileSync('dev/rss/rss.xml', 'utf8')).should.equal(stripBuildDate(fs.readFileSync('test/fixtures/integration/output/rss/rss' + fileSuffix + '.xml', 'utf8')));
+      stripBuildDate(fs.readFileSync('dest2/rss/rss.xml', 'utf8')).should.equal(stripBuildDate(fs.readFileSync('test/fixtures/integration/output/target2/rss/rss' + fileSuffix + '.xml', 'utf8')));
     });
   });
 
-  describe('when run with the pagination config property set', function () {
+  describe('when specifying `options.pagination`', function () {
 
-    before(function (done) {
-      var buildProcess = spawn('grunt', ['pages:paginated']);
-      buildProcess.on('close', function () {
-        done();
+    describe('when specifying `options.pagination.postsPerPage`', function () {
+
+      it('should create the root list page as index.html inside of `dest`', function() {
+        fs.existsSync('dest3/index.html').should.eql(true, 'Root list page for default pagination scheme.');
+      });
+
+      it('should create the non-root list page relative to `dest` using the default pagination url scheme', function () {
+        fs.existsSync('dest3/page/1/index.html', 'utf8').should.eql(true, 'Non-root list page for default pagination scheme.');
+      });
+
+      it('should create the root list page with the expected post group based on `options.pagination.postsPerPage`', function () {
+        fs.readFileSync('dest3/index.html', 'utf8').should.equal(fs.readFileSync('test/fixtures/integration/output/target3/index.html', 'utf8'));
+      });
+
+      it('should create the non-root list page with the expected post group based on `options.pagination.postsPerPage`', function () {
+        fs.readFileSync('dest3/page/1/index.html', 'utf8').should.equal(fs.readFileSync('test/fixtures/integration/output/target3/page/1/index.html', 'utf8'));
       });
     });
 
-    it('should create paginated list pages in the expected location', function() {
-      fs.existsSync('dev/index.html').should.eql(true, 'Root list page for default pagination scheme.');
-      fs.existsSync('dev/list/1/index.html').should.eql(true, 'First page for default pagination scheme.');
-      fs.existsSync('dev/page/javascript/index.html').should.eql(true, 'List page for posts with javascript tag.');
-      fs.existsSync('dev/page/tips/index.html').should.eql(true, 'List page for posts with tips tag.');
-      fs.existsSync('dev/page/tutorial/index.html').should.eql(true, 'List page for posts with tutorial tag.');
+    describe('when specifying `options.pageSrc`', function () {
+
+      it('should create the root list page relative to `options.pageSrc` inside of `dest`', function() {
+        fs.existsSync('dest2/blog/index.html').should.eql(true, 'Root list page for custom url pagination scheme.');
+      });
+
+      it('should create the non-root list page relative to `options.pageSrc` inside of `dest`', function() {
+        fs.existsSync('dest2/blog/index.html').should.eql(true, 'Root list page for custom url pagination scheme.');
+      });
+
     });
 
-    it('should create the custom list page with the expected content', function () {
-      fs.readFileSync('dev/page/javascript/index.html', 'utf8').should.equal(fs.readFileSync('test/fixtures/integration/output/page/javascript/index.html', 'utf8'));
+    describe('when specifying `options.pagination.url`', function () {
+
+      it('should create list pages using the `options.pagination.url` scheme', function () {
+        fs.existsSync('dest2/blog/list/1/index.html').should.eql(true, 'First page for the custom pagination scheme.');
+      });
     });
 
-    it('should create the root list page with the expected content', function () {
-      fs.readFileSync('dev/index.html', 'utf8').should.equal(fs.readFileSync('test/fixtures/integration/output/blog/paginatedIndex.html', 'utf8'));
-    });
+    describe('when specifying `options.pagination.getPostGroups`', function () {
 
-    it('should create the paginated list page with the expected content', function () {
-      fs.readFileSync('dev/list/1/index.html', 'utf8').should.equal(fs.readFileSync('test/fixtures/integration/output/list/1/index.html', 'utf8'));
+      it('should create custom list pages inside of `dest` using the URLs returned from `options.pagination.getPostGroups`', function () {
+        fs.existsSync('dest2/blog/page/javascript/index.html').should.eql(true, 'List page for posts with javascript tag.');
+        fs.existsSync('dest2/blog/page/tips/index.html').should.eql(true, 'List page for posts with tips tag.');
+        fs.existsSync('dest2/blog/page/tutorial/index.html').should.eql(true, 'List page for posts with tutorial tag.');
+      });
+
+      it('should create list pages with custom post groups', function () {
+        fs.readFileSync('dest2/blog/page/javascript/index.html', 'utf8').should.equal(fs.readFileSync('test/fixtures/integration/output/target2/page/javascript/index.html', 'utf8'));
+      });
     });
   });
 });
