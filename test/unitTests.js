@@ -109,7 +109,7 @@ describe('grunt-pages library', function () {
         }
       }), grunt);
       lib.setData({});
-      failStub.lastCall.args[0].should.include('options.data format not recognized.');
+      failStub.lastCall.args[0].should.include('`options.data` format not recognized.');
     });
   });
 
@@ -256,18 +256,47 @@ describe('grunt-pages library', function () {
 
   describe('getListPageUrl', function () {
 
+    it('should log an error if `options.pagination.listPage` doesn\'t exist', function () {
+      lib = pages.call(_.extend(grunt, {
+        testOptions: {
+          pageSrc: 'test/fixtures/unit/pages'
+        }
+      }), grunt);
+
+      lib.getListPageUrl(1, { listPage: 'test/fixtures/unit/typo.jade' });
+
+      failStub.lastCall.args[0].should.include('No `options.pagination.listPage` found at ');
+    });
+
+    it('should log an error when the pagination.url doesn\'t contain \':id\'', function () {
+      lib = pages.call(_.extend(grunt, {
+        testContext: {
+          data: {
+            dest: 'dest'
+          }
+        }
+      }), grunt);
+
+      lib.getListPageUrl(1, {
+        listPage: 'test/fixtures/unit/pages/blog/index.jade',
+        url: 'pages/:i/index.html'
+      });
+
+      failStub.lastCall.args[0].should.include('The `options.pagination.url` must include an \':id\' variable which is replaced by the list page\'s identifier.');
+    });
+
     describe('when options.pageSrc is set', function () {
 
-      it('should log an error if options.pagination.listPage isn\'t located inside the options.pageSrc directory', function () {
+      it('should log an error if `options.pagination.listPage` isn\'t located inside the options.pageSrc directory', function () {
         lib = pages.call(_.extend(grunt, {
           testOptions: {
-            pageSrc: 'src/pages'
+            pageSrc: 'test/fixtures/unit/pages'
           }
         }), grunt);
 
-        lib.getListPageUrl(1, { listPage: 'src/pages.jade' });
+        lib.getListPageUrl(1, { listPage: 'test/fixtures/unit/pages.jade' });
 
-        failStub.lastCall.args[0].should.include('The pagination.listPage must be within the options.pageSrc directory.');
+        failStub.lastCall.args[0].should.include('The `options.pagination.listPage` must be within the options.pageSrc directory.');
       });
 
       it('should return the listPage\'s relative location to options.pageSrc as the url of page 0', function () {
@@ -278,11 +307,11 @@ describe('grunt-pages library', function () {
             }
           },
           testOptions: {
-            pageSrc: 'src/pages'
+            pageSrc: 'test/fixtures/unit/pages'
           }
         }), grunt);
 
-        lib.getListPageUrl(0, { listPage: 'src/pages/blog/index.jade' }).should.eql('blog/');
+        lib.getListPageUrl(0, { listPage: 'test/fixtures/unit/pages/blog/index.jade' }).should.eql('blog/');
       });
 
       it('should replace options.pageSrc\'s basename with the pagination.url including the page\'s id', function () {
@@ -293,12 +322,12 @@ describe('grunt-pages library', function () {
             }
           },
           testOptions: {
-            pageSrc: 'src/pages'
+            pageSrc: 'test/fixtures/unit/pages'
           }
         }), grunt);
 
         lib.getListPageUrl(1, {
-          listPage: 'src/pages/blog/index.jade',
+          listPage: 'test/fixtures/unit/pages/blog/index.jade',
           url: ':id/index.html'
         }).should.eql('blog/1/');
       });
@@ -316,7 +345,7 @@ describe('grunt-pages library', function () {
           testOptions: {}
         }), grunt);
 
-        lib.getListPageUrl(0, { listPage: 'src/listPage.jade' }).should.eql('');
+        lib.getListPageUrl(0, { listPage: 'test/fixtures/unit/pages/blog/index.jade' }).should.eql('');
       });
 
       it('should return pagination.url replaced with the page\'s id as the url of every other list page', function () {
@@ -329,27 +358,10 @@ describe('grunt-pages library', function () {
         }), grunt);
 
         lib.getListPageUrl(1, {
-          listPage: 'src/pages/index.jade',
+          listPage: 'test/fixtures/unit/pages/blog/index.jade',
           url: 'pages/:id/'
         }).should.eql('pages/1/');
       });
-    });
-
-    it('should log an error when the pagination.url doesn\'t contain \':id\'', function () {
-      lib = pages.call(_.extend(grunt, {
-        testContext: {
-          data: {
-            dest: 'dest'
-          }
-        }
-      }), grunt);
-
-      lib.getListPageUrl(1, {
-        listPage: 'src/pages/blog/index.jade',
-        url: 'pages/:i/index.html'
-      });
-
-      failStub.lastCall.args[0].should.include('The pagination.url property must include an \':id\' variable which is replaced by the list page\'s identifier.');
     });
   });
 });

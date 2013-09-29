@@ -268,7 +268,7 @@ module.exports = function (grunt) {
     } else if (typeof options.data === 'object') {
       templateData.data = options.data;
     } else {
-      grunt.fail.fatal('options.data format not recognized. Must be an Object or String.');
+      grunt.fail.fatal('`options.data` format not recognized. Must be an Object or String.');
     }
   };
 
@@ -687,13 +687,17 @@ module.exports = function (grunt) {
     var url       = '';
     var urlFormat = pagination.url || 'page/:id/';
 
+    if (!fs.existsSync(listPage)) {
+      return grunt.fail.fatal('No `options.pagination.listPage` found at ' + listPage);
+    }
+
     // If the pageSrc option is used, generate list pages relative to options.pageSrc
     // Otherwise, generate list pages relative to the root of the destination folder
     if (options.pageSrc) {
       if (listPage.indexOf(options.pageSrc + '/') !== -1) {
         url += listPage.slice(options.pageSrc.length + 1);
       } else {
-        grunt.fail.fatal('The pagination.listPage must be within the options.pageSrc directory.');
+        return grunt.fail.fatal('The `options.pagination.listPage` must be within the options.pageSrc directory.');
       }
     }
 
@@ -710,7 +714,7 @@ module.exports = function (grunt) {
     // relative to the folder that contains the listPage or relative to the root of the site
     } else {
       if (urlFormat.indexOf(':id') === -1) {
-        grunt.fail.fatal('The pagination.url property must include an \':id\' variable which is replaced by the list page\'s identifier.');
+        return grunt.fail.fatal('The `options.pagination.url` must include an \':id\' variable which is replaced by the list page\'s identifier.');
       }
       if (options.pageSrc) {
         url = url.replace(path.basename(listPage), urlFormat.replace(':id', pageId));
