@@ -1,6 +1,6 @@
 var fs = require('fs');
 require('should');
-var spawn = require('child_process').spawn;
+var exec = require('child_process').exec;
 
 describe('grunt-pages', function () {
 
@@ -8,26 +8,23 @@ describe('grunt-pages', function () {
   before(function (done) {
 
     var builds = 0;
-    spawn('grunt', ['pages:target1'])
-      .on('close', function () {
-        if (++builds === 3) {
-          done();
-        }
-      });
+    exec('grunt pages:target1', function () {
+      if (++builds === 3) {
+        done();
+      }
+    });
 
-    spawn('grunt', ['pages:target2'])
-      .on('close', function () {
-        if (++builds === 3) {
-          done();
-        }
-      });
+    exec('grunt pages:target2', function () {
+      if (++builds === 3) {
+        done();
+      }
+    });
 
-    spawn('grunt', ['pages:target3'])
-      .on('close', function () {
-        if (++builds === 3) {
-          done();
-        }
-      });
+    exec('grunt pages:target3', function () {
+      if (++builds === 3) {
+        done();
+      }
+    });
   });
 
   it('should create posts in the `dest` folder using the `url` as a relative path ' +
