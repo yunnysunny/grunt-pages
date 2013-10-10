@@ -223,7 +223,12 @@ module.exports = function (grunt) {
       }
 
       postData = eval('(' + fileString.substr(metaDataStart, metaDataEnd) + ')');
-      postData.date = new Date(postData.date);
+      if (postData.date) {
+        postData.date = new Date(postData.date);
+      } else {
+        postData.date = new Date(fs.statSync(postPath).mtime);
+      }
+
       postData.markdown = fileString.slice(metaDataEnd);
       return postData;
     } catch (e) {
