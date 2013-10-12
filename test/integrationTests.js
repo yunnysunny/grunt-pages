@@ -34,6 +34,11 @@ describe('grunt-pages', function () {
     fs.existsSync('dest1/blog/posts/post-2/index.html').should.eql(true, 'Second post created in correct location.');
   });
 
+  it('should create posts with the compiled markdown source and metdata rendered by a template engine', function () {
+    fs.readFileSync('dest1/blog/posts/post-1/index.html', 'utf8').should.eql(fs.readFileSync('test/fixtures/integration/output/target1/blog/posts/post-1/index.html', 'utf8').replace(/<date>.*?<\/date>/g, '<date>' + new Date('5-12-2013') + '</date>'));
+    fs.readFileSync('dest1/blog/posts/post-2/index.html', 'utf8').should.eql(fs.readFileSync('test/fixtures/integration/output/target1/blog/posts/post-2/index.html', 'utf8').replace(/<date>.*?<\/date>/g, '<date>' + new Date(fs.statSync('test/fixtures/integration/input/posts/post2.md').mtime) + '</date>'));
+  });
+
   it('should ignore _ prefixed draft posts', function () {
     fs.existsSync('dest1/blog/posts/Draft.html').should.eql(false, 'Draft posts should not be generated.');
   });
@@ -93,8 +98,9 @@ describe('grunt-pages', function () {
     });
   });
 
-  function stripBuildDate(str) {
-    return str.replace(/<lastBuildDate>.*?<\/lastBuildDate>/, '');
+  function stripDate (str) {
+    return str.replace(/<lastBuildDate>.*?<\/lastBuildDate>/, '')
+              .replace(/<pubDate>.*?<\/pubDate>/g, '');
   }
 
   describe('when specifying `options.rss` with the default required properties', function () {
@@ -105,7 +111,7 @@ describe('grunt-pages', function () {
         fileSuffix = '-ci';
       }
 
-      stripBuildDate(fs.readFileSync('dest1/feed.xml', 'utf8')).should.equal(stripBuildDate(fs.readFileSync('test/fixtures/integration/output/target1/feed' + fileSuffix + '.xml', 'utf8')));
+      stripDate(fs.readFileSync('dest1/feed.xml', 'utf8')).should.equal(stripDate(fs.readFileSync('test/fixtures/integration/output/target1/feed' + fileSuffix + '.xml', 'utf8')));
     });
   });
 
@@ -116,7 +122,7 @@ describe('grunt-pages', function () {
       if (process.env.NODE_ENV === 'ci') {
         fileSuffix = '-ci';
       }
-      stripBuildDate(fs.readFileSync('dest2/rss/rss.xml', 'utf8')).should.equal(stripBuildDate(fs.readFileSync('test/fixtures/integration/output/target2/rss/rss' + fileSuffix + '.xml', 'utf8')));
+      stripDate(fs.readFileSync('dest2/rss/rss.xml', 'utf8')).should.equal(stripDate(fs.readFileSync('test/fixtures/integration/output/target2/rss/rss' + fileSuffix + '.xml', 'utf8')));
     });
   });
 
