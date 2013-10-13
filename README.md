@@ -51,7 +51,7 @@ Posts are written in markdown and include a metadata section at the top to provi
 }
 ```
 
-The only property that is not interpreted literally is the `date`. It is used as a `dateString` when constructing a [Date object](https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Date) in JavaScript, and must be in a [parseable format](https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Date/parse).
+The only property that is not interpreted literally is the `date`. If it is specified, it is used as a `dateString` when constructing a [Date object](https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Date) in JavaScript, and must be in a [parseable format](https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Date/parse). If unspecified, the post's date will be the result of constructing a Date object using the post's last modified time.
 
 #### Syntax Highlighting
 For adding code to your posts, grunt-pages has [GitHub flavoured markdown](https://help.github.com/articles/github-flavored-markdown) and syntax highlighting using [pygments](http://pygments.org/).
@@ -350,6 +350,8 @@ Type: `String`
 The file extension of the template engine to be used. This option filters template files in the `pageSrc` folder when developing a grunt-pages configuration for multiple template engines.
 
 # Changelog
+
+**0.8.3** - Posts without the `date` specified now default to using the post's last modified time as the date thanks to [@danburzo](https://github.com/danburzo). Fixed bug where draft posts in nested folders weren't ignored properly.
 
 **0.8.2** - Temporarily reverted bug fix as caching issues resulted from code change.
 
