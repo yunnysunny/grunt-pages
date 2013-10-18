@@ -8,19 +8,19 @@ describe('grunt-pages', function () {
   before(function (done) {
 
     var builds = 0;
-    exec('grunt pages:target1', function () {
+    exec('grunt pages:target1 --debug', function () {
       if (++builds === 3) {
         done();
       }
     });
 
-    exec('grunt pages:target2', function () {
+    exec('grunt pages:target2 --debug', function () {
       if (++builds === 3) {
         done();
       }
     });
 
-    exec('grunt pages:target3', function () {
+    exec('grunt pages:target3 --debug', function () {
       if (++builds === 3) {
         done();
       }
