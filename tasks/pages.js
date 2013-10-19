@@ -478,7 +478,7 @@ module.exports = function (grunt) {
       // Pass the post data to the template via a post object
       templateData.post = post;
 
-      grunt.log.debug(JSON.stringify(templateData, null, '  '));
+      grunt.log.debug(JSON.stringify(lib.reducePostContent(templateData), null, '  '));
       grunt.file.write(post.dest, fn(templateData));
       grunt.log.ok('Created '.green + 'post'.blue + ' at: ' + post.dest);
     });
@@ -509,7 +509,7 @@ module.exports = function (grunt) {
                            path.normalize(abspath).slice(path.normalize(rootdir).length + 1).replace(path.extname(abspath), '.html'));
 
         templateData.currentPage = path.basename(abspath, path.extname(abspath));
-        grunt.log.debug(JSON.stringify(templateData, null, '  '));
+        grunt.log.debug(JSON.stringify(lib.reducePostContent(templateData), null, '  '));
         grunt.file.write(dest, fn(templateData));
         grunt.log.ok('Created '.green + 'page'.magenta + ' at: ' + dest);
       }
@@ -552,6 +552,28 @@ module.exports = function (grunt) {
     }
 
     return true;
+  };
+
+  /**
+   * Reduces the content of posts to make --debug logging more readable
+   * @param  {Object} templateData Data to be passed to templates for rendering
+   * @return {Object}              Data to be logged in --debug output
+   */
+  lib.reducePostContent = function (templateData) {
+
+    var templateDataClone = _.cloneDeep(templateData);
+
+    if (templateDataClone.posts) {
+      templateDataClone.posts.map(function (post) {
+        return _.extend(post, { content: post.content.substr(0, 10) });
+      });
+    }
+    if (templateDataClone.post) {
+      templateDataClone.post.content = templateDataClone.post.content.substr(0, 10);
+    }
+
+    return templateDataClone;
+
   };
 
   /**
@@ -621,7 +643,7 @@ module.exports = function (grunt) {
         data:  templateData.data || {}
       };
 
-      grunt.log.debug(JSON.stringify(templateRenderData, null, '  '));
+      grunt.log.debug(JSON.stringify(lib.reducePostContent(templateRenderData), null, '  '));
       grunt.file.write(lib.getDestFromUrl(page.url), fn(templateRenderData));
       grunt.log.ok('Created '.green + 'paginated'.rainbow + ' page'.magenta + ' at: ' + lib.getDestFromUrl(page.url));
     });
