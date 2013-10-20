@@ -475,8 +475,9 @@ module.exports = function (grunt) {
 
     templateData.posts.forEach(function (post) {
 
-      // Pass the post data to the template via a post object
-      templateData.post = post;
+        // Pass the post data to the template via a post object
+        // adding the current index to allow for navigation between consecutive posts
+        templateData.post = _.extend(_.cloneDeep(post), { currentIndex: currentIndex });
 
       grunt.log.debug(JSON.stringify(lib.reducePostContent(templateData), null, '  '));
       grunt.file.write(post.dest, fn(templateData));
