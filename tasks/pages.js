@@ -7,11 +7,12 @@
  */
 
 'use strict';
-var fs   = require('fs');
+
 var path = require('path');
 var url  = require('url');
 
 require('colors');
+var fs         = require('node-fs');
 var _          = require('lodash');
 var marked     = require('marked');
 var pygmentize = require('pygmentize-bundled');
@@ -60,7 +61,7 @@ module.exports = function (grunt) {
     // Get the content and metadata of unmodified posts so that they don't have to be parsed
     // if they haven't been modified
     var unmodifiedPosts = [];
-    var cacheFile = path.normalize(__dirname + '/../.' + this.target + '-post-cache.json');
+    var cacheFile = path.normalize(process.cwd() + '/.grunt/grunt-pages/' + this.target + '-post-cache.json');
     if (fs.existsSync(cacheFile)) {
       unmodifiedPosts = lib.getUnmodifiedPosts(JSON.parse(fs.readFileSync(cacheFile)).posts);
       var unmodifiedPostPaths = unmodifiedPosts.map(function (post) {
@@ -353,6 +354,10 @@ module.exports = function (grunt) {
 
     if (options.rss) {
       lib.generateRSS(postCollection);
+    }
+
+    if (!fs.existsSync(path.dirname(cacheFile))) {
+      fs.mkdirSync(path.dirname(cacheFile), '0777', true);
     }
 
     fs.writeFileSync(cacheFile, JSON.stringify(cachedPosts));
