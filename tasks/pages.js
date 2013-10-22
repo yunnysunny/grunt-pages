@@ -471,7 +471,7 @@ module.exports = function (grunt) {
    */
   lib.generatePosts = function (templateData) {
     var layoutString = fs.readFileSync(_this.data.layout, 'utf8');
-    var fn = templateEngine.compile(layoutString, { pretty: true, filename: _this.data.layout });
+    var fn = templateEngine.compile(layoutString, { pretty: grunt.option('debug') ? true : false, filename: _this.data.layout });
 
     templateData.posts.forEach(function (post) {
 
@@ -501,7 +501,7 @@ module.exports = function (grunt) {
     grunt.file.recurse(options.pageSrc, function (abspath, rootdir) {
       if (lib.shouldRenderPage(abspath)) {
         var layoutString = fs.readFileSync(abspath, 'utf8');
-        var fn           = templateEngine.compile(layoutString, { pretty: true, filename: abspath });
+        var fn           = templateEngine.compile(layoutString, { pretty: grunt.option('debug') ? true : false, filename: abspath });
 
         // Determine the page's destination by prepending the dest folder, then finding its relative location
         // to options.pageSrc and replacing its file extension with 'html'
@@ -604,7 +604,7 @@ module.exports = function (grunt) {
     var listPage     = pagination.listPage;
     var pages        = lib.getPaginatedPages(templateData.posts, pagination);
     var layoutString = fs.readFileSync(listPage, 'utf8');
-    var fn           = templateEngine.compile(layoutString, { pretty: true, filename: listPage });
+    var fn           = templateEngine.compile(layoutString, { pretty: grunt.option('debug') ? true : false, filename: listPage });
 
     pages.forEach(function (page, currentIndex) {
 
