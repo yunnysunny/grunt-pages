@@ -10,7 +10,8 @@
     "pygmentize-bundled": "~2.1.0",
     "marked": "git://github.com/ChrisWren/marked.git#listener",
     "rss": "~0.2.0",
-    "lodash": "~2.2.0"
+    "lodash": "~2.2.0",
+    "node-fs": "~0.1.7"
   },
   "devDependencies": {
     "grunt": "~0.4.1",
