@@ -472,24 +472,27 @@ module.exports = function (grunt) {
   lib.generatePosts = function (templateData) {
     var layoutString = fs.readFileSync(_this.data.layout, 'utf8');
     var fn = templateEngine.compile(layoutString, { pretty: grunt.option('debug') ? true : false, filename: _this.data.layout });
+    var postDests = [];
 
-    templateData.posts.forEach(function (post) {
+    _(templateData.posts)
+      // Remove the dest property from the posts now that they are generated
+      .each(function (post) {
+        postDests.push(post.dest);
+        delete post.dest;
+      })
+      .each(function (post, currentIndex) {
 
-      // Pass the post data to the template via a post object
-      templateData.post = post;
+        // Pass the post data to the template via a post object
+        // adding the current index to allow for navigation between consecutive posts
+        templateData.post = _.extend(_.cloneDeep(post), { currentIndex: currentIndex });
 
-      grunt.log.debug(JSON.stringify(lib.reducePostContent(templateData), null, '  '));
-      grunt.file.write(post.dest, fn(templateData));
-      grunt.log.ok('Created '.green + 'post'.blue + ' at: ' + post.dest);
-    });
+        grunt.log.debug(JSON.stringify(lib.reducePostContent(templateData), null, '  '));
+        grunt.file.write(postDests[currentIndex], fn(templateData));
+        grunt.log.ok('Created '.green + 'post'.blue + ' at: ' + postDests[currentIndex]);
+      });
 
     // Remove the post object from the templateData now that each post has been generated
     delete templateData.post;
-
-    // Remove the dest property from the posts now that they are generated
-    templateData.posts.forEach(function (post) {
-      delete post.dest;
-    });
   };
 
   /**
