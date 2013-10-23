@@ -12,9 +12,9 @@ var path = require('path');
 var url  = require('url');
 
 require('colors');
-var fs         = require('node-fs');
 var _          = require('lodash');
 var marked     = require('marked');
+var fs         = require('node-fs');
 var pygmentize = require('pygmentize-bundled');
 var RSS        = require('rss');
 
