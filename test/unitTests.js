@@ -243,11 +243,11 @@ describe('grunt-pages library', function () {
   describe('reducePostContent', function () {
 
     it('should reduce the content of templateData.posts when logging template data about posts and pages', function () {
-      lib.reducePostContent({ posts: [{ content: 'testdataforeverandever' }] }).should.eql({ posts: [{ content: 'testdataforeverandever'.substr(0, 10) }] });
+      lib.reducePostContent({ posts: [{ content: 'testdataforeverandever' }] }).should.eql({ posts: [{ content: 'testdataforeverandever'.substr(0, 10) + '...' }] });
     });
 
     it('should reduce the content of templateData.post when logging template data about posts', function () {
-      lib.reducePostContent({ post: { content: 'testdataforeverandever' }}).should.eql({ post: { content: 'testdataforeverandever'.substr(0, 10) }});
+      lib.reducePostContent({ post: { content: 'testdataforeverandever' }}).should.eql({ post: { content: 'testdataforeverandever'.substr(0, 10) + '...' }});
     });
 
     it('should not modify the passed in object', function () {

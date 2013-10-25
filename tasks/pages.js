@@ -573,11 +573,11 @@ module.exports = function (grunt) {
 
     if (templateDataClone.posts) {
       templateDataClone.posts.map(function (post) {
-        return _.extend(post, { content: post.content.substr(0, 10) });
+        return _.extend(post, { content: post.content.substr(0, 10) + '...' });
       });
     }
     if (templateDataClone.post) {
-      templateDataClone.post.content = templateDataClone.post.content.substr(0, 10);
+      templateDataClone.post.content = templateDataClone.post.content.substr(0, 10) + '...';
     }
 
     return templateDataClone;
