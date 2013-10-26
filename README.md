@@ -101,7 +101,7 @@ The URL of each post. The URL string takes variables as parameters using the `:v
 #### pageSrc
 Type: `String`
 
-The folder where the ejs or jade source pages of your website are located. These pages have access to each post's `content` and metadata properties via a `posts` array. Additionally, pages have access to their own filename(without extension) via the `currentPage` variable to optionally display it differently when linking to pages. All of the files in this folder are generated in the `dest` folder maintaining the same relative path from `pageSrc`.
+The folder where the ejs or jade source pages of your website are located. These pages have access to each post's `content` and metadata properties via a `posts` array. Additionally, pages have access to their own filename(without extension) via the `currentPage` variable to optionally display it differently when linking to pages. All of the files in this folder are generated in the `dest` folder maintaining the same relative path from `options.pageSrc`.
 
 #### data
 Type: `Object || String`
@@ -137,7 +137,7 @@ function (url) {
 }
 ```
 
-A function that takes a `url` as a parameter and returns a formatted url string. This is primarily used to remove special characters and replace whitespace.
+A function that takes a `url` as a parameter and returns a formatted URL string. This is primarily used to remove special characters and replace whitespace.
 
 #### rss
 Type: `Object`
@@ -226,12 +226,12 @@ The number of posts each list page will contain.
 ##### pagination.listPage
 Type: `String`
 
-The location of the layout template which is used for each list page. This page will not be rendered as a regular page if inside the options.pageSrc folder and instead will be rendered as the root list page with the first post group. [Here](https://github.com/CabinJS/grunt-pages/blob/master/test/fixtures/integration/input/jade/pages/blog/index.jade) is a sample `listPage` template. This template has access to the following variables:
+The location of the layout template which is used for each list page. This page will not be rendered as a regular page if `options.pageSrc` is specified. Instead it will be rendered as the root paginated list page with the first post group instead of all the posts. [Here](https://github.com/CabinJS/grunt-pages/blob/master/test/fixtures/integration/input/jade/pages/blog/index.jade) is a sample `listPage` template. This template has access to the following variables:
 
 ###### posts
 Type: `Array` of `Object`s
 
-An array of post objects assigned to this page which each contain the `content` and metadata properties of the post.
+An array of post objects assigned to this page which each contain the post `content` and other metadata properties of the post.
 
 ###### pages
 Type: `Array` of `Object`s
@@ -241,7 +241,7 @@ An array of page objects which each contain a `url` and `id` property.
 ###### currentIndex
 Type: `Number`
 
-A reference to the index of the page currently being rendered. This can be used to display the current page differently than the rest of the pages in a list, or to display links to the surrounding pages based on their position relative to the `currentIndex`.
+A reference to the index of the list page currently being rendered. This can be used to display the current page differently than the rest of the pages in a list, or to display links to the surrounding pages based on their position relative to the `currentIndex`.
 
 ##### pagination.url
 Type: `String` Default: `pages/:id/`
@@ -255,7 +255,7 @@ To paginate in a custom manor, you can use the following parameter:
 ##### pagination.getPostGroups
 Type: `Function`
 
-Default: `Group by postsPerPage`
+Default: `Group by options.pagination.postsPerPage`
 
 ```js
 function (postCollection, pagination) {
@@ -347,7 +347,7 @@ pages: {
 #### templateEngine
 Type: `String`
 
-The file extension of the template engine to be used. This option filters template files in the `pageSrc` folder when developing a grunt-pages configuration for multiple template engines.
+The file extension of the template engine to be used. This option filters template files in the `options.pageSrc` folder when developing a grunt-pages configuration for multiple template engines.
 
 # Changelog
 
