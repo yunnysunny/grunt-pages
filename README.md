@@ -14,7 +14,7 @@ If you haven't used Grunt before, be sure to check out the [Getting Started](htt
 npm install grunt-pages --save-dev
 ```
 
-Then add this line to your project's `Gruntfile.js` gruntfile:
+Then add this line to your project's `Gruntfile.js` Gruntfile:
 
 ```javascript
 grunt.loadNpmTasks('grunt-pages');
@@ -87,9 +87,9 @@ The directory where pages are generated.
 #### layout
 Type: `String`
 
-The [jade](https://github.com/visionmedia/jade) or [ejs](https://github.com/visionmedia/ejs) layout template used for each post. The post metadata will be stored in a `post` object to be rendered in the layout template. [Here](https://github.com/CabinJS/grunt-pages/blob/master/test/fixtures/integration/input/jade/layouts/post.jade) is an example post layout template.
+The [jade](https://github.com/visionmedia/jade) or [EJS](https://github.com/visionmedia/ejs) layout template used for each post. The post metadata will be stored in a `post` object to be rendered in the layout template. [Here](https://github.com/CabinJS/grunt-pages/blob/master/test/fixtures/integration/input/target2/layouts/post.jade) is an example post layout template.
 
-**Note: you can run grunt-pages with the `--debug` flag set to see all the data passed to templates for rendering**
+**Note: you can run grunt-pages with the `--debug` flag set to see all the data passed to templates for rendering**.
 
 #### url
 Type: `String`
@@ -226,7 +226,7 @@ The number of posts each list page will contain.
 ##### pagination.listPage
 Type: `String`
 
-The location of the layout template which is used for each list page. This page will not be rendered as a regular page if `options.pageSrc` is specified. Instead it will be rendered as the root paginated list page with the first post group instead of all the posts. [Here](https://github.com/CabinJS/grunt-pages/blob/master/test/fixtures/integration/input/jade/pages/blog/index.jade) is a sample `listPage` template. This template has access to the following variables:
+The location of the layout template which is used for each list page. This page will not be rendered as a regular page if `options.pageSrc` is specified. Instead it will be rendered as the root paginated list page with the first post group instead of all the posts. [Here](https://github.com/CabinJS/grunt-pages/blob/master/test/fixtures/integration/input/target2/pages/blog/index.jade) is a sample `listPage` template. This template has access to the following variables:
 
 ###### posts
 Type: `Array` of `Object`s
