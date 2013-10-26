@@ -125,7 +125,7 @@ module.exports = function (grunt) {
           heading: function (token, callback) {
             callback(null, '<a name="' +
                              token.text.toLowerCase().replace(/[^\w]+/g, '-') +
-                            '"class="anchor" href="#' +
+                            '" class="anchor" href="#' +
                             token.text.toLowerCase().replace(/[^\w]+/g, '-') +
                             '"><span class="header-link"></span></a>' +
                             token.text);
