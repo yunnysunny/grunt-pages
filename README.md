@@ -87,14 +87,14 @@ The directory where pages are generated.
 #### layout
 Type: `String`
 
-The [jade](https://github.com/visionmedia/jade) or [EJS](https://github.com/visionmedia/ejs) layout template used for each post. The post metadata will be stored in a `post` object to be rendered in the layout template. [Here](https://github.com/CabinJS/grunt-pages/blob/master/test/fixtures/integration/input/target2/layouts/post.jade) is an example post layout template.
+The [jade](https://github.com/visionmedia/jade) or [EJS](https://github.com/visionmedia/ejs) layout template used for each post. The post metadata will be stored in a `post` object to be rendered in the layout template. Posts also have access to other posts via the `posts` array, and know about their `currentIndex` within the array so that they can optionally create navigation to nearby posts. [Here](https://github.com/CabinJS/grunt-pages/blob/master/test/fixtures/integration/input/target2/layouts/post.jade) is an example post layout template.
 
 **Note: you can run grunt-pages with the `--debug` flag set to see all the data passed to templates for rendering**.
 
 #### url
 Type: `String`
 
-The URL of each post. The URL string takes variables as parameters using the `:variable` syntax. Variables specified in the URL are required in each post's metadata. URLs ending with a trailing `/` will generate posts as index.html files inside of the URL's folder.
+The URL of each post. The URL string takes variables as parameters using the `:variable` syntax. Variables specified in the URL are required in each post's metadata. URLs ending with a trailing `/` will generate posts as index.html files inside of the URL's folder. Parsed posts are cached in the `.grunt/grunt-pages` folder to improve build time.
 
 ### Options
 
@@ -226,7 +226,7 @@ The number of posts each list page will contain.
 ##### pagination.listPage
 Type: `String`
 
-The location of the layout template which is used for each list page. This page will not be rendered as a regular page if `options.pageSrc` is specified. Instead it will be rendered as the root paginated list page with the first post group instead of all the posts. [Here](https://github.com/CabinJS/grunt-pages/blob/master/test/fixtures/integration/input/target2/pages/blog/index.jade) is a sample `listPage` template. This template has access to the following variables:
+The location of the layout template which is used for each list page. This page will not be rendered as a regular page if `options.pageSrc` is specified. Instead it will be rendered as the root paginated list page with the first post group instead of all the posts. [Here](https://github.com/CabinJS/grunt-pages/blob/master/test/fixtures/integration/input/target2/pages/blog/index.jade) is a sample `options.pagination.listPage` template. This template has access to the following variables:
 
 ###### posts
 Type: `Array` of `Object`s
@@ -246,7 +246,7 @@ A reference to the index of the list page currently being rendered. This can be 
 ##### pagination.url
 Type: `String` Default: `pages/:id/`
 
-The location of the generated list pages relative to the `pagination.listPage`. You can override this property to have a custom url scheme for list pages. You **must** have a `:id` variable in your url scheme which will be replaced by the page's id.
+The location of the generated list pages relative to the `options.pagination.listPage`. You can override this property to have a custom url scheme for list pages. You **must** have a `:id` variable in your url scheme which will be replaced by the page's id.
 
 ### Config using a custom pagination scheme
 
@@ -275,7 +275,7 @@ var postsPerPage = pagination.postsPerPage;
 }
 ```
 
-This function returns an array of post groups to be rendered as list pages. It takes the `posts` array and `pagination` config object as parameters and is expected to return an array of postGroup objects which each contain the `id` of the group(to be used in the url) and the array of `posts` in the following format:
+This function returns an array of post groups to be rendered as list pages. It takes the `posts` array and `options.pagination` config object as parameters and is expected to return an array of postGroup objects which each contain the `id` of the group(to be used in the url) and the array of `posts` in the following format:
 
 ```js
 [{
@@ -351,6 +351,14 @@ The file extension of the template engine to be used. This option filters templa
 
 # Changelog
 
+**0.9.0** - Posts now have access to their `currentIndex` within the `posts` array for navigating between nearby posts. Parsed posts are now cached in the `.grunt/grunt-pages` folder instead of `node_modules/grunt-pages` to provide more visibility and follow Grunt conventions. Header anchor tags now have correct attribute spacing thanks to [@gmarty](https://github.com/gmarty). Improved template debugging by printing data passed to template when an error is encountered. Reduced `--debug` output for post content to allow for easier debugging. 
+
+**Breaking changes:**
+
+- Parsed posts are now cached in the `.grunt/grunt-pages` folder instead of `node_modules/grunt-pages`.
+- Jade template output is no longer pretty printed unless `--debug` is specified.
+- Posts no longer have access to the post `dest` property which was mistakenly leaked to the template.
+
 **0.8.3** - Posts without the `date` specified now default to using the post's last modified time as the date thanks to [@danburzo](https://github.com/danburzo). Fixed bug where draft posts in nested folders weren't ignored properly.
 
 **0.8.2** - Temporarily reverted bug fix as caching issues resulted from code change.
@@ -361,8 +369,8 @@ The file extension of the template engine to be used. This option filters templa
 
 **Breaking changes:**
 
-- Header tags are now rendered with a nested span and anchor tag for linking into post sections instead of being wrapped with anchor tags
-- No more YAML metadata in posts
+- Header tags are now rendered with a nested span and anchor tag for linking into post sections instead of being wrapped with anchor tags.
+- No more YAML metadata in posts.
 
 **0.7.2** - Added support for Python 3 due to updating of [node-pygmentize-bundled](https://github.com/rvagg/node-pygmentize-bundled/) dependency. 
 
