@@ -131,7 +131,7 @@ module.exports = function (grunt) {
     mdlint: ['README.md'],
     clean: {
       build: ['dest*'],
-      cache: ['.*post-cache.json']
+      cache: ['.grunt']
     },
     copy: {
       styles: {
