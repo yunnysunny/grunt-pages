@@ -492,7 +492,12 @@ module.exports = function (grunt) {
         templateData.post = _.extend(_.cloneDeep(post), { currentIndex: currentIndex });
 
         grunt.log.debug(JSON.stringify(lib.reducePostContent(templateData), null, '  '));
-        grunt.file.write(postDests[currentIndex], fn(templateData));
+        try {
+          grunt.file.write(postDests[currentIndex], fn(templateData));
+        } catch (e) {
+          console.log('\nData passed to ' + _this.data.layout.blue + ' post template:\n\n' + JSON.stringify(lib.reducePostContent(templateData), null, '  ').yellow + '\n');
+          grunt.fail.fatal(e.message);
+        }
         grunt.log.ok('Created '.green + 'post'.blue + ' at: ' + postDests[currentIndex]);
       });
 
@@ -518,7 +523,12 @@ module.exports = function (grunt) {
 
         templateData.currentPage = path.basename(abspath, path.extname(abspath));
         grunt.log.debug(JSON.stringify(lib.reducePostContent(templateData), null, '  '));
-        grunt.file.write(dest, fn(templateData));
+        try {
+          grunt.file.write(dest, fn(templateData));
+        } catch (e) {
+          console.log('\nData passed to ' + abspath.magenta + ' page template:\n\n' + JSON.stringify(lib.reducePostContent(templateData), null, '  ').yellow + '\n');
+          grunt.fail.fatal(e.message);
+        }
         grunt.log.ok('Created '.green + 'page'.magenta + ' at: ' + dest);
       }
     });
@@ -652,7 +662,12 @@ module.exports = function (grunt) {
       };
 
       grunt.log.debug(JSON.stringify(lib.reducePostContent(templateRenderData), null, '  '));
-      grunt.file.write(lib.getDestFromUrl(page.url), fn(templateRenderData));
+      try {
+        grunt.file.write(lib.getDestFromUrl(page.url), fn(templateRenderData));
+      } catch (e) {
+        console.log('\nData passed to ' + listPage.magenta + ' paginated list page template:\n\n' + JSON.stringify(lib.reducePostContent(templateData), null, '  ').yellow + '\n');
+        grunt.fail.fatal(e.message);
+      }
       grunt.log.ok('Created '.green + 'paginated'.rainbow + ' page'.magenta + ' at: ' + lib.getDestFromUrl(page.url));
     });
   };
