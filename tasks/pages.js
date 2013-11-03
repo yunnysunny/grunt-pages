@@ -774,7 +774,8 @@ module.exports = function (grunt) {
     }
 
     // Remove unnecessary trailing index.html from urls
-    if (url.lastIndexOf('index.html') === url.length - 'index.html'.length) {
+    if (url.indexOf('index.html') !== -1 &&
+        url.lastIndexOf('index.html') === url.length - 'index.html'.length) {
       url = url.slice(0, - 'index.html'.length);
     }
 
