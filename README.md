@@ -351,6 +351,8 @@ The file extension of the template engine to be used. This option filters templa
 
 # Changelog
 
+**0.9.1** - Fixed bug where the `options.pagination.listPage` wasn't properly ignored for certain filenames.
+
 **0.9.0** - Posts now have access to their `currentIndex` within the `posts` array for navigating between nearby posts. Parsed posts are now cached in the `.grunt/grunt-pages` folder instead of `node_modules/grunt-pages` to provide more visibility and follow Grunt conventions. Header anchor tags now have correct attribute spacing thanks to [@gmarty](https://github.com/gmarty). Improved template debugging by printing data passed to template when an error is encountered. Reduced `--debug` output for post content to allow for easier debugging. 
 
 **Breaking changes:**
