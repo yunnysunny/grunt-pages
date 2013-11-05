@@ -7,10 +7,4 @@
 <span class="p">}</span>
 </pre></div>
 </code></pre>
-]]></description><link>http://the.url.com/blog/posts/Post_1/</link><guid isPermaLink="true">http://the.url.com/blog/posts/Post_1/</guid><category><![CDATA[JavaScript]]></category><category><![CDATA[Tutorial]]></category><dc:creator><![CDATA[The Author]]></dc:creator><pubDate>Sun, 12 May 2013 00:00:00 GMT</pubDate></item><item><title><![CDATA[Post 2]]></title><description><![CDATA[<p>Here&#39;s some alerts:</p>
-<pre><code class="lang-js"><div class="highlight"><pre><span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span>  <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-  <span class="nx">alert</span><span class="p">(</span><span class="nx">i</span><span class="p">);</span>
-<span class="p">}</span>
-</pre></div>
-</code></pre>
-]]></description><link>http://the.url.com/blog/posts/Post_2/</link><guid isPermaLink="true">http://the.url.com/blog/posts/Post_2/</guid><category><![CDATA[JavaScript]]></category><category><![CDATA[Tips]]></category><dc:creator><![CDATA[The Author]]></dc:creator><pubDate>Mon, 13 May 2013 00:00:00 GMT</pubDate></item></channel></rss>
+]]></description><link>http://the.url.com/blog/posts/Post_1/</link><guid isPermaLink="true">http://the.url.com/blog/posts/Post_1/</guid><category><![CDATA[JavaScript]]></category><category><![CDATA[Tutorial]]></category><dc:creator><![CDATA[The Author]]></dc:creator><pubDate>Sun, 12 May 2013 00:00:00 GMT</pubDate></item></channel></rss>

@@ -63,6 +63,7 @@ module.exports = function (grunt) {
           // Test RSS config using all custom options
           rss: {
             path: 'rss/rss.xml',
+            numPosts: 1,
             author: 'The Author',
             title: 'Blog of Blogs',
             description: 'The Description',
