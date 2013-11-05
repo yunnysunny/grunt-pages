@@ -717,8 +717,8 @@ module.exports = function (grunt) {
       ttl:            options.rss.ttl || '60'
     });
 
-    // Add each post
-    postCollection.forEach(function (post) {
+    // Add the first 20 or specified number of posts to the RSS feed
+    _.first(postCollection, (options.rss.numPosts || 10)).forEach(function (post) {
       feed.item({
         title:       post.title,
         description: post.content,
