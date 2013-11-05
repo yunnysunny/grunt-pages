@@ -182,6 +182,11 @@ Type: `String`
 
 The title of the feed.
 
+##### rss.numPosts
+Type: `Number` Default: `10`
+
+Number of posts to output in the RSS feed. This is used to avoid hitting a max file size limit.
+
 ##### rss.description
 Type: `String`
 
