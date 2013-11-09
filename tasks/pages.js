@@ -45,6 +45,17 @@ module.exports = function (grunt) {
   // Create a reference to the template engine that is available to all library methods
   var templateEngine;
 
+  // Declare a global function to format URLs that is available to all library methods
+  var formatPostUrl = function (urlSegment) {
+    return urlSegment
+      .toLowerCase() // change everything to lowercase
+      .replace(/^\s+|\s+$/g, '') // trim leading and trailing spaces
+      .replace(/[_|\s|\.]+/g, '-') // change all spaces, periods and underscores to a hyphen
+      .replace(/[^a-z\u0400-\u04FF0-9-]+/g, '') // remove all non-cyrillic, non-numeric characters except the hyphen
+      .replace(/[-]+/g, '-') // replace multiple instances of the hyphen with a single instance
+      .replace(/^-+|-+$/g, ''); // trim leading and trailing hyphens
+  };
+
   // Save start time to monitor task run time
   var start = new Date().getTime();
 
@@ -57,6 +68,10 @@ module.exports = function (grunt) {
     // so that they are available to all library methods
     _this = this;
     options = this.options();
+
+    if (options.formatPostUrl) {
+      formatPostUrl = options.formatPostUrl;
+    }
 
     // Get the content and metadata of unmodified posts so that they don't have to be parsed
     // if they haven't been modified
@@ -124,11 +139,11 @@ module.exports = function (grunt) {
         on: _.extend({
           heading: function (token, callback) {
             callback(null, '<a name="' +
-                             token.text.toLowerCase().replace(/[^\w]+/g, '-') +
-                            '" class="anchor" href="#' +
-                            token.text.toLowerCase().replace(/[^\w]+/g, '-') +
-                            '"><span class="header-link"></span></a>' +
-                            token.text);
+                           formatPostUrl(token.text) +
+                           '" class="anchor" href="#' +
+                           formatPostUrl(token.text) +
+                           '"><span class="header-link"></span></a>' +
+                           token.text);
           }
         }, options.listeners || {}),
         highlight: function (code, lang, callback) {
@@ -390,28 +405,20 @@ module.exports = function (grunt) {
 
     var url = _this.data.url;
 
-    var formatPostUrl = options.formatPostUrl || function (urlSegment) {
-      return urlSegment
-        .toLowerCase() // change everything to lowercase
-        .replace(/^\s+|\s+$/g, '') // trim leading and trailing spaces
-        .replace(/[_|\s|\.]+/g, '-') // change all spaces, periods and underscores to a hyphen
-        .replace(/[^a-z\u0400-\u04FF0-9-]+/g, '') // remove all non-cyrillic, non-numeric characters except the hyphen
-        .replace(/[-]+/g, '-') // replace multiple instances of the hyphen with a single instance
-        .replace(/^-+|-+$/g, ''); // trim leading and trailing hyphens
-    };
-
     // Extract dynamic URL segments and replace them with post metadata
     _this.data.url.split('/')
 
+      // Get all variables
       .filter(function (urlSegment) {
         return urlSegment.indexOf(':') !== -1;
       })
 
+      // Retrieve variable name
       .map(function (urlSegment) {
         return urlSegment.slice(urlSegment.indexOf(':') + 1);
       })
 
-      // Replace dynamic URL segments
+      // Replace variable segment with metadata value
       .forEach(function (urlSegment) {
 
         // Don't replace the .html part of the URL segment
