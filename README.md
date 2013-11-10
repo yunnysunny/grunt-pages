@@ -356,6 +356,13 @@ The file extension of the template engine to be used. This option filters templa
 
 # Changelog
 
+**0.10.0** - Added [`options.rss.numPosts`](#rssnumposts) option to determine the number of posts included in the RSS feed, defaulting to 10. Header links now use the same URL formatting function as post URLs.
+
+**Breaking changes:**
+
+- The generated RSS feed now uses the first 10 posts(after sorting) instead of all of them to prevent a max file size error in RSS readers.
+- Header links now use the same URL formatting function as post URLs.
+
 **0.9.1** - Fixed bug where the `options.pagination.listPage` wasn't properly ignored for certain filenames.
 
 **0.9.0** - Posts now have access to their `currentIndex` within the `posts` array for navigating between nearby posts. Parsed posts are now cached in the `.grunt/grunt-pages` folder instead of `node_modules/grunt-pages` to provide more visibility and follow Grunt conventions. Header anchor tags now have correct attribute spacing thanks to [@gmarty](https://github.com/gmarty). Improved template debugging by printing data passed to template when an error is encountered. Reduced `--debug` output for post content to allow for easier debugging. 
