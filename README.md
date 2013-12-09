@@ -92,9 +92,28 @@ The [jade](https://github.com/visionmedia/jade) or [EJS](https://github.com/visi
 **Note: you can run grunt-pages with the `--debug` flag set to see all the data passed to templates for rendering**.
 
 #### url
-Type: `String`
+Type: `String || Function`
 
-The URL of each post. The URL string takes variables as parameters using the `:variable` syntax. Variables specified in the URL are required in each post's metadata. URLs ending with a trailing `/` will generate posts as index.html files inside of the URL's folder. Parsed posts are cached in the `.grunt/grunt-pages` folder to improve build time.
+The URL format of each post. When specified as a string, the `url` takes variables as parameters using the `:variable` syntax. Variables specified in the `url` are required in each post's metadata. URLs with a trailing `/` will generate posts as index.html files inside of the URL's folder.
+
+You can also specify the `url` as a function which receives a post's metadata and grunt options object and returns the post's url. Note that the post metadata also includes the `sourcePath` of the post and `lastModified` time. This is used to maintain legacy post urls when migrating from another static site tool and to account for post titles that have all special characters(foreign languages).
+
+Here is an example config which demonstrates how to implement the `url` as a function:
+
+```js
+pages: {
+  customURL: {
+    src: 'posts',
+    dest: 'dist',
+    url: function (post, options) {
+      // use post source path and apply default post url formatting
+      return options.formatPostUrl(post.sourcePath.replace('.md', '/'));
+    }
+  }
+}
+```
+
+Parsed posts are cached in the `.grunt/grunt-pages` folder  based on the `lastModified` time to improve the task run time.
 
 ### Options
 

@@ -403,6 +403,10 @@ module.exports = function (grunt) {
       grunt.fail.fatal('Please specify the dest property in your config.');
     }
 
+    if (typeof _this.data.url === 'function') {
+      return _this.data.url(post, options);
+    }
+
     var url = _this.data.url;
 
     // Extract dynamic URL segments and replace them with post metadata
