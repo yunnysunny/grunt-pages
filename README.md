@@ -375,6 +375,8 @@ The file extension of the template engine to be used. This option filters templa
 
 # Changelog
 
+**0.10.1** - [`url`](#url) can now be specified as a function to allow for foreign language post titles and to support legacy URLs for those migrating to grunt-pages from another static site tool.
+
 **0.10.0** - Added [`options.rss.numPosts`](#rssnumposts) option to determine the number of posts included in the RSS feed, defaulting to 10. Header links now use the same URL formatting function as post URLs.
 
 **Breaking changes:**
