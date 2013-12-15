@@ -41,7 +41,9 @@ module.exports = function (grunt) {
         src: 'test/fixtures/integration/input/posts/',
         dest: 'dest2',
         layout: 'test/fixtures/integration/input/target2/layouts/post.jade',
-        url: 'blog/posts/:title/',
+        url: function (post, options) {
+          return 'blog/posts/' + options.formatPostUrl(post.title) + '/';
+        },
         options: {
 
           // Test using a different post url format
