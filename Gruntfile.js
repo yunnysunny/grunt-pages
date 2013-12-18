@@ -117,6 +117,7 @@ module.exports = function (grunt) {
           }]
         }
       },
+
       // Tests default pagination behavior without using other pages(via options.pageSrc)
       target3: {
         src: 'test/fixtures/integration/input/posts/',
@@ -129,8 +130,22 @@ module.exports = function (grunt) {
             listPage: 'test/fixtures/integration/input/target2/pages/blog/index.jade'
           }
         }
+      },
+
+      handlebars: {
+        src: 'test/fixtures/integration/input/posts/',
+        dest: 'dest4',
+        layout: './test/fixtures/integration/input/target3/layouts/post.handlebars',
+        url: 'blog/posts/:title/',
+        options: {
+          /*pagination: {
+            postsPerPage: 1,
+            listPage: 'test/fixtures/integration/input/target3/pages/blog/index.handlebars'
+            }*/
+        }
       }
     },
+
     mdlint: ['README.md'],
     clean: {
       build: ['dest*'],

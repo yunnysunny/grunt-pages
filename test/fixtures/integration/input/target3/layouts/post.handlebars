@@ -1,0 +1,17 @@
+<html>
+  <head>
+    <title>{{ post.title }}</title>
+    <link href="/styles/monokai.css" rel="stylesheet">
+  </head>
+  <body>
+    <ul>
+      <li><a href="/blog">Blog</a></li>
+      <li><a href="/">Home</a></li>
+    </ul>
+    <h1>{{ post.title }}</h1>
+    <date>{{ post.date }}</date>
+    {{{ post.content }}}
+    {{ post.currentIndex }}
+    {{ posts.length }}
+  </body>
+</html>

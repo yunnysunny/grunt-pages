@@ -26,6 +26,10 @@ var templateEngines = {
   jade: {
     engine: require('jade'),
     extensions: ['.jade']
+  },
+  handlebars: {
+    engine: require('handlebars'),
+    extensions: ['.hbs', '.handlebars']
   }
 };
 
