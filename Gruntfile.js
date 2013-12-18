@@ -135,14 +135,8 @@ module.exports = function (grunt) {
       handlebars: {
         src: 'test/fixtures/integration/input/posts/',
         dest: 'dest4',
-        layout: './test/fixtures/integration/input/target3/layouts/post.handlebars',
-        url: 'blog/posts/:title/',
-        options: {
-          /*pagination: {
-            postsPerPage: 1,
-            listPage: 'test/fixtures/integration/input/target3/pages/blog/index.handlebars'
-            }*/
-        }
+        layout: './test/fixtures/integration/input/handlebars/layouts/post.handlebars',
+        url: 'blog/posts/:title/'
       }
     },
 
