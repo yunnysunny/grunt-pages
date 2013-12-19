@@ -696,8 +696,8 @@ module.exports = function (grunt) {
       grunt.fail.fatal('options.rss.title is required');
     }
 
-    if (!options.rss.author) {
-      grunt.fail.fatal('options.rss.author is required');
+    if (!options.rss.description) {
+      grunt.fail.fatal('options.rss.description is required');
     }
 
     var fileName = options.rss.path || 'feed.xml';
