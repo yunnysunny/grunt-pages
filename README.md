@@ -171,7 +171,6 @@ pages: {
   options: {
     pageSrc: 'src/pages',
     rss: {
-      author: 'Chris Wren',
       title: 'Chris Wren\'s Blog',
       description: 'A blog about code.',
       url: 'http://chrisawren.com'
@@ -186,35 +185,39 @@ pages: {
 }
 ```
 
+#### Required RSS properties
+
 ##### rss.url
 Type: `String`
 
 The URL of your site.
-
-##### rss.author
-Type: `String`
-
-The feed owner. Also used as `managingEditor` and `webMaster` if those options are not specified.
 
 ##### rss.title
 Type: `String`
 
 The title of the feed.
 
+##### rss.description
+Type: `String`
+
+Short description of the feed.
+
+#### Optional RSS properties
+
 ##### rss.numPosts
 Type: `Number` Default: `10`
 
 Number of posts to output in the RSS feed. This is used to avoid hitting a max file size limit.
 
-##### rss.description
+##### rss.author
 Type: `String`
 
-Optional. Short description of the feed.
+The feed owner. Also used as `managingEditor` and `webMaster` if those options are not specified.
 
 ##### rss.path
 Type: `String`
 
-Optional. The path of the file to store the RSS XML in. This is specific to grunt-pages and is not part of dylang/node-rss.
+The path of the file to store the RSS XML in. This is specific to grunt-pages and is not part of dylang/node-rss.
 
 #### pagination
 Type: `Object || Array`
@@ -374,6 +377,12 @@ Type: `String`
 The file extension of the template engine to be used. This option filters template files in the `options.pageSrc` folder when developing a grunt-pages configuration for multiple template engines.
 
 # Changelog
+
+**0.11.0** - Fixed required RSS properties, now correctly matching the [RSS spec](http://cyber.law.harvard.edu/rss/rss.html), thanks to [@rogeriopvl](https://github.com/rogeriopvl).
+
+**Breaking changes:**
+
+- `options.rss.description` is now required, and `options.rss.author` is not.
 
 **0.10.1** - [`url`](#url) can now be specified as a function to allow for foreign language post titles and to support legacy URLs for those migrating to grunt-pages from another static site tool.
 
