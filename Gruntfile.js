@@ -136,7 +136,10 @@ module.exports = function (grunt) {
         src: 'test/fixtures/integration/input/posts/',
         dest: 'dest4',
         layout: './test/fixtures/integration/input/handlebars/layouts/post.handlebars',
-        url: 'blog/posts/:title/'
+        url: 'blog/posts/:title/',
+        options: {
+          partials: './test/fixtures/integration/input/handlebars/partials/**/*.handlebars'
+        }
       }
     },
 

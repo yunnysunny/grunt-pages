@@ -29,7 +29,19 @@ var templateEngines = {
   },
   handlebars: {
     engine: require('handlebars'),
-    extensions: ['.hbs', '.handlebars']
+    extensions: ['.hbs', '.handlebars'],
+
+    pregenerate: function(grunt, templateEngine, options) {
+      if (options.partials) {
+        var files = grunt.file.expand(options.partials);
+        files.forEach(function(file) {
+          var partialString = grunt.file.read(file);
+          var name = path.basename(file, path.extname(file));
+
+          templateEngine.registerPartial(name,partialString);
+        }.bind(this));
+      }
+    }
   }
 };
 
@@ -48,6 +60,7 @@ module.exports = function (grunt) {
 
   // Create a reference to the template engine that is available to all library methods
   var templateEngine;
+  var engineOptions;
 
   // Declare a global function to format URLs that is available to all library methods
   var formatPostUrl = function (urlSegment) {
@@ -301,9 +314,10 @@ module.exports = function (grunt) {
    * Determines the template engine based on the `layout`'s file extension
    */
   lib.setTemplateEngine = function () {
-    templateEngine = _.find(templateEngines, function (engine) {
+    engineOptions = _.find(templateEngines, function (engine) {
       return _.contains(engine.extensions, path.extname(_this.data.layout).toLowerCase());
-    }).engine;
+    });
+    templateEngine = engineOptions.engine;
   };
 
   /**
@@ -343,6 +357,10 @@ module.exports = function (grunt) {
 
     // Record how long it takes to generate posts
     var postStart = new Date().getTime();
+
+    if (engineOptions.pregenerate) {
+      engineOptions.pregenerate.call(this, grunt, templateEngine, options);
+    }
 
     lib.generatePosts(templateData);
 

@@ -4,10 +4,7 @@
     <link href="/styles/monokai.css" rel="stylesheet">
   </head>
   <body>
-    <ul>
-      <li><a href="/blog">Blog</a></li>
-      <li><a href="/">Home</a></li>
-    </ul>
+    {{> nav}}
     <h1>{{ post.title }}</h1>
     {{{ post.content }}}
     {{ post.currentIndex }}
