@@ -45,9 +45,9 @@ Posts are written in markdown and include a metadata section at the top to provi
 
 ```js
 {
-  title: "Art Ballin': Explorations in New-Weird-American Expressionism",
-  date: "2013-2-22",
-  author: "Highroller, Jody"
+  title: "Blogging use CabinJS",
+  date: "2014-1-1",
+  author: "Firstname Lastname"
 }
 ```
 
@@ -87,7 +87,23 @@ The directory where pages are generated.
 #### layout
 Type: `String`
 
-The [jade](https://github.com/visionmedia/jade) or [EJS](https://github.com/visionmedia/ejs) layout template used for each post. The post metadata will be stored in a `post` object to be rendered in the layout template. Posts also have access to other posts via the `posts` array, and know about their `currentIndex` within the array so that they can optionally create navigation to nearby posts. [Here](https://github.com/CabinJS/grunt-pages/blob/master/test/fixtures/integration/input/target2/layouts/post.jade) is an example post layout template.
+The [jade](https://github.com/visionmedia/jade), [EJS](https://github.com/visionmedia/ejs), or [Handlebars](http://handlebarsjs.com/) layout template used for each post. The post metadata will be stored in a `post` object to be rendered in the layout template. Posts also have access to other posts via the `posts` array, and know about their `currentIndex` within the array so that they can optionally create navigation to nearby posts. [Here](https://github.com/CabinJS/grunt-pages/blob/master/test/fixtures/integration/input/target2/layouts/post.jade) is an example post layout template.
+
+##### Handlebars partials
+
+Handlebars partials can be specified using the `options.partials` property. This allows you to specify a file glob of partials to use in your layout and page templates. Here is an example config which shows how to use Handlebars partials:
+
+```js
+target4: {
+  src: 'posts',
+  dest: 'dest4',
+  layout: 'src/layouts/post.hbs',
+  url: 'blog/posts/:title/',
+  options: {
+    partials: 'src/layouts/partials/**/*.hbs'
+  }
+}
+```
 
 **Note: you can run grunt-pages with the `--debug` flag set to see all the data passed to templates for rendering**.
 
@@ -120,7 +136,7 @@ Parsed posts are cached in the `.grunt/grunt-pages` folder  based on the `lastMo
 #### pageSrc
 Type: `String`
 
-The folder where the ejs or jade source pages of your website are located. These pages have access to each post's `content` and metadata properties via a `posts` array. Additionally, pages have access to their own filename(without extension) via the `currentPage` variable to optionally display it differently when linking to pages. All of the files in this folder are generated in the `dest` folder maintaining the same relative path from `options.pageSrc`.
+The folder where the jade, EJS, or Handlebars source pages of your website are located. These pages have access to each post's `content` and metadata properties via a `posts` array. Additionally, pages have access to their own filename(without extension) via the `currentPage` variable to optionally display it differently when linking to pages. All of the files in this folder are generated in the `dest` folder maintaining the same relative path from `options.pageSrc`.
 
 #### data
 Type: `Object || String`
@@ -378,7 +394,7 @@ The file extension of the template engine to be used. This option filters templa
 
 # Changelog
 
-**0.11.0** - Fixed required RSS properties, now correctly matching the [RSS spec](http://cyber.law.harvard.edu/rss/rss.html), thanks to [@rogeriopvl](https://github.com/rogeriopvl).
+**0.11.0** - Fixed required RSS properties, now correctly matching the [RSS spec](http://cyber.law.harvard.edu/rss/rss.html), thanks to [@rogeriopvl](https://github.com/rogeriopvl). Added Handlebars support with partials thanks to [@thomasboyt](https://github.com/thomasboyt). 
 
 **Breaking changes:**
 
