@@ -25,12 +25,16 @@ module.exports = function (grunt) {
           // Test passing data as a String
           data: 'test/fixtures/integration/input/target1/data/data.json',
 
-          // TestRSS config using default options
+          // Test RSS config using default options
           rss: {
-            author: 'The Author',
+
+            // Required properties
             title: 'Blog of Blogs',
             description: 'The Description',
             url: 'http://the.url.com',
+
+            // Optional properties
+            author: 'The Author',
             pubDate: new Date(1000) // Must pass date for output to match
           }
         }
@@ -117,6 +121,7 @@ module.exports = function (grunt) {
           }]
         }
       },
+
       // Tests default pagination behavior without using other pages(via options.pageSrc)
       target3: {
         src: 'test/fixtures/integration/input/posts/',
@@ -129,8 +134,20 @@ module.exports = function (grunt) {
             listPage: 'test/fixtures/integration/input/target2/pages/blog/index.jade'
           }
         }
+      },
+
+      // Tests Handlebars template rendering
+      target4: {
+        src: 'test/fixtures/integration/input/posts/',
+        dest: 'dest4',
+        layout: 'test/fixtures/integration/input/handlebars/layouts/post.handlebars',
+        url: 'blog/posts/:title/',
+        options: {
+          partials: 'test/fixtures/integration/input/handlebars/partials/**/*.handlebars'
+        }
       }
     },
+
     mdlint: ['README.md'],
     clean: {
       build: ['dest*'],
