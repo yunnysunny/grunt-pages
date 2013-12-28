@@ -1,29 +1,23 @@
 var fs = require('fs');
 require('should');
 var exec = require('child_process').exec;
+var Q = require('q');
 
 describe('grunt-pages', function () {
 
   // Build test targets before running tests
   before(function (done) {
 
-    var builds = 0;
-    exec('grunt pages:target1 --debug', function () {
-      if (++builds === 3) {
-        done();
-      }
-    });
+    // turn exec() into a Q promise
+    var qExec = Q.denodeify(exec);
 
-    exec('grunt pages:target2 --debug', function () {
-      if (++builds === 3) {
-        done();
-      }
-    });
-
-    exec('grunt pages:target3 --debug', function () {
-      if (++builds === 3) {
-        done();
-      }
+    Q.all([
+      qExec('grunt pages:target1 --debug'),
+      qExec('grunt pages:target2 --debug'),
+      qExec('grunt pages:target3 --debug'),
+      qExec('grunt pages:handlebars --debug')
+    ]).done(function() {
+      done();
     });
   });
 
@@ -178,5 +172,9 @@ describe('grunt-pages', function () {
         fs.readFileSync('dest2/blog/page/javascript/index.html', 'utf8').should.equal(fs.readFileSync('test/fixtures/integration/output/target2/page/javascript/index.html', 'utf8'));
       });
     });
+  });
+
+  it('should supporting rendering handlebars templates', function() {
+    fs.readFileSync('dest4/blog/posts/post-1/index.html', 'utf8').should.equal(fs.readFileSync('test/fixtures/integration/output/handlebars/posts/post-1/index.html', 'utf8'));
   });
 });

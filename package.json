@@ -11,7 +11,8 @@
     "marked": "git://github.com/ChrisWren/marked.git#listener",
     "rss": "~0.2.0",
     "lodash": "~2.4.1",
-    "node-fs": "~0.1.7"
+    "node-fs": "~0.1.7",
+    "handlebars": "~1.1.2"
   },
   "devDependencies": {
     "grunt": "~0.4.1",
@@ -28,7 +29,8 @@
     "grunt-release": "~0.4.0",
     "grunt-mdlint": "0.0.0",
     "grunt-node-inspector": "~0.1.0",
-    "grunt-shell": "~0.4.0"
+    "grunt-shell": "~0.4.0",
+    "q": "~0.9.7"
   },
   "peerDependencies": {
     "grunt": "~0.4.1"
