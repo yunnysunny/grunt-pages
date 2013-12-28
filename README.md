@@ -383,6 +383,7 @@ The file extension of the template engine to be used. This option filters templa
 **Breaking changes:**
 
 - `options.rss.description` is now required, and `options.rss.author` is not.
+- Updated to jade 1.0, check [here](https://github.com/visionmedia/jade/blob/master/History.md#100--2013-12-22) for the changelog.
 
 **0.10.1** - [`url`](#url) can now be specified as a function to allow for foreign language post titles and to support legacy URLs for those migrating to grunt-pages from another static site tool.
 
