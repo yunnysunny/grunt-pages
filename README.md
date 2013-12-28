@@ -394,7 +394,7 @@ The file extension of the template engine to be used. This option filters templa
 
 # Changelog
 
-**0.11.0** - Fixed required RSS properties, now correctly matching the [RSS spec](http://cyber.law.harvard.edu/rss/rss.html), thanks to [@rogeriopvl](https://github.com/rogeriopvl). Added Handlebars support with partials thanks to [@thomasboyt](https://github.com/thomasboyt). 
+**0.11.0** - Fixed required RSS properties, now correctly matching the [RSS spec](http://cyber.law.harvard.edu/rss/rss.html), thanks to [@rogeriopvl](https://github.com/rogeriopvl). Added Handlebars support with partials thanks to [@thomasboyt](https://github.com/thomasboyt).
 
 **Breaking changes:**
 
