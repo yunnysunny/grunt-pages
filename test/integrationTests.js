@@ -15,7 +15,7 @@ describe('grunt-pages', function () {
       qExec('grunt pages:target1 --debug'),
       qExec('grunt pages:target2 --debug'),
       qExec('grunt pages:target3 --debug'),
-      qExec('grunt pages:handlebars --debug')
+      qExec('grunt pages:target4 --debug')
     ]).done(function() {
       done();
     });
@@ -174,7 +174,7 @@ describe('grunt-pages', function () {
     });
   });
 
-  it('should supporting rendering handlebars templates', function() {
-    fs.readFileSync('dest4/blog/posts/post-1/index.html', 'utf8').should.equal(fs.readFileSync('test/fixtures/integration/output/handlebars/posts/post-1/index.html', 'utf8'));
+  it('should support rendering Handlebars templates', function() {
+    fs.readFileSync('dest4/blog/posts/post-1/index.html', 'utf8').should.equal(fs.readFileSync('test/fixtures/integration/output/target4/posts/post-1/index.html', 'utf8'));
   });
 });
