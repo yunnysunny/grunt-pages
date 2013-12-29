@@ -8,7 +8,7 @@
     "ejs": "~0.8.4",
     "colors": "~0.6.0-1",
     "pygmentize-bundled": "~2.1.0",
-    "marked": "git://github.com/ChrisWren/marked.git#listener",
+    "marked": "~0.3.0",
     "rss": "~0.2.0",
     "lodash": "~2.4.1",
     "node-fs": "~0.1.7",
