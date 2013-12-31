@@ -31,10 +31,10 @@ var templateEngines = {
     engine: require('handlebars'),
     extensions: ['.hbs', '.handlebars'],
 
-    pregenerate: function(grunt, templateEngine, options) {
+    pregenerate: function (grunt, templateEngine, options) {
       if (options.partials) {
         var files = grunt.file.expand(options.partials);
-        files.forEach(function(file) {
+        files.forEach(function (file) {
           var partialString = grunt.file.read(file);
           var name = path.basename(file, path.extname(file));
 
@@ -151,28 +151,44 @@ module.exports = function (grunt) {
         grunt.fail.fatal('The following post is blank, please add some content to it or delete it: ' + postpath.red + '.');
       }
 
+      var renderer = _.extend(new marked.Renderer(), {
+
+        // Override heading rendering to embed anchor tag and icon span
+        heading: function (text, level) {
+          return '<h' + level + '><a name="' +
+                         formatPostUrl(text) +
+                         '" class="anchor" href="#' +
+                         formatPostUrl(text) +
+                         '"><span class="header-link"></span></a>' +
+                         text + '</h' + level + '>';
+        }
+      });
+
+      var customMarkedOptions;
+
+      if (options.markedOptions) {
+        if (typeof options.markedOptions === 'function') {
+          customMarkedOptions = options.markedOptions(marked);
+        } else {
+          customMarkedOptions = options.markedOptions;
+        }
+      } else {
+        customMarkedOptions = {};
+      }
+
       // Parse post using [marked](https://github.com/chjj/marked)
-      marked(post.markdown, {
-        on: _.extend({
-          heading: function (token, callback) {
-            callback(null, '<a name="' +
-                           formatPostUrl(token.text) +
-                           '" class="anchor" href="#' +
-                           formatPostUrl(token.text) +
-                           '"><span class="header-link"></span></a>' +
-                           token.text);
-          }
-        }, options.listeners || {}),
+      marked(post.markdown, _.extend({
+        renderer: renderer,
+        gfm: true,
+        anchors: true,
         highlight: function (code, lang, callback) {
 
           // Use [pygments](http://pygments.org/) for syntax highlighting
           pygmentize({ lang: lang, format: 'html' }, code, function (err, result) {
             callback(err, result.toString());
           });
-        },
-        gfm: true,
-        anchors: true
-      }, function (err, content) {
+        }
+      }, customMarkedOptions), function (err, content) {
         if (err) throw err;
 
         // Replace markdown property with parsed content property

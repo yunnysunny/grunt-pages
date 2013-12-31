@@ -143,7 +143,14 @@ module.exports = function (grunt) {
         layout: 'test/fixtures/integration/input/handlebars/layouts/post.handlebars',
         url: 'blog/posts/:title/',
         options: {
-          partials: 'test/fixtures/integration/input/handlebars/partials/**/*.handlebars'
+          partials: 'test/fixtures/integration/input/handlebars/partials/**/*.handlebars',
+
+          // Test overriding marked options
+          markedOptions: function (marked) {
+            return {
+              renderer: new marked.Renderer()
+            };
+          }
         }
       }
     },
