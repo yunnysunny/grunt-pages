@@ -162,8 +162,19 @@ module.exports = function (grunt) {
                          '"><span class="header-link"></span></a>' +
                          text + '</h' + level + '>';
         }
-      // Allow user to override any renderer methods
       });
+
+      var customMarkedOptions;
+
+      if (options.markedOptions) {
+        if (typeof options.markedOptions === 'function') {
+          customMarkedOptions = options.markedOptions(marked);
+        } else {
+          customMarkedOptions = options.markedOptions;
+        }
+      } else {
+        customMarkedOptions = {};
+      }
 
       // Parse post using [marked](https://github.com/chjj/marked)
       marked(post.markdown, _.extend({
@@ -177,7 +188,7 @@ module.exports = function (grunt) {
             callback(err, result.toString());
           });
         }
-      }, options.markedOptions || {}), function (err, content) {
+      }, customMarkedOptions), function (err, content) {
         if (err) throw err;
 
         // Replace markdown property with parsed content property
