@@ -70,7 +70,7 @@ By default, grunt-pages generates header tags that include nested anchor tags wi
   "Styling Headers"
 </h3>
 ```
-The generated markup follows the same format as GitHub README's and it is recommended to reference [Cabin theme](http://www.cabinjs.com/#themes)'s styling when trying to create header linking. Note that you can override this by implementing  [`options.markedOptions.renderer.heading`](#).
+The generated markup follows the same format as GitHub README's and it is recommended to reference [Cabin theme](http://www.cabinjs.com/#themes)'s styling when trying to create header linking. Note that you can override this by implementing [`options.markedOptions.renderer.heading`](#markedoptions).
 
 ### Required properties
 
@@ -399,7 +399,7 @@ The file extension of the template engine to be used. This option filters templa
 
 # Changelog
 
-**0.11.0** - Fixed required RSS properties, now correctly matching the [RSS spec](http://cyber.law.harvard.edu/rss/rss.html), thanks to [@rogeriopvl](https://github.com/rogeriopvl). Added Handlebars support with partials thanks to [@thomasboyt](https://github.com/thomasboyt). Updated to marked ~0.3.0 now supporting [`options.markedOptions`]() to configure any [marked options](https://github.com/chjj/marked#options-1) that you desire.
+**0.11.0** - Fixed required RSS properties, now correctly matching the [RSS spec](http://cyber.law.harvard.edu/rss/rss.html), thanks to [@rogeriopvl](https://github.com/rogeriopvl). Added Handlebars support with partials thanks to [@thomasboyt](https://github.com/thomasboyt). Updated to marked ~0.3.0 now supporting [`options.markedOptions`](#markedoptions) to configure any [marked options](https://github.com/chjj/marked#options-1) that you desire.
 
 **Breaking changes:**
 - `options.rss.description` is now required, and `options.rss.author` is not.
