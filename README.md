@@ -91,7 +91,7 @@ The [jade](https://github.com/visionmedia/jade), [EJS](https://github.com/vision
 
 ##### Handlebars partials
 
-Handlebars partials can be specified using the `options.partials` property. This allows you to specify a file glob of partials to use in your layout and page templates. Here is an example config which shows how to use Handlebars partials:
+Handlebars partials can be specified using the `options.partials` property. This allows you to specify a file glob of partials to use in your layout and page templates. The partials are available as the basename of the partial file, so a file with the path `src/layouts/partials/nav.hbs` would be referenced as `{{> nav}}` Here is an example config which shows how to configure Handlebars partials:
 
 ```js
 target4: {
