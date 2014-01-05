@@ -45,9 +45,9 @@ Posts are written in markdown and include a metadata section at the top to provi
 
 ```js
 {
-  title: "Art Ballin': Explorations in New-Weird-American Expressionism",
-  date: "2013-2-22",
-  author: "Highroller, Jody"
+  title: 'Blogging in my Cabin',
+  date: '2014-1-1',
+  author: 'Firstname Lastname'
 }
 ```
 
@@ -70,29 +70,45 @@ By default, grunt-pages generates header tags that include nested anchor tags wi
   "Styling Headers"
 </h3>
 ```
-The generated markup follows the same format as GitHub README's and it is recommended to reference [Cabin theme](http://www.cabinjs.com/#themes)'s styling when trying to create header linking. 
+The generated markup follows the same format as GitHub README's and it is recommended to reference [Cabin theme](http://www.cabinjs.com/#themes)'s styling when trying to create header linking. Note that you can override this by implementing [`options.markedOptions.renderer.heading`](#markedoptions).
 
 ### Required properties
 
 #### src
-Type: `String`
+Type: `string`
 
 The directory where the source posts are located.
 
 #### dest
-Type: `String`
+Type: `string`
 
 The directory where pages are generated.
 
 #### layout
-Type: `String`
+Type: `string`
 
-The [jade](https://github.com/visionmedia/jade) or [EJS](https://github.com/visionmedia/ejs) layout template used for each post. The post metadata will be stored in a `post` object to be rendered in the layout template. Posts also have access to other posts via the `posts` array, and know about their `currentIndex` within the array so that they can optionally create navigation to nearby posts. [Here](https://github.com/CabinJS/grunt-pages/blob/master/test/fixtures/integration/input/target2/layouts/post.jade) is an example post layout template.
+The [jade](https://github.com/visionmedia/jade), [EJS](https://github.com/visionmedia/ejs), or [Handlebars](http://handlebarsjs.com/) layout template used for each post. The post metadata will be stored in a `post` object to be rendered in the layout template. Posts also have access to other posts via the `posts` array, and know about their `currentIndex` within the array so that they can optionally create navigation to nearby posts. [Here](https://github.com/CabinJS/grunt-pages/blob/master/test/fixtures/integration/input/target2/layouts/post.jade) is an example post layout template.
+
+##### Handlebars partials
+
+Handlebars partials can be specified using the `options.partials` property. This allows you to specify a file glob of partials to use in your layout and page templates. The partials are available as the basename of the partial file, so a file with the path `src/layouts/partials/nav.hbs` would be referenced as `{{> nav}}` Here is an example config which shows how to configure Handlebars partials:
+
+```js
+target4: {
+  src: 'posts',
+  dest: 'dest4',
+  layout: 'src/layouts/post.hbs',
+  url: 'blog/posts/:title/',
+  options: {
+    partials: 'src/layouts/partials/**/*.hbs'
+  }
+}
+```
 
 **Note: you can run grunt-pages with the `--debug` flag set to see all the data passed to templates for rendering**.
 
 #### url
-Type: `String || Function`
+Type: `string || function`
 
 The URL format of each post. When specified as a string, the `url` takes variables as parameters using the `:variable` syntax. Variables specified in the `url` are required in each post's metadata. URLs with a trailing `/` will generate posts as index.html files inside of the URL's folder.
 
@@ -118,48 +134,22 @@ Parsed posts are cached in the `.grunt/grunt-pages` folder  based on the `lastMo
 ### Options
 
 #### pageSrc
-Type: `String`
+Type: `string`
 
-The folder where the ejs or jade source pages of your website are located. These pages have access to each post's `content` and metadata properties via a `posts` array. Additionally, pages have access to their own filename(without extension) via the `currentPage` variable to optionally display it differently when linking to pages. All of the files in this folder are generated in the `dest` folder maintaining the same relative path from `options.pageSrc`.
+The folder where the jade, EJS, or Handlebars source pages of your website are located. These pages have access to each post's `content` and metadata properties via a `posts` array. Additionally, pages have access to their own filename(without extension) via the `currentPage` variable to optionally display it differently when linking to pages. All of the files in this folder are generated in the `dest` folder maintaining the same relative path from `options.pageSrc`.
 
 #### data
-Type: `Object || String`
+Type: `object || string`
 
 A JavaScript object or the location of a JSON file which is passed as data to templates. This option is primarily used to specify config that is shared across all pages. It is available in page and post templates via the `data` object.
 
-#### sortFunction
-Type: `Function`
+#### markedOptions
+Type: `function || object`
 
-Default: Sort by `date` descending
-
-```js
-function (a, b) {
-  return b.date - a.date;
-}
-```
-
-A compare function used by [Array.sort](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort) to sort posts.
-
-#### formatPostUrl
-Type: `Function`
-
-Default:
-```js
-function (url) {
-  return url
-    .toLowerCase() // change everything to lowercase
-    .replace(/^\s+|\s+$/g, '') // trim leading and trailing spaces
-    .replace(/[_|\s|\.]+/g, '-') // change all spaces, periods and underscores to a hyphen
-    .replace(/[^a-z\u0400-\u04FF0-9-]+/g, '') // remove all non-cyrillic, non-numeric characters except the hyphen
-    .replace(/[-]+/g, '-') // replace multiple instances of the hyphen with a single instance
-    .replace(/^-+|-+$/g, ''); // trim leading and trailing hyphens
-}
-```
-
-A function that takes a `url` as a parameter and returns a formatted URL string. This is primarily used to remove special characters and replace whitespace.
+You can configure how [marked](https://github.com/chjj/marked) parses your markdown by overriding options here. Check out the [marked options](https://github.com/chjj/marked#options-1) to see what you can alter. When `options.markedOptions` is implemented as a function, it receives `marked` as an argument so you can instantiate `marked.Renderer` and override particular properties.
 
 #### rss
-Type: `Object`
+Type: `object`
 
 An object containing config for RSS feed generation.
 
@@ -171,7 +161,6 @@ pages: {
   options: {
     pageSrc: 'src/pages',
     rss: {
-      author: 'Chris Wren',
       title: 'Chris Wren\'s Blog',
       description: 'A blog about code.',
       url: 'http://chrisawren.com'
@@ -186,38 +175,42 @@ pages: {
 }
 ```
 
+#### Required RSS properties
+
 ##### rss.url
-Type: `String`
+Type: `string`
 
 The URL of your site.
 
-##### rss.author
-Type: `String`
-
-The feed owner. Also used as `managingEditor` and `webMaster` if those options are not specified.
-
 ##### rss.title
-Type: `String`
+Type: `string`
 
 The title of the feed.
 
+##### rss.description
+Type: `string`
+
+Short description of the feed.
+
+#### Optional RSS properties
+
 ##### rss.numPosts
-Type: `Number` Default: `10`
+Type: `number` Default: `10`
 
 Number of posts to output in the RSS feed. This is used to avoid hitting a max file size limit.
 
-##### rss.description
-Type: `String`
+##### rss.author
+Type: `string`
 
-Optional. Short description of the feed.
+The feed owner. Also used as `managingEditor` and `webMaster` if those options are not specified.
 
 ##### rss.path
-Type: `String`
+Type: `string`
 
-Optional. The path of the file to store the RSS XML in. This is specific to grunt-pages and is not part of dylang/node-rss.
+The path of the file to store the RSS XML in. This is specific to grunt-pages and is not part of dylang/node-rss.
 
 #### pagination
-Type: `Object || Array`
+Type: `object || array`
 
 Object or an array of objects containing config for pagination. This option generates paginated list pages which each contain a specified group of posts.
 
@@ -243,32 +236,32 @@ pages: {
 This config will generate paginated list pages by grouping the specified number of posts per page and using the default url scheme specified in the [pagination.url](#paginationurl) parameter.
 
 ##### pagination.postsPerPage
-Type: `Number`
+Type: `number`
 
 The number of posts each list page will contain.
 
 ##### pagination.listPage
-Type: `String`
+Type: `string`
 
 The location of the layout template which is used for each list page. This page will not be rendered as a regular page if `options.pageSrc` is specified. Instead it will be rendered as the root paginated list page with the first post group instead of all the posts. [Here](https://github.com/CabinJS/grunt-pages/blob/master/test/fixtures/integration/input/target2/pages/blog/index.jade) is a sample `options.pagination.listPage` template. This template has access to the following variables:
 
 ###### posts
-Type: `Array` of `Object`s
+Type: `array` of `object`s
 
 An array of post objects assigned to this page which each contain the post `content` and other metadata properties of the post.
 
 ###### pages
-Type: `Array` of `Object`s
+Type: `array` of `object`s
 
 An array of page objects which each contain a `url` and `id` property.
 
 ###### currentIndex
-Type: `Number`
+Type: `number`
 
 A reference to the index of the list page currently being rendered. This can be used to display the current page differently than the rest of the pages in a list, or to display links to the surrounding pages based on their position relative to the `currentIndex`.
 
 ##### pagination.url
-Type: `String` Default: `pages/:id/`
+Type: `string` Default: `pages/:id/`
 
 The location of the generated list pages relative to the `options.pagination.listPage`. You can override this property to have a custom url scheme for list pages. You **must** have a `:id` variable in your url scheme which will be replaced by the page's id.
 
@@ -277,7 +270,7 @@ The location of the generated list pages relative to the `options.pagination.lis
 To paginate in a custom manor, you can use the following parameter:
 
 ##### pagination.getPostGroups
-Type: `Function`
+Type: `function`
 
 Default: `Group by options.pagination.postsPerPage`
 
@@ -368,12 +361,49 @@ pages: {
 }
 ```
 
+#### sortFunction
+Type: `function`
+
+Default: Sort by `date` descending
+
+```js
+function (a, b) {
+  return b.date - a.date;
+}
+```
+
+A compare function used by [Array.sort](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort) to sort posts.
+
+#### formatPostUrl
+Type: `function`
+
+Default:
+```js
+function (url) {
+  return url
+    .toLowerCase() // change everything to lowercase
+    .replace(/^\s+|\s+$/g, '') // trim leading and trailing spaces
+    .replace(/[_|\s|\.]+/g, '-') // change all spaces, periods and underscores to a hyphen
+    .replace(/[^a-z\u0400-\u04FF0-9-]+/g, '') // remove all non-cyrillic, non-numeric characters except the hyphen
+    .replace(/[-]+/g, '-') // replace multiple instances of the hyphen with a single instance
+    .replace(/^-+|-+$/g, ''); // trim leading and trailing hyphens
+}
+```
+
+A function that takes a `url` as a parameter and returns a formatted URL string. This is primarily used to remove special characters and replace whitespace.
+
 #### templateEngine
-Type: `String`
+Type: `string`
 
 The file extension of the template engine to be used. This option filters template files in the `options.pageSrc` folder when developing a grunt-pages configuration for multiple template engines.
 
 # Changelog
+
+**0.11.0** - Fixed required RSS properties, now correctly matching the [RSS spec](http://cyber.law.harvard.edu/rss/rss.html), thanks to [@rogeriopvl](https://github.com/rogeriopvl). Added Handlebars support with partials thanks to [@thomasboyt](https://github.com/thomasboyt). Updated to marked ~0.3.0 now supporting [`options.markedOptions`](#markedoptions) to configure any [marked options](https://github.com/chjj/marked#options-1) that you desire.
+
+**Breaking changes:**
+- `options.rss.description` is now required, and `options.rss.author` is not.
+- Updated to jade 1.0, check [here](https://github.com/visionmedia/jade/blob/master/History.md#100--2013-12-22) for the changelog.
 
 **0.10.1** - [`url`](#url) can now be specified as a function to allow for foreign language post titles and to support legacy URLs for those migrating to grunt-pages from another static site tool.
 
