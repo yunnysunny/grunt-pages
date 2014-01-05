@@ -483,7 +483,7 @@ The file extension of the template engine to be used. This option filters templa
 
 **0.2.5** - Fixed metadata parsing bug, added `formatPostUrl` option & added `pagination.url` option.
 
-**0.2.4** - Added `sortfunction` option & allowed for `data` option to take an object as a parameter.
+**0.2.4** - Added `sortFunction` option & allowed for `data` option to take an object as a parameter.
 
 **0.2.3** - Ignored dotfiles, added error reporting for incorrect data JSON files, and added new header anchor link format.
 
