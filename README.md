@@ -2,7 +2,7 @@
 > Grunt task to create pages using markdown and templates
 
 [![NPM version](https://badge.fury.io/js/grunt-pages.png)](http://badge.fury.io/js/grunt-pages)
-[![Dependency Status](https://gemnasium.com/CabinJS/grunt-pages.png)](https://gemnasium.com/CabinJS/grunt-pages)
+[![Dependency Status](https://david-dm.org/CabinJS/grunt-pages.png)](https://david-dm.org/CabinJS/grunt-pages)
 [![Travis Status](https://travis-ci.org/CabinJS/grunt-pages.png?branch=master)](https://travis-ci.org/CabinJS/grunt-pages)
 
 ## Prerequisites
