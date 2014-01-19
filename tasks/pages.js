@@ -575,6 +575,7 @@ module.exports = function (grunt) {
                            path.normalize(abspath).slice(path.normalize(rootdir).length + 1).replace(path.extname(abspath), '.html'));
 
         templateData.currentPage = path.basename(abspath, path.extname(abspath));
+        templateData.currentPagePath = path.relative(options.pageSrc, abspath);
         grunt.log.debug(JSON.stringify(lib.reducePostContent(templateData), null, '  '));
         try {
           grunt.file.write(dest, fn(templateData));
