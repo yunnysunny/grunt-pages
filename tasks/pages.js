@@ -93,12 +93,14 @@ module.exports = function (grunt) {
     // Get the content and metadata of unmodified posts so that they don't have to be parsed
     // if they haven't been modified
     var unmodifiedPosts = [];
-    var cacheFile = path.normalize(process.cwd() + '/.grunt/grunt-pages/' + this.target + '-post-cache.json');
-    if (fs.existsSync(cacheFile)) {
-      unmodifiedPosts = lib.getUnmodifiedPosts(JSON.parse(fs.readFileSync(cacheFile)).posts);
-      var unmodifiedPostPaths = unmodifiedPosts.map(function (post) {
-        return post.sourcePath;
-      });
+    if (!grunt.option('no-cache')) {
+      var cacheFile = path.normalize(process.cwd() + '/.grunt/grunt-pages/' + this.target + '-post-cache.json');
+      if (fs.existsSync(cacheFile)) {
+        unmodifiedPosts = lib.getUnmodifiedPosts(JSON.parse(fs.readFileSync(cacheFile)).posts);
+        var unmodifiedPostPaths = unmodifiedPosts.map(function (post) {
+          return post.sourcePath;
+        });
+      }
     }
 
     // Don't include draft posts or dotfiles when counting the number of posts
@@ -417,7 +419,9 @@ module.exports = function (grunt) {
       fs.mkdirSync(path.dirname(cacheFile), '0777', true);
     }
 
-    fs.writeFileSync(cacheFile, JSON.stringify(cachedPosts));
+    if (!grunt.option('no-cache')) {
+      fs.writeFileSync(cacheFile, JSON.stringify(cachedPosts));
+    }
 
     if (grunt.option('bench')) {
       console.log('Task'.yellow + ' took ' + (new Date().getTime() - start) / 1000 + ' seconds.');
