@@ -367,16 +367,6 @@ module.exports = function (grunt) {
 
     var cachedPosts = _.cloneDeep(templateData);
 
-    // Remove data that will not be passed to templates for rendering
-    templateData.posts.forEach(function (post) {
-
-      // Remove the lastModified attribute as it only used for caching
-      delete post.lastModified;
-
-      // Remove the source path from the post as it is only used for caching and error logging in getPostDest
-      delete post.sourcePath;
-    });
-
     // Record how long it takes to generate posts
     var postStart = new Date().getTime();
 
