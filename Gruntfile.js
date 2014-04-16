@@ -1,3 +1,4 @@
+var pygmentize = require('pygmentize-bundled');
 module.exports = function (grunt) {
   // load all grunt tasks
   require('matchdep').filterDev('grunt-*').forEach(grunt.loadNpmTasks);
@@ -136,7 +137,7 @@ module.exports = function (grunt) {
         }
       },
 
-      // Tests Handlebars template rendering
+      // Tests Handlebars template rendering and custom marked options
       target4: {
         src: 'test/fixtures/integration/input/posts/',
         dest: 'dest4',
@@ -144,17 +145,23 @@ module.exports = function (grunt) {
         url: 'blog/posts/:title/',
         options: {
           partials: 'test/fixtures/integration/input/handlebars/partials/**/*.handlebars',
-
           // Test overriding marked options
           markedOptions: function (marked) {
+            var codeBlockNum = 0;
             return {
-              renderer: new marked.Renderer()
+              renderer: new marked.Renderer(),
+              highlight: function (code, lang, callback) {
+                // Use [pygments](http://pygments.org/) for syntax highlighting
+                pygmentize({ lang: lang, format: 'html' }, code, function (err, result) {
+                  callback(err, '<span>' + codeBlockNum + '</span>' + result.toString());
+                  codeBlockNum++;
+                });
+              }
             };
           }
         }
       }
     },
-
     mdlint: ['README.md'],
     clean: {
       build: ['dest*'],
