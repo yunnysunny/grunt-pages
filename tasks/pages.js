@@ -81,6 +81,8 @@ module.exports = function (grunt) {
     // Task is asynchronous due to usage of pygments syntax highlighter written in python
     var done = this.async();
 
+    var cacheFile;
+
     // Create a reference to the the context object and task options
     // so that they are available to all library methods
     _this = this;
@@ -94,7 +96,7 @@ module.exports = function (grunt) {
     // if they haven't been modified
     var unmodifiedPosts = [];
     if (!grunt.option('no-cache')) {
-      var cacheFile = path.normalize(process.cwd() + '/.grunt/grunt-pages/' + this.target + '-post-cache.json');
+      cacheFile = path.normalize(process.cwd() + '/.grunt/grunt-pages/' + this.target + '-post-cache.json');
       if (fs.existsSync(cacheFile)) {
         unmodifiedPosts = lib.getUnmodifiedPosts(JSON.parse(fs.readFileSync(cacheFile)).posts);
         var unmodifiedPostPaths = unmodifiedPosts.map(function (post) {
@@ -200,8 +202,8 @@ module.exports = function (grunt) {
         opts.renderer[methodName] = function() {
           var newArgs = Array.prototype.slice.call(arguments);
           newArgs.push(post);
-          return method.apply({ options: opts }, newArgs)
-        }
+          return method.apply({ options: opts }, newArgs);
+        };
       });
 
       // Parse post using [marked](https://github.com/chjj/marked)
