@@ -178,8 +178,7 @@ module.exports = function (grunt) {
         customMarkedOptions = {};
       }
 
-      // Parse post using [marked](https://github.com/chjj/marked)
-      marked(post.markdown, _.extend({
+      var opts = _.extend(marked.defaults, {
         renderer: renderer,
         gfm: true,
         anchors: true,
@@ -194,7 +193,19 @@ module.exports = function (grunt) {
             callback(err, result.toString());
           });
         }
-      }, customMarkedOptions), function (err, content) {
+      }, customMarkedOptions);
+
+      // Extend methods by adding current post as an additional argument
+      _.each(opts.renderer, function(method, methodName) {
+        opts.renderer[methodName] = function() {
+          var newArgs = Array.prototype.slice.call(arguments);
+          newArgs.push(post);
+          return method.apply({ options: opts }, newArgs)
+        }
+      });
+
+      // Parse post using [marked](https://github.com/chjj/marked)
+      marked(post.markdown, opts, function (err, content) {
         if (err) throw err;
 
         // Replace markdown property with parsed content property
