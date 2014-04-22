@@ -190,6 +190,12 @@ describe('grunt-pages library', function () {
       });
     });
 
+    describe('if the post\'s url doesn\'t begin with a /', function () {
+      it('should add a / to the begining of the post dest', function () {
+        lib.getDestFromUrl('blog').should.eql('dest/blog.html');
+      });
+    });
+
     describe('if the post\'s url doesn\'t end with a /', function () {
       it('should return the post destinations by adding .html to the URL', function () {
         lib.getDestFromUrl('about').should.eql('dest/about.html');

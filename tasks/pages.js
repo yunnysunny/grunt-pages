@@ -497,7 +497,13 @@ module.exports = function (grunt) {
    * @param {String} url Url to determine the destination from
    */
   lib.getDestFromUrl = function (url) {
-    var dest = _this.data.dest + '/' + url;
+    var dest = _this.data.dest;
+
+    if (url.indexOf('/') !== 0) {
+      dest += '/';
+    }
+    dest += url;
+
 
     // Ensures that a .html is present at the end of the file's destination path
     if (dest.indexOf('.html') === -1) {
