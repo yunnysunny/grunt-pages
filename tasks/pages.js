@@ -366,6 +366,10 @@ module.exports = function (grunt) {
 
     lib.setTemplateEngine();
 
+    if (options.metadataValidator) {
+      options.metadataValidator(postCollection);
+    }
+
     if (options.data) {
       lib.setData(templateData);
     }
