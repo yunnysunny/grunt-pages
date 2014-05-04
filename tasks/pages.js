@@ -2,7 +2,7 @@
  * grunt-pages
  * https://github.com/CabinJS/grunt-pages
  *
- * Copyright (c) 2013 Chris Wren & contributors
+ * Copyright (c) 2014 Chris Wren & contributors
  * Licensed under the MIT license.
  */
 
@@ -138,8 +138,8 @@ module.exports = function (grunt) {
         return;
       }
 
-      // Don't include dotfiles
-      if (path.basename(postpath).indexOf('.') === 0) {
+      // Don't include dotfiles or files in dotfolders
+      if (path.basename(postpath).indexOf('.') === 0 || path.basename(postpath).indexOf('/.') !== -1) {
         return;
       }
 
