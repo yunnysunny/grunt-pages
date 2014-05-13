@@ -2,7 +2,7 @@
  * grunt-pages
  * https://github.com/CabinJS/grunt-pages
  *
- * Copyright (c) 2013 Chris Wren & contributors
+ * Copyright (c) 2014 Chris Wren & contributors
  * Licensed under the MIT license.
  */
 
@@ -81,6 +81,8 @@ module.exports = function (grunt) {
     // Task is asynchronous due to usage of pygments syntax highlighter written in python
     var done = this.async();
 
+    var cacheFile;
+
     // Create a reference to the the context object and task options
     // so that they are available to all library methods
     _this = this;
@@ -93,12 +95,14 @@ module.exports = function (grunt) {
     // Get the content and metadata of unmodified posts so that they don't have to be parsed
     // if they haven't been modified
     var unmodifiedPosts = [];
-    var cacheFile = path.normalize(process.cwd() + '/.grunt/grunt-pages/' + this.target + '-post-cache.json');
-    if (fs.existsSync(cacheFile)) {
-      unmodifiedPosts = lib.getUnmodifiedPosts(JSON.parse(fs.readFileSync(cacheFile)).posts);
-      var unmodifiedPostPaths = unmodifiedPosts.map(function (post) {
-        return post.sourcePath;
-      });
+    if (!grunt.option('no-cache')) {
+      cacheFile = path.normalize(process.cwd() + '/.grunt/grunt-pages/' + this.target + '-post-cache.json');
+      if (fs.existsSync(cacheFile)) {
+        unmodifiedPosts = lib.getUnmodifiedPosts(JSON.parse(fs.readFileSync(cacheFile)).posts);
+        var unmodifiedPostPaths = unmodifiedPosts.map(function (post) {
+          return post.sourcePath;
+        });
+      }
     }
 
     // Don't include draft posts or dotfiles when counting the number of posts
@@ -134,8 +138,8 @@ module.exports = function (grunt) {
         return;
       }
 
-      // Don't include dotfiles
-      if (path.basename(postpath).indexOf('.') === 0) {
+      // Don't include dotfiles or files in dotfolders
+      if (path.basename(postpath).indexOf('.') === 0 || path.basename(postpath).indexOf('/.') !== -1) {
         return;
       }
 
@@ -176,8 +180,7 @@ module.exports = function (grunt) {
         customMarkedOptions = {};
       }
 
-      // Parse post using [marked](https://github.com/chjj/marked)
-      marked(post.markdown, _.extend({
+      var opts = _.extend(marked.defaults, {
         renderer: renderer,
         gfm: true,
         anchors: true,
@@ -192,7 +195,19 @@ module.exports = function (grunt) {
             callback(err, result.toString());
           });
         }
-      }, customMarkedOptions), function (err, content) {
+      }, customMarkedOptions);
+
+      // Extend methods by adding current post as an additional argument
+      _.each(opts.renderer, function(method, methodName) {
+        opts.renderer[methodName] = function() {
+          var newArgs = Array.prototype.slice.call(arguments);
+          newArgs.push(post);
+          return method.apply({ options: opts }, newArgs);
+        };
+      });
+
+      // Parse post using [marked](https://github.com/chjj/marked)
+      marked(post.markdown, opts, function (err, content) {
         if (err) throw err;
 
         // Replace markdown property with parsed content property
@@ -351,6 +366,10 @@ module.exports = function (grunt) {
 
     lib.setTemplateEngine();
 
+    if (options.metadataValidator) {
+      options.metadataValidator(postCollection);
+    }
+
     if (options.data) {
       lib.setData(templateData);
     }
@@ -364,16 +383,6 @@ module.exports = function (grunt) {
     lib.sortPosts(postCollection);
 
     var cachedPosts = _.cloneDeep(templateData);
-
-    // Remove data that will not be passed to templates for rendering
-    templateData.posts.forEach(function (post) {
-
-      // Remove the lastModified attribute as it only used for caching
-      delete post.lastModified;
-
-      // Remove the source path from the post as it is only used for caching and error logging in getPostDest
-      delete post.sourcePath;
-    });
 
     // Record how long it takes to generate posts
     var postStart = new Date().getTime();
@@ -417,7 +426,9 @@ module.exports = function (grunt) {
       fs.mkdirSync(path.dirname(cacheFile), '0777', true);
     }
 
-    fs.writeFileSync(cacheFile, JSON.stringify(cachedPosts));
+    if (!grunt.option('no-cache')) {
+      fs.writeFileSync(cacheFile, JSON.stringify(cachedPosts));
+    }
 
     if (grunt.option('bench')) {
       console.log('Task'.yellow + ' took ' + (new Date().getTime() - start) / 1000 + ' seconds.');
@@ -490,7 +501,13 @@ module.exports = function (grunt) {
    * @param {String} url Url to determine the destination from
    */
   lib.getDestFromUrl = function (url) {
-    var dest = _this.data.dest + '/' + url;
+    var dest = _this.data.dest;
+
+    if (url.indexOf('/') !== 0) {
+      dest += '/';
+    }
+    dest += url;
+
 
     // Ensures that a .html is present at the end of the file's destination path
     if (dest.indexOf('.html') === -1) {

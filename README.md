@@ -392,6 +392,11 @@ function (url) {
 
 A function that takes a `url` as a parameter and returns a formatted URL string. This is primarily used to remove special characters and replace whitespace.
 
+#### metadataValidator
+Type: `function`
+
+A function that takes an array of posts as an argument and determines if the supplied metadata is valid for those posts. This is helpful in catching issues when metadata is forgotten or invalid like having two posts with the same `index` property when displaying posts in a list.
+
 #### templateEngine
 Type: `string`
 
