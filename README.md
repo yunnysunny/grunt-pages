@@ -131,6 +131,8 @@ pages: {
 
 Parsed posts are cached in the `.grunt/grunt-pages` folder  based on the `lastModified` time to improve the task run time.
 
+*Note: posts are not re-compiled when the grunt config changes, you can either run the task with the `--no-cache` flag or delete the `.grunt/grunt-pages` folder to force all posts to be re-built.*
+
 ### Options
 
 #### pageSrc
@@ -147,6 +149,8 @@ A JavaScript object or the location of a JSON file which is passed as data to te
 Type: `function || object`
 
 You can configure how [marked](https://github.com/chjj/marked) parses your markdown by overriding options here. Check out the [marked options](https://github.com/chjj/marked#options-1) to see what you can alter. When `options.markedOptions` is implemented as a function, it receives `marked` as an argument so you can instantiate `marked.Renderer` and override particular properties.
+
+*Note: all marked renderer methods are extened to have access to the current `post` as an extra argument.*
 
 #### rss
 Type: `object`
@@ -403,6 +407,8 @@ Type: `string`
 The file extension of the template engine to be used. This option filters template files in the `options.pageSrc` folder when developing a grunt-pages configuration for multiple template engines.
 
 # Changelog
+
+**0.11.1** - Fixed leading `/` issue for post URLs. Added `post.sourcePath` and `post.lastModified` to template data. Added current `post` as an extra argument to all marked renderer methods. Added `metadataValidator` option to ensure metadata is proper for all posts. Added `--no-cache` flag to invalidate caching when altering how posts are parsed.
 
 **0.11.0** - Fixed required RSS properties, now correctly matching the [RSS spec](http://cyber.law.harvard.edu/rss/rss.html), thanks to [@rogeriopvl](https://github.com/rogeriopvl). Added [Handlebars support with partials](https://github.com/CabinJS/grunt-pages#handlebars-partials) thanks to [@thomasboyt](https://github.com/thomasboyt). Updated to marked ~0.3.0 now supporting [`options.markedOptions`](#markedoptions) to configure any [marked options](https://github.com/chjj/marked#options-1) that you desire.
 
