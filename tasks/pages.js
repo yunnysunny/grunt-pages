@@ -189,7 +189,7 @@ module.exports = function (grunt) {
           // Use [pygments](http://pygments.org/) for syntax highlighting
           pygmentize({ lang: lang, format: 'html' }, code, function (err, result) {
             if (!result) {
-              grunt.fail.fatal('Syntax highlighting failed, make sure you have python installed.');
+              grunt.fail.fatal('Syntax highlighting failed, make sure the following code block is valid: ' + code);
             }
 
             callback(err, result.toString());
