@@ -399,7 +399,7 @@ A function that takes a `url` as a parameter and returns a formatted URL string.
 #### metadataValidator
 Type: `function`
 
-A function that takes an array of posts as an argument and determines if the supplied metadata is valid for those posts. This is helpful in catching issues when metadata is forgotten or invalid like having two posts with the same `index` property when displaying posts in a list.
+A function that takes an array of `posts` as the first argument and the `templateData` to be passed to posts as a second argument in order to determine if the supplied metadata is valid for the posts. This is helpful in catching issues when metadata is forgotten or invalid like having two posts with the same `index` property when displaying posts in a list. It can also be used to record information about posts and add new information to `templateData` for rendering in templates after posts have been processed.
 
 #### templateEngine
 Type: `string`
@@ -407,6 +407,8 @@ Type: `string`
 The file extension of the template engine to be used. This option filters template files in the `options.pageSrc` folder when developing a grunt-pages configuration for multiple template engines.
 
 # Changelog
+
+**0.11.2** - Add `templateData` argument to `metadataValidator` option.
 
 **0.11.1** - Fixed leading `/` issue for post URLs. Added `post.sourcePath` and `post.lastModified` to template data. Added current `post` as an extra argument to all marked renderer methods. Added `metadataValidator` option to ensure metadata is proper for all posts. Added `--no-cache` flag to invalidate caching when altering how posts are parsed.
 
