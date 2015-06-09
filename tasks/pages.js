@@ -17,6 +17,7 @@ var marked     = require('marked');
 var fs         = require('node-fs');
 var pygmentize = require('pygmentize-bundled');
 var RSS        = require('rss');
+var sitemap    = require('sitemap');
 
 var templateEngines = {
   ejs: {
@@ -421,6 +422,9 @@ module.exports = function (grunt) {
     if (options.rss) {
       lib.generateRSS(postCollection);
     }
+	if (options.sitemap) {
+		lib.generateSitemap(postCollection);
+	}
 
     if (!fs.existsSync(path.dirname(cacheFile))) {
       fs.mkdirSync(path.dirname(cacheFile), '0777', true);
@@ -795,6 +799,41 @@ module.exports = function (grunt) {
     grunt.file.write(dest, feed.xml());
 
     grunt.log.ok('Created '.green + 'RSS feed'.yellow + ' at ' + dest);
+  };
+
+  /**
+   * Writes sitemap XML based on the collection of posts
+   * @param  {Array} postCollection Collection of parsed posts with the content and metadata properties
+   */
+  lib.generateSitemap = function (postCollection) {
+    if (!options.sitemap.url) {
+      grunt.fail.fatal('options.sitemap.url is required');
+    }
+
+    var fileName = options.sitemap.path || 'sitemap.xml';
+    var dest     = path.join(_this.data.dest, fileName);
+
+    // Create a sitemap
+    var sitemapObj = sitemap.createSitemap({
+		hostname:options.sitemap.url,
+		cacheTime: options.sitemap.cacheTime > 0 ? options.sitemap.cacheTime : 600000
+	});
+
+    // Add posts to sitemap
+    postCollection.forEach(function (post) {
+      /* feed.item({
+        title:       post.title,
+        description: post.content,
+        url:         url.resolve(options.rss.url, post.url),
+        categories:  post.tags,
+        date:        post.date
+      }); */
+	  sitemapObj.add({url:url.resolve(options.rss.url, post.url),lastmod:post.date});
+    });
+
+    grunt.file.write(dest, sitemapObj.toString());
+
+    grunt.log.ok('Created '.green + 'sitemap'.yellow + ' at ' + dest);
   };
 
   /**

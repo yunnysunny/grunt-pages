@@ -179,6 +179,20 @@ pages: {
 }
 ```
 
+#### sitemap
+Type: `object`
+
+An object containing config for sitemap generation.
+
+##### sitemap.url
+Type: `string`
+
+The URL of your site.
+
+##### sitemap.cacheTime
+Type: `number` Default: `600000`
+Cache purge period,the module [sitemap](https://github.com/ekalinin/sitemap.js "") will cache the generated sitemap file till current time larger than the last cache time + sitemap.cacheTime.
+
 #### Required RSS properties
 
 ##### rss.url
