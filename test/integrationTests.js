@@ -2,7 +2,9 @@ var fs = require('fs');
 require('should');
 var exec = require('child_process').exec;
 var Q = require('q');
-
+function getFileContentWithoutEnter(path) {
+    return fs.readFileSync(path, 'utf8').replace(/\r/g,'');
+}
 describe('grunt-pages', function () {
 
   // Build test targets before running tests
@@ -29,8 +31,8 @@ describe('grunt-pages', function () {
   });
 
   it('should create posts with the compiled markdown source and metdata rendered by a template engine', function () {
-    fs.readFileSync('dest1/blog/posts/post-1/index.html', 'utf8').should.eql(fs.readFileSync('test/fixtures/integration/output/target1/blog/posts/post-1/index.html', 'utf8').replace(/<date>.*?<\/date>/g, '<date>' + new Date('5-12-2013') + '</date>'));
-    fs.readFileSync('dest1/blog/posts/post-2/index.html', 'utf8').should.eql(fs.readFileSync('test/fixtures/integration/output/target1/blog/posts/post-2/index.html', 'utf8').replace(/<date>.*?<\/date>/g, '<date>' + new Date(fs.statSync('test/fixtures/integration/input/posts/post2.md').mtime) + '</date>'));
+    getFileContentWithoutEnter('dest1/blog/posts/post-1/index.html', 'utf8').should.eql(getFileContentWithoutEnter('test/fixtures/integration/output/target1/blog/posts/post-1/index.html', 'utf8').replace(/<date>.*?<\/date>/g, '<date>' + new Date('5-12-2013') + '</date>'));
+    getFileContentWithoutEnter('dest1/blog/posts/post-2/index.html', 'utf8').should.eql(getFileContentWithoutEnter('test/fixtures/integration/output/target1/blog/posts/post-2/index.html', 'utf8').replace(/<date>.*?<\/date>/g, '<date>' + new Date(fs.statSync('test/fixtures/integration/input/posts/post2.md').mtime) + '</date>'));
   });
 
   it('should ignore _ prefixed draft posts', function () {
@@ -38,7 +40,7 @@ describe('grunt-pages', function () {
   });
 
   it('should cache posts after they have been parsed', function () {
-    var posts = JSON.parse(fs.readFileSync('.grunt/grunt-pages/target1-post-cache.json')).posts;
+    var posts = JSON.parse(getFileContentWithoutEnter('.grunt/grunt-pages/target1-post-cache.json')).posts;
     posts[0].sourcePath.should.equal('test/fixtures/integration/input/posts/post2.md');
     posts[1].sourcePath.should.equal('test/fixtures/integration/input/posts/post1.md');
   });
@@ -51,29 +53,29 @@ describe('grunt-pages', function () {
     });
 
     it('should create pages with the expected content by rendering the page templates with the posts\' data', function () {
-      fs.readFileSync('dest1/index.html', 'utf8').should.equal(fs.readFileSync('test/fixtures/integration/output/target1/index.html', 'utf8'));
-      fs.readFileSync('dest1/blog/index.html', 'utf8').should.equal(fs.readFileSync('test/fixtures/integration/output/target1/blog/index.html', 'utf8'));
+      getFileContentWithoutEnter('dest1/index.html', 'utf8').should.equal(getFileContentWithoutEnter('test/fixtures/integration/output/target1/index.html', 'utf8'));
+      getFileContentWithoutEnter('dest1/blog/index.html', 'utf8').should.equal(getFileContentWithoutEnter('test/fixtures/integration/output/target1/blog/index.html', 'utf8'));
     });
   });
 
   describe('when specifying `options.data` as an Object', function () {
 
     it('should pass the `options.data` Object to the pages for rendering', function () {
-      fs.readFileSync('dest2/test.html', 'utf8').should.include('data sourced from object');
+      getFileContentWithoutEnter('dest2/test.html', 'utf8').should.include('data sourced from object');
     });
   });
 
   describe('when specifying `options.data` as a String', function () {
 
     it('should read the JSON file specified by the String\'s pathname and pass it to the pages for rendering', function () {
-      fs.readFileSync('dest1/index.html', 'utf8').should.include('data sourced from file');
+      getFileContentWithoutEnter('dest1/index.html', 'utf8').should.include('data sourced from file');
     });
   });
 
   describe('when specifying `options.sortFunction`', function () {
 
     it('should sort posts according to the provided sort function', function () {
-      fs.readFileSync('dest2/blog/index.html', 'utf8').should.include('Post 1', 'Root list page should have older post first due to options.sortFunction.');
+      getFileContentWithoutEnter('dest2/blog/index.html', 'utf8').should.include('Post 1', 'Root list page should have older post first due to options.sortFunction.');
     });
   });
 
@@ -94,7 +96,8 @@ describe('grunt-pages', function () {
 
   function stripDate (str) {
     return str.replace(/<lastBuildDate>.*?<\/lastBuildDate>/, '')
-              .replace(/<pubDate>.*?<\/pubDate>/g, '');
+              .replace(/<pubDate>.*?<\/pubDate>/g, '')
+        .replace(/<copyright><!\[CDATA\[\d{4}\sThe\sAuthor\]\]><\/copyright>/,'<copyright><![CDATA[2014 The Author]]></copyright>');
   }
 
   describe('when specifying `options.rss` with the default required properties', function () {
@@ -105,7 +108,7 @@ describe('grunt-pages', function () {
         fileSuffix = '-ci';
       }
 
-      stripDate(fs.readFileSync('dest1/feed.xml', 'utf8')).should.equal(stripDate(fs.readFileSync('test/fixtures/integration/output/target1/feed' + fileSuffix + '.xml', 'utf8')));
+      stripDate(getFileContentWithoutEnter('dest1/feed.xml', 'utf8')).should.equal(stripDate(getFileContentWithoutEnter('test/fixtures/integration/output/target1/feed' + fileSuffix + '.xml', 'utf8')));
     });
   });
 
@@ -116,7 +119,7 @@ describe('grunt-pages', function () {
       if (process.env.NODE_ENV === 'ci') {
         fileSuffix = '-ci';
       }
-      stripDate(fs.readFileSync('dest2/rss/rss.xml', 'utf8')).should.equal(stripDate(fs.readFileSync('test/fixtures/integration/output/target2/rss/rss' + fileSuffix + '.xml', 'utf8')));
+      stripDate(getFileContentWithoutEnter('dest2/rss/rss.xml', 'utf8')).should.equal(stripDate(getFileContentWithoutEnter('test/fixtures/integration/output/target2/rss/rss' + fileSuffix + '.xml', 'utf8')));
     });
   });
 
@@ -133,11 +136,11 @@ describe('grunt-pages', function () {
       });
 
       it('should create the root list page with the expected post group based on `options.pagination.postsPerPage`', function () {
-        fs.readFileSync('dest3/index.html', 'utf8').should.equal(fs.readFileSync('test/fixtures/integration/output/target3/index.html', 'utf8'));
+        getFileContentWithoutEnter('dest3/index.html', 'utf8').should.equal(getFileContentWithoutEnter('test/fixtures/integration/output/target3/index.html', 'utf8'));
       });
 
       it('should create the non-root list page with the expected post group based on `options.pagination.postsPerPage`', function () {
-        fs.readFileSync('dest3/page/1/index.html', 'utf8').should.equal(fs.readFileSync('test/fixtures/integration/output/target3/page/1/index.html', 'utf8'));
+        getFileContentWithoutEnter('dest3/page/1/index.html', 'utf8').should.equal(getFileContentWithoutEnter('test/fixtures/integration/output/target3/page/1/index.html', 'utf8'));
       });
     });
 
@@ -169,12 +172,12 @@ describe('grunt-pages', function () {
       });
 
       it('should create list pages with custom post groups', function () {
-        fs.readFileSync('dest2/blog/page/javascript/index.html', 'utf8').should.equal(fs.readFileSync('test/fixtures/integration/output/target2/page/javascript/index.html', 'utf8'));
+        getFileContentWithoutEnter('dest2/blog/page/javascript/index.html', 'utf8').should.equal(getFileContentWithoutEnter('test/fixtures/integration/output/target2/page/javascript/index.html', 'utf8'));
       });
     });
   });
 
   it('should support rendering Handlebars templates', function() {
-    fs.readFileSync('dest4/blog/posts/post-1/index.html', 'utf8').should.equal(fs.readFileSync('test/fixtures/integration/output/target4/posts/post-1/index.html', 'utf8'));
+    getFileContentWithoutEnter('dest4/blog/posts/post-1/index.html', 'utf8').should.equal(getFileContentWithoutEnter('test/fixtures/integration/output/target4/posts/post-1/index.html', 'utf8'));
   });
 });

@@ -48,7 +48,7 @@ describe('grunt-pages library', function () {
 
       it('should return the post metadata and markdown if the metadata is a valid JavaScript Object', function () {
         lib.parsePostData(__dirname + '/fixtures/unit/posts/goodobjectmetadata.md').title.should.eql('Good Post :)');
-        lib.parsePostData(__dirname + '/fixtures/unit/posts/goodobjectmetadata.md').markdown.should.eql('\n\n# Hello');
+        lib.parsePostData(__dirname + '/fixtures/unit/posts/goodobjectmetadata.md').markdown.replace(/\r/g,'').should.eql('\n\n# Hello');
       });
 
     });
